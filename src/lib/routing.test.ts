@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getTenantCandidate, normalizeSegments } from "./routing";
+import {
+  getTenantCandidate,
+  normalizeSegments,
+  shouldBypassTenantRewrite,
+} from "./routing";
 
 describe("normalizeSegments", () => {
   it("maps empty segments to the home slug", () => {
@@ -39,5 +43,15 @@ describe("getTenantCandidate", () => {
     expect(getTenantCandidate("usa.wial.org")).toBe("usa");
     expect(getTenantCandidate("usa.localhost:3000")).toBe("usa");
     expect(getTenantCandidate("usa.lvh.me:3000")).toBe("usa");
+  });
+});
+
+describe("shouldBypassTenantRewrite", () => {
+  it("keeps auth and account routes on their public paths", () => {
+    expect(shouldBypassTenantRewrite("/login")).toBe(true);
+    expect(shouldBypassTenantRewrite("/register")).toBe(true);
+    expect(shouldBypassTenantRewrite("/auth/callback")).toBe(true);
+    expect(shouldBypassTenantRewrite("/account/profile")).toBe(true);
+    expect(shouldBypassTenantRewrite("/resources")).toBe(false);
   });
 });

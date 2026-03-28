@@ -2,51 +2,186 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { NavigationItem } from "@/lib/types";
+import { getAccountNavItems, getRoleLabel } from "@/lib/account";
+import type { NavigationItem, UserProfile } from "@/lib/types";
 
 type MobileNavProps = {
   items: NavigationItem[];
   chapterLabel?: string | null;
+  accountLink: {
+    href: string;
+    label: string;
+  };
+  viewer: UserProfile | null;
 };
 
-export function MobileNav({ items, chapterLabel }: MobileNavProps) {
+function CloseIcon() {
+  return (
+    <svg fill="none" viewBox="0 0 24 24">
+      <path
+        d="M6 6 18 18M18 6 6 18"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function DrawerLink({
+  href,
+  label,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <Link className="account-sidebar-link" href={href} onClick={onClick}>
+      <span className="account-sidebar-icon">
+        <span className="block h-2.5 w-2.5 rounded-full bg-white/70" />
+      </span>
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+}
+
+export function MobileNav({
+  items,
+  chapterLabel,
+  accountLink,
+  viewer,
+}: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const workspaceItems = viewer ? getAccountNavItems(viewer.role) : [];
 
   return (
-    <div className="md:hidden">
+    <div>
       <button
         aria-expanded={open}
         aria-label="Toggle navigation"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white/70 text-teal-deep"
-        onClick={() => setOpen((value) => !value)}
+        className="inline-flex h-11 items-center justify-center rounded-full border border-line bg-white/70 px-4 text-sm font-semibold text-teal-deep"
+        onClick={() => setOpen(true)}
         type="button"
       >
-        <span className="flex flex-col gap-1.5">
-          <span className="block h-0.5 w-5 rounded-full bg-current" />
-          <span className="block h-0.5 w-5 rounded-full bg-current" />
-          <span className="block h-0.5 w-5 rounded-full bg-current" />
-        </span>
+        Menu
       </button>
 
       {open ? (
-        <div className="site-panel absolute inset-x-4 top-[5.2rem] z-30 rounded-[1.6rem] p-5">
-          {chapterLabel ? (
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-              {chapterLabel}
-            </p>
-          ) : null}
-          <nav className="flex flex-col gap-2">
-            {items.map((item) => (
-              <Link
-                className="rounded-2xl px-4 py-3 font-semibold text-teal-deep transition hover:bg-accent-soft"
-                href={item.href}
-                key={item.href}
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+        <div className="account-sidebar-drawer">
+          <div className="account-sidebar-panel account-sidebar-drawer-panel">
+            <div className="account-sidebar-inner">
+              <div className="account-sidebar-header">
+                <div className="account-sidebar-brand">
+                  <div className="account-sidebar-mark" aria-hidden="true">
+                    W
+                  </div>
+                  <div className="min-w-0">
+                    <p className="account-sidebar-overline">Navigation</p>
+                    <h2 className="account-sidebar-title truncate">
+                      {chapterLabel ?? "Global WIAL"}
+                    </h2>
+                  </div>
+                </div>
+                <button
+                  aria-label="Close navigation"
+                  className="account-sidebar-close"
+                  onClick={() => setOpen(false)}
+                  type="button"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+
+              <div className="account-sidebar-pill">
+                {viewer ? getRoleLabel(viewer.role) : "Public visitor"}
+              </div>
+
+              <div className="account-sidebar-nav">
+                <section className="account-sidebar-section">
+                  <p className="account-sidebar-section-title">Explore</p>
+                  <nav className="flex flex-col gap-1.5">
+                    <DrawerLink href="/" label="Home" onClick={() => setOpen(false)} />
+                    {items.map((item) => (
+                      <DrawerLink
+                        href={item.href}
+                        key={item.href}
+                        label={item.label}
+                        onClick={() => setOpen(false)}
+                      />
+                    ))}
+                  </nav>
+                </section>
+
+                <div className="account-sidebar-divider" />
+
+                {viewer ? (
+                  <section className="account-sidebar-section">
+                    <p className="account-sidebar-section-title">Workspace</p>
+                    <nav className="flex flex-col gap-1.5">
+                      {workspaceItems.map((item) => (
+                        <DrawerLink
+                          href={item.href}
+                          key={item.href}
+                          label={item.label}
+                          onClick={() => setOpen(false)}
+                        />
+                      ))}
+                    </nav>
+                  </section>
+                ) : (
+                  <section className="account-sidebar-section">
+                    <p className="account-sidebar-section-title">Access</p>
+                    <div className="grid gap-3">
+                      <Link
+                        className="account-sidebar-signout"
+                        href="/login"
+                        onClick={() => setOpen(false)}
+                      >
+                        Sign in
+                      </Link>
+                      <Link
+                        className="account-sidebar-signout"
+                        href="/register"
+                        onClick={() => setOpen(false)}
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  </section>
+                )}
+              </div>
+
+              <div className="account-sidebar-footer">
+                {viewer ? (
+                  <>
+                    <Link
+                      className="account-sidebar-signout"
+                      href={accountLink.href}
+                      onClick={() => setOpen(false)}
+                    >
+                      {accountLink.label}
+                    </Link>
+                    <form action="/auth/sign-out" method="post">
+                      <button className="account-sidebar-signout" type="submit">
+                        Sign out
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div className="account-sidebar-note">
+                    <p className="account-sidebar-note-label">Public signup</p>
+                    <p className="account-sidebar-note-body">
+                      Registration creates a standard coach account. Elevated
+                      roles are still assigned by WIAL.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
     </div>

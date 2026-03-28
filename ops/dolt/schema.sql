@@ -34,3 +34,14 @@ create table if not exists seed_snapshots (
   artifact_path varchar(255),
   notes text
 );
+
+create table if not exists ui_navigation_snapshots (
+  id varchar(64) primary key,
+  role varchar(64),
+  item_label varchar(255),
+  href varchar(255),
+  sort_order int,
+  default_route varchar(255),
+  auth_mode varchar(64),
+  profile_fields text
+);

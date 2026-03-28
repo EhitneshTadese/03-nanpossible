@@ -14,6 +14,9 @@ const pages = JSON.parse(
 const assets = JSON.parse(
   fs.readFileSync(path.join(contentDir, "assets.json"), "utf8"),
 );
+const accountNavigation = JSON.parse(
+  fs.readFileSync(path.join(contentDir, "account-navigation.json"), "utf8"),
+);
 const migrationRuns = JSON.parse(
   fs.readFileSync(path.join(contentDir, "migration-runs.json"), "utf8"),
 );
@@ -258,7 +261,27 @@ const snapshotRows = [
     artifact_path: "src/content/pages.json",
     notes: "Canonical migration source used by both the app fallback data and the generated SQL seed.",
   },
+  {
+    id: "snapshot-003",
+    created_at: migrationRuns[0]?.executedAt ?? new Date().toISOString(),
+    artifact_path: "src/content/account-navigation.json",
+    notes: "Role-based sidebar configuration, auth mode, and self-service profile fields for the account workspace.",
+  },
 ];
+
+const uiNavigationRows = Object.entries(accountNavigation.roles).flatMap(
+  ([role, roleConfig]) =>
+    roleConfig.items.map((item, index) => ({
+      id: `${role}-${String(index + 1).padStart(2, "0")}`,
+      role,
+      item_label: item.label,
+      href: item.href,
+      sort_order: index + 1,
+      default_route: roleConfig.defaultHref,
+      auth_mode: accountNavigation.authMode,
+      profile_fields: accountNavigation.profileFields.join("|"),
+    })),
+);
 
 fs.writeFileSync(
   path.join(outputDir, "source_pages.csv"),
@@ -275,4 +298,8 @@ fs.writeFileSync(
 fs.writeFileSync(
   path.join(outputDir, "seed_snapshots.csv"),
   toCsv(snapshotRows),
+);
+fs.writeFileSync(
+  path.join(outputDir, "ui_navigation_snapshots.csv"),
+  toCsv(uiNavigationRows),
 );

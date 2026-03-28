@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getTenantCandidate, shouldBypassTenantRewrite } from "@/lib/routing";
+import { getTenantCandidate } from "@/lib/routing";
 
 const STATIC_FILE_PATTERN = /\.(.*)$/;
 
@@ -16,7 +16,6 @@ export function proxy(request: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    shouldBypassTenantRewrite(pathname) ||
     pathname.startsWith("/sites") ||
     pathname === "/favicon.ico" ||
     pathname === "/robots.txt" ||

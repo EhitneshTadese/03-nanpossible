@@ -68,4 +68,71 @@ select public.assert_true(
   'chapter admin should be able to touch rows inside their own chapter'
 );
 
+reset role;
+set local session_replication_role = replica;
+
+insert into public.users (
+  id,
+  email,
+  role,
+  chapter_id,
+  name,
+  phone,
+  location,
+  bio,
+  photo_url
+)
+values (
+  '66666666-6666-4666-8666-666666666666',
+  'coach@wial.org',
+  'coach',
+  '22222222-2222-4222-8222-222222222222',
+  'Coach Profile',
+  null,
+  null,
+  null,
+  null
+);
+
+set local session_replication_role = origin;
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"66666666-6666-4666-8666-666666666666","role":"authenticated","app_metadata":{"role":"coach","chapter_id":"22222222-2222-4222-8222-222222222222"}}',
+  true
+);
+
+with attempted_role_change as (
+  update public.users
+  set role = 'platform_admin'
+  where id = '66666666-6666-4666-8666-666666666666'
+  returning id
+)
+select public.assert_true(
+  not exists(select 1 from attempted_role_change),
+  'coach should not directly update privileged user fields'
+);
+
+select public.update_my_profile(
+  'Updated Coach',
+  '555-0100',
+  'Phoenix, AZ',
+  'Profile updated through the safe RPC',
+  'https://example.com/profile.png'
+);
+
+select public.assert_true(
+  exists(
+    select 1
+    from public.users
+    where id = '66666666-6666-4666-8666-666666666666'
+      and role = 'coach'
+      and phone = '555-0100'
+      and location = 'Phoenix, AZ'
+      and bio = 'Profile updated through the safe RPC'
+      and photo_url = 'https://example.com/profile.png'
+  ),
+  'update_my_profile should update safe profile fields without changing role'
+);
+
 rollback;

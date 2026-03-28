@@ -4,6 +4,7 @@ import "./globals.css";
 import { headers } from "next/headers";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getCurrentViewer } from "@/lib/auth";
 import { getLayoutSiteContext } from "@/lib/site-context";
 
 const fraunces = Fraunces({
@@ -36,7 +37,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headerStore = await headers();
-  const siteContext = await getLayoutSiteContext(headerStore);
+  const [siteContext, viewer] = await Promise.all([
+    getLayoutSiteContext(headerStore),
+    getCurrentViewer(),
+  ]);
 
   return (
     <html
@@ -46,7 +50,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full bg-background text-foreground">
         <div className="flex min-h-full flex-col">
-          <SiteHeader siteContext={siteContext} />
+          <SiteHeader siteContext={siteContext} viewer={viewer} />
           <main className="flex-1">{children}</main>
           <SiteFooter siteContext={siteContext} />
         </div>

@@ -1,0 +1,11 @@
+id,role,item_label,href,sort_order,default_route,auth_mode,profile_fields
+"platform_admin-01","platform_admin","Dashboard","/account/dashboard","1","/account/dashboard","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"platform_admin-02","platform_admin","Chapters and Chapter Heads","/account/chapters","2","/account/dashboard","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"platform_admin-03","platform_admin","Update account details","/account/profile","3","/account/dashboard","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"chapter_admin-01","chapter_admin","Change website content","/account/content","1","/account/content","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"chapter_admin-02","chapter_admin","Coaches","/account/coaches","2","/account/content","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"chapter_admin-03","chapter_admin","Chapter revenue dashboard","/account/revenue","3","/account/content","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"chapter_admin-04","chapter_admin","Update account details","/account/profile","4","/account/content","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"coach-01","coach","Certification courses","/account/certifications","1","/account/certifications","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"coach-02","coach","Payment dues","/account/dues","2","/account/certifications","password_login_public_registration","name|email|phone|location|bio|photo_url"
+"coach-03","coach","Update account details","/account/profile","3","/account/certifications","password_login_public_registration","name|email|phone|location|bio|photo_url"

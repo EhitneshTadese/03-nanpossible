@@ -66,3 +66,14 @@ export function getTenantCandidate(hostname: string, siteDomain = "wial.org") {
 
   return null;
 }
+
+export function shouldBypassTenantRewrite(pathname: string) {
+  return (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/auth" ||
+    pathname.startsWith("/auth/") ||
+    pathname === "/account" ||
+    pathname.startsWith("/account/")
+  );
+}

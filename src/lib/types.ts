@@ -5,9 +5,40 @@ export type CanonicalPageSlug =
   | "resources"
   | "contact";
 
+export type AppRole = "platform_admin" | "chapter_admin" | "coach";
+
 export type NavigationItem = {
   href: string;
   label: string;
+};
+
+export type AccountNavItem = {
+  href: string;
+  label: string;
+  roles: AppRole[];
+};
+
+export type AccountRoleConfig = {
+  defaultHref: string;
+  items: Array<Pick<AccountNavItem, "href" | "label">>;
+};
+
+export type AccountNavigationConfig = {
+  authMode: "password_login_public_registration";
+  profileFields: string[];
+  roles: Record<AppRole, AccountRoleConfig>;
+};
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  name: string;
+  role: AppRole;
+  chapterId: string | null;
+  phone: string | null;
+  location: string | null;
+  bio: string | null;
+  photoUrl: string | null;
 };
 
 export type ChapterRecord = {

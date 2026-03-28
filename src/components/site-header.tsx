@@ -2,14 +2,24 @@ import Link from "next/link";
 import { MobileNav } from "@/components/mobile-nav";
 import { WialLogo } from "@/components/wial-logo";
 import { navigationItems } from "@/lib/routing";
-import type { SiteContext } from "@/lib/types";
+import type { SiteContext, UserProfile } from "@/lib/types";
 
 type SiteHeaderProps = {
   siteContext: SiteContext;
+  viewer: UserProfile | null;
 };
 
-export function SiteHeader({ siteContext }: SiteHeaderProps) {
+export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
   const chapterLabel = siteContext.tenant?.name ?? null;
+  const accountLink = viewer
+    ? {
+        href: "/account",
+        label: "Open account",
+      }
+    : {
+        href: "/login",
+        label: "Sign in",
+      };
 
   return (
     <header className="sticky top-0 z-40 border-b border-transparent bg-background/88 py-4 backdrop-blur-xl">
@@ -40,7 +50,26 @@ export function SiteHeader({ siteContext }: SiteHeaderProps) {
                   : `${siteContext.tenant?.subdomain}.wial.org`}
               </p>
             </div>
-            <MobileNav chapterLabel={chapterLabel} items={navigationItems} />
+            {!viewer ? (
+              <Link
+                className="hidden text-sm font-semibold text-teal-deep/78 transition hover:text-teal-deep md:inline-flex"
+                href="/register"
+              >
+                Register
+              </Link>
+            ) : null}
+            <Link
+              className="button-link secondary hidden min-w-[9.5rem] md:inline-flex"
+              href={accountLink.href}
+            >
+              {accountLink.label}
+            </Link>
+            <MobileNav
+              accountLink={accountLink}
+              chapterLabel={chapterLabel}
+              items={navigationItems}
+              viewer={viewer}
+            />
           </div>
         </div>
       </div>

@@ -1,0 +1,31 @@
+{
+  "authMode": "password_login_public_registration",
+  "profileFields": ["name", "email", "phone", "location", "bio", "photo_url"],
+  "roles": {
+    "platform_admin": {
+      "defaultHref": "/account/dashboard",
+      "items": [
+        { "href": "/account/dashboard", "label": "Dashboard" },
+        { "href": "/account/chapters", "label": "Chapters and Chapter Heads" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "chapter_admin": {
+      "defaultHref": "/account/content",
+      "items": [
+        { "href": "/account/content", "label": "Change website content" },
+        { "href": "/account/coaches", "label": "Coaches" },
+        { "href": "/account/revenue", "label": "Chapter revenue dashboard" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "coach": {
+      "defaultHref": "/account/certifications",
+      "items": [
+        { "href": "/account/certifications", "label": "Certification courses" },
+        { "href": "/account/dues", "label": "Payment dues" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    }
+  }
+}
