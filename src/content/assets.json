@@ -1,0 +1,47 @@
+[
+  {
+    "id": "asset-001",
+    "pageSlug": "resources",
+    "title": "WIAL Action Learning Brochure",
+    "assetUrl": "https://wial.org/wp-content/uploads/WIAL-Action-Learning-Brochure-1.pdf",
+    "assetKind": "pdf",
+    "status": "imported",
+    "notes": "Safe on-domain brochure linked from the rebuilt resources page."
+  },
+  {
+    "id": "asset-002",
+    "pageSlug": "resources",
+    "title": "The Power of Action Learning",
+    "assetUrl": "https://wial.org/wp-content/uploads/The-power-of-Action-Learning-%E2%80%93-5-ways-to-create-a-better-world.pdf",
+    "assetKind": "pdf",
+    "status": "imported",
+    "notes": "Healthy downloadable PDF retained in the resource set."
+  },
+  {
+    "id": "asset-003",
+    "pageSlug": "resources",
+    "title": "Leadership Development at the New York Public Library",
+    "assetUrl": "https://wial.org/wp-content/uploads/Leadership-developent-at-the-NY-Library.pdf",
+    "assetKind": "pdf",
+    "status": "imported",
+    "notes": "Used as a stable case study on the new resources page."
+  },
+  {
+    "id": "asset-004",
+    "pageSlug": "about",
+    "title": "About WIAL page",
+    "assetUrl": "https://wial.org/about-us/",
+    "assetKind": "page",
+    "status": "imported",
+    "notes": "Healthy replacement for the compromised /about-wial/ route."
+  },
+  {
+    "id": "asset-005",
+    "pageSlug": "resources",
+    "title": "Legacy archive.org references",
+    "assetUrl": "https://wial.org/",
+    "assetKind": "legacy-link",
+    "status": "skipped",
+    "notes": "Archive-hosted references were excluded by design during the safe-first migration pass."
+  }
+]

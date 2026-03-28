@@ -1,0 +1,143 @@
+begin;
+
+insert into public.chapters (
+  id,
+  name,
+  subdomain,
+  locale,
+  status,
+  contact_email,
+  theme_json,
+  tagline
+)
+values
+(
+  '11111111-1111-4111-8111-111111111111',
+  'WIAL Global',
+  'global',
+  'en',
+  'active',
+  'info@wial.org',
+  '{"accent":"#c8642f","surface":"#fffaf2","tone":"global"}'::jsonb,
+  'The shared standard for Action Learning chapters worldwide.'
+),
+(
+  '22222222-2222-4222-8222-222222222222',
+  'WIAL USA',
+  'usa',
+  'en-US',
+  'active',
+  'usa@wial.org',
+  '{"accent":"#205c59","surface":"#fffaf2","tone":"chapter"}'::jsonb,
+  'A seeded chapter record used to exercise tenant routing before DNS cutover.'
+)
+on conflict (subdomain) do update
+set
+  name = excluded.name,
+  locale = excluded.locale,
+  status = excluded.status,
+  contact_email = excluded.contact_email,
+  theme_json = excluded.theme_json,
+  tagline = excluded.tagline;
+
+insert into public.content_pages (
+  id,
+  chapter_id,
+  slug,
+  title,
+  body_html,
+  body_richtext,
+  seo,
+  source_url,
+  published
+)
+values
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001',
+  null,
+  'home',
+  'World Institute for Action Learning',
+  '<header><p>WIAL is the world''s leading certifying body for Action Learning, unifying a global network of affiliates, coaches, and chapter sites around one shared standard.</p></header><section><h2>What this foundation makes possible</h2><div><article><h3>A single standard across all chapters</h3><p>The new platform preserves one global WIAL brand while letting chapters publish local content on top of the same layout and governance model.</p></article><article><h3>A better starting point for coach discovery</h3><p>The shared schema already includes the coaches, certifications, and payments tables needed for the later AI-powered directory and dues workflows.</p></article><article><h3>Safe migration over blind copy</h3><p>Current WordPress content was reviewed page by page. Broken archive links, unsafe endpoints, and compromised paths were excluded instead of copied forward.</p></article></div></section><section><h2>Action Learning with one global operating model</h2><p>Search-indexed content from the current WIAL homepage and About Us page describes WIAL as a rapidly growing international not-for-profit organization supported by affiliates around the world.</p><p>The current platform also emphasizes practical business impact: Action Learning is presented as a way to solve urgent challenges while developing leaders, teams, and organizations at the same time.</p><ul><li>Shared branding and navigation across global and chapter sites</li><li>Server-rendered content pages with zero page-level client JavaScript</li><li>Supabase-backed multi-tenant content with a Dolt audit trail for migration work</li></ul></section><blockquote><p>Action Learning will impact the way you work, think, and do business.</p><cite>Current WIAL homepage copy</cite></blockquote><section><h2>Need help planning a chapter rollout?</h2><p>Use the new shared contact route to coordinate certification questions, migration review, and next-step onboarding for chapter leads.</p><p><a href="/contact">Talk with WIAL</a></p></section>',
+  '{"heroIntro":"WIAL is the world''s leading certifying body for Action Learning, unifying a global network of affiliates, coaches, and chapter sites around one shared standard.","metrics":[{"label":"Chapter-ready architecture","value":"20+"},{"label":"Certification paths","value":"4"},{"label":"Global shell","value":"1"}],"sections":[{"type":"feature_grid","title":"What this foundation makes possible","items":[{"eyebrow":"Certification","title":"A single standard across all chapters","body":"The new platform preserves one global WIAL brand while letting chapters publish local content on top of the same layout and governance model."},{"eyebrow":"Directory","title":"A better starting point for coach discovery","body":"The shared schema already includes the coaches, certifications, and payments tables needed for the later AI-powered directory and dues workflows."},{"eyebrow":"Migration","title":"Safe migration over blind copy","body":"Current WordPress content was reviewed page by page. Broken archive links, unsafe endpoints, and compromised paths were excluded instead of copied forward."}]},{"type":"prose","title":"Action Learning with one global operating model","paragraphs":["Search-indexed content from the current WIAL homepage and About Us page describes WIAL as a rapidly growing international not-for-profit organization supported by affiliates around the world.","The current platform also emphasizes practical business impact: Action Learning is presented as a way to solve urgent challenges while developing leaders, teams, and organizations at the same time."],"bullets":["Shared branding and navigation across global and chapter sites","Server-rendered content pages with zero page-level client JavaScript","Supabase-backed multi-tenant content with a Dolt audit trail for migration work"]},{"type":"quote","quote":"Action Learning will impact the way you work, think, and do business.","attribution":"Current WIAL homepage copy"},{"type":"cta","title":"Need help planning a chapter rollout?","body":"Use the new shared contact route to coordinate certification questions, migration review, and next-step onboarding for chapter leads.","href":"/contact","label":"Talk with WIAL"}]}'::jsonb,
+  '{"description":"Shared global WIAL homepage content migrated into the new Next.js shell.","sourceUrl":"https://wial.org/","sourceStatus":"indexed-home-snippet","sourceNotes":"Direct HTTP fetches to wial.org reset from this environment, so homepage copy was reconstructed from indexed snippets and cross-checked against other healthy pages."}'::jsonb,
+  'https://wial.org/',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0002',
+  null,
+  'about',
+  'About WIAL',
+  '<header><p>The healthy About Us page on the current site describes WIAL as the world''s leading certifying body for Action Learning and a global organization helping clients solve urgent business challenges.</p></header><section><h2>What the current site says about WIAL</h2><p>The current About Us page states that WIAL provides training and certification programs internationally and is supported by affiliates around the world.</p><p>That same page also highlights client outcomes and points to large organizations and universities that have adopted the WIAL model in practice.</p><ul><li>Action Learning in Action</li><li>Optimizing the Power of Action Learning</li><li>Action Learning for Developing Leaders and Organizations: Principles, Strategies, and Cases</li></ul></section><section><h2>A compact history</h2><div><article><strong>1940s</strong><h3>Reg Revans develops Action Learning</h3><p>The current site credits Professor Reginald Revans with inventing and developing Action Learning in the United Kingdom while working with the Coal Board.</p></article><article><strong>1995</strong><h3>Michael Marquardt meets Reg Revans</h3><p>WIAL co-founder Michael Marquardt began the dialogue that later shaped the WIAL model of Action Learning with its six components and two ground rules.</p></article><article><strong>Today</strong><h3>A global certification body</h3><p>WIAL now uses a shared certification standard and a distributed affiliate network, which this platform foundation is designed to support.</p></article></div></section><section><h2>See how certification fits into the full model</h2><p>The certification page now lives inside the same shell, with the CALC, PALC, SALC, and MALC structure preserved from the current site.</p><p><a href="/certification">Review certification</a></p></section>',
+  '{"heroIntro":"The healthy About Us page on the current site describes WIAL as the world''s leading certifying body for Action Learning and a global organization helping clients solve urgent business challenges.","metrics":[{"label":"Origin era","value":"1940s"},{"label":"WIAL model roots","value":"1995"},{"label":"Classic books cited","value":"3"}],"sections":[{"type":"prose","title":"What the current site says about WIAL","paragraphs":["The current About Us page states that WIAL provides training and certification programs internationally and is supported by affiliates around the world.","That same page also highlights client outcomes and points to large organizations and universities that have adopted the WIAL model in practice."],"bullets":["Action Learning in Action","Optimizing the Power of Action Learning","Action Learning for Developing Leaders and Organizations: Principles, Strategies, and Cases"]},{"type":"timeline","title":"A compact history","items":[{"year":"1940s","title":"Reg Revans develops Action Learning","body":"The current site credits Professor Reginald Revans with inventing and developing Action Learning in the United Kingdom while working with the Coal Board."},{"year":"1995","title":"Michael Marquardt meets Reg Revans","body":"WIAL co-founder Michael Marquardt began the dialogue that later shaped the WIAL model of Action Learning with its six components and two ground rules."},{"year":"Today","title":"A global certification body","body":"WIAL now uses a shared certification standard and a distributed affiliate network, which this platform foundation is designed to support."}]},{"type":"cta","title":"See how certification fits into the full model","body":"The certification page now lives inside the same shell, with the CALC, PALC, SALC, and MALC structure preserved from the current site.","href":"/certification","label":"Review certification"}]}'::jsonb,
+  '{"description":"Healthy About Us content migrated from the current WIAL site.","sourceUrl":"https://wial.org/about-us/","sourceStatus":"healthy-live-page","sourceNotes":"Used the healthy About Us page instead of /about-wial/, which appeared compromised in indexed content."}'::jsonb,
+  'https://wial.org/about-us/',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0003',
+  null,
+  'certification',
+  'Certification Information',
+  '<header><p>The current certification page explains why organizations increasingly want trained WIAL-certified Action Learning coaches and lays out the four certification levels.</p></header><section><h2>Why get certified</h2><p>The current WIAL certification page states that a trained Action Learning coach is a key success factor for Action Learning programs and that professionals can enhance their value through WIAL certification.</p><p>It also notes that WIAL is an ICF-accredited training provider and that the CALC certification is an accredited ICF CCE program.</p></section><section><h2>Four levels of certification</h2><div><article><h3>Certified Action Learning Coach</h3><p>CALCs can coach Action Learning sessions and form the first formal certification step in the WIAL model.</p></article><article><h3>Professional Action Learning Coach</h3><p>PALCs are described on the current site as coaches who have proven their ability and have accumulated meaningful WIAL Action Learning experience.</p></article><article><h3>Senior Action Learning Coach</h3><p>SALCs are cleared to lead all WIAL programs and represent a higher level of experience and readiness.</p></article><article><h3>Master Action Learning Coach</h3><p>MALCs are framed as thought leaders in the Action Learning community and the highest level in the current hierarchy.</p></article></div></section><section><h2>Digital badges</h2><p>The current site explains that WIAL recognition can also be shared through a digital badge, which surfaces the date of award, expiration, competencies, and the work done to earn certification.</p><p>That badge workflow currently relies on Credly and is preserved here as an external system relationship rather than reimplemented during this phase.</p></section><section><h2>Need a certification conversation?</h2><p>The migrated contact route keeps certification questions inside the new shell even though the original JavaScript form embed was intentionally skipped.</p><p><a href="/contact">Ask about certification</a></p></section>',
+  '{"heroIntro":"The current certification page explains why organizations increasingly want trained WIAL-certified Action Learning coaches and lays out the four certification levels.","metrics":[{"label":"Certification levels","value":"4"},{"label":"ICF note","value":"CCE"},{"label":"Badge support","value":"Credly"}],"sections":[{"type":"prose","title":"Why get certified","paragraphs":["The current WIAL certification page states that a trained Action Learning coach is a key success factor for Action Learning programs and that professionals can enhance their value through WIAL certification.","It also notes that WIAL is an ICF-accredited training provider and that the CALC certification is an accredited ICF CCE program."]},{"type":"feature_grid","title":"Four levels of certification","items":[{"eyebrow":"CALC","title":"Certified Action Learning Coach","body":"CALCs can coach Action Learning sessions and form the first formal certification step in the WIAL model."},{"eyebrow":"PALC","title":"Professional Action Learning Coach","body":"PALCs are described on the current site as coaches who have proven their ability and have accumulated meaningful WIAL Action Learning experience."},{"eyebrow":"SALC","title":"Senior Action Learning Coach","body":"SALCs are cleared to lead all WIAL programs and represent a higher level of experience and readiness."},{"eyebrow":"MALC","title":"Master Action Learning Coach","body":"MALCs are framed as thought leaders in the Action Learning community and the highest level in the current hierarchy."}]},{"type":"prose","title":"Digital badges","paragraphs":["The current site explains that WIAL recognition can also be shared through a digital badge, which surfaces the date of award, expiration, competencies, and the work done to earn certification.","That badge workflow currently relies on Credly and is preserved here as an external system relationship rather than reimplemented during this phase."]},{"type":"cta","title":"Need a certification conversation?","body":"The migrated contact route keeps certification questions inside the new shell even though the original JavaScript form embed was intentionally skipped.","href":"/contact","label":"Ask about certification"}]}'::jsonb,
+  '{"description":"Certification structure and badge overview migrated from the current WIAL certification page.","sourceUrl":"https://wial.org/certification/","sourceStatus":"healthy-live-page","sourceNotes":"Text migrated from the indexed certification page. Form embed was omitted because it depends on legacy client-side behavior."}'::jsonb,
+  'https://wial.org/certification/',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0004',
+  null,
+  'resources',
+  'Resources & Library',
+  '<header><p>This first-pass resources page favors reliable, on-domain WIAL materials over legacy links that now point to archive pages or unhealthy destinations.</p></header><section><h2>Verified resources from the current domain</h2><p>The current site references WIAL Talk, a library, and downloadable material. This phase keeps the resource set tight and verifiable by prioritizing on-domain PDF assets that are still accessible.</p><div><article><strong>Brochure</strong><h3>WIAL Action Learning Brochure</h3><p>A concise overview of the WIAL approach, suitable for onboarding and introductory review.</p><p><a href="https://wial.org/wp-content/uploads/WIAL-Action-Learning-Brochure-1.pdf">Open brochure</a></p></article><article><strong>Article</strong><h3>The Power of Action Learning</h3><p>A current on-domain PDF about the impact of Action Learning and its relevance for creating a better world.</p><p><a href="https://wial.org/wp-content/uploads/The-power-of-Action-Learning-%E2%80%93-5-ways-to-create-a-better-world.pdf">Read article</a></p></article><article><strong>Case study</strong><h3>Leadership Development at the New York Public Library</h3><p>A WIAL-hosted PDF that can anchor the new library page with an applied example instead of broken legacy links.</p><p><a href="https://wial.org/wp-content/uploads/Leadership-developent-at-the-NY-Library.pdf">Read case study</a></p></article></div></section><section><h2>What was intentionally skipped</h2><p>The current environment revealed broken or archived links on the legacy site. Those destinations were not imported into this phase because they would weaken trust in the new foundation.</p><p>As more healthy source material is recovered through WordPress export or direct admin access, this page can expand without changing the public route structure.</p></section><section><h2>Need a missing library item migrated?</h2><p>Use the shared contact route to flag source files that should be restored in a later migration pass once a healthy origin is available.</p><p><a href="/contact">Request a migration review</a></p></section>',
+  '{"heroIntro":"This first-pass resources page favors reliable, on-domain WIAL materials over legacy links that now point to archive pages or unhealthy destinations.","metrics":[{"label":"Seeded resources","value":"3"},{"label":"Archive links imported","value":"0"},{"label":"Content strategy","value":"Safe-first"}],"sections":[{"type":"resource_list","title":"Verified resources from the current domain","description":"The current site references WIAL Talk, a library, and downloadable material. This phase keeps the resource set tight and verifiable by prioritizing on-domain PDF assets that are still accessible.","items":[{"kind":"Brochure","title":"WIAL Action Learning Brochure","body":"A concise overview of the WIAL approach, suitable for onboarding and introductory review.","href":"https://wial.org/wp-content/uploads/WIAL-Action-Learning-Brochure-1.pdf","label":"Open brochure"},{"kind":"Article","title":"The Power of Action Learning","body":"A current on-domain PDF about the impact of Action Learning and its relevance for creating a better world.","href":"https://wial.org/wp-content/uploads/The-power-of-Action-Learning-%E2%80%93-5-ways-to-create-a-better-world.pdf","label":"Read article"},{"kind":"Case study","title":"Leadership Development at the New York Public Library","body":"A WIAL-hosted PDF that can anchor the new library page with an applied example instead of broken legacy links.","href":"https://wial.org/wp-content/uploads/Leadership-developent-at-the-NY-Library.pdf","label":"Read case study"}]},{"type":"prose","title":"What was intentionally skipped","paragraphs":["The current environment revealed broken or archived links on the legacy site. Those destinations were not imported into this phase because they would weaken trust in the new foundation.","As more healthy source material is recovered through WordPress export or direct admin access, this page can expand without changing the public route structure."]},{"type":"cta","title":"Need a missing library item migrated?","body":"Use the shared contact route to flag source files that should be restored in a later migration pass once a healthy origin is available.","href":"/contact","label":"Request a migration review"}]}'::jsonb,
+  '{"description":"Safe-first WIAL resources page seeded with verified, on-domain downloadable materials.","sourceUrl":"https://wial.org/action-learning/library/","sourceStatus":"curated-safe-rebuild","sourceNotes":"Library page content was reconstructed from healthy on-domain assets because the legacy library path was not reliably fetchable from this environment."}'::jsonb,
+  'https://wial.org/action-learning/library/',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0005',
+  null,
+  'contact',
+  'Contact WIAL',
+  '<header><p>The current contact page invites visitors to reach out with questions about WIAL, Action Learning, events, and certification. The legacy JavaScript form was replaced with direct contact details in this first pass.</p></header><section><h2>How to reach WIAL now</h2><div><article><strong>Email</strong><h3>International contact</h3><p>info@wial.org</p></article><article><strong>Mailing address</strong><h3>Washington, DC</h3><p>P.O. Box 7601 #83791<br />Washington, DC 20044</p></article><article><strong>Topics</strong><h3>Questions this route covers</h3><p>Action Learning<br />Certification programs<br />Events<br />General WIAL inquiries</p></article></div></section><section><h2>Why the old form was not copied</h2><p>The contact page on the current site depends on client-side form behavior that does not survive a safe server-rendered migration by itself.</p><p>Rather than carrying forward a brittle form shell with no working backend, this phase keeps the contact route focused on trustworthy direct contact information.</p></section><section><h2>Looking for chapter-specific contact next?</h2><p>The tenant model already supports chapter-local overrides. The seeded USA tenant includes its own contact page to demonstrate how future chapters can inherit the shell and override only local content.</p><p><a href="/">Return to the site home</a></p></section>',
+  '{"heroIntro":"The current contact page invites visitors to reach out with questions about WIAL, Action Learning, events, and certification. The legacy JavaScript form was replaced with direct contact details in this first pass.","metrics":[{"label":"Mailbox","value":"1"},{"label":"Mailing base","value":"DC"},{"label":"Legacy form embeds","value":"0"}],"sections":[{"type":"contact_cards","title":"How to reach WIAL now","items":[{"eyebrow":"Email","title":"International contact","body":"info@wial.org","href":"mailto:info@wial.org","label":"Email WIAL"},{"eyebrow":"Mailing address","title":"Washington, DC","body":"P.O. Box 7601 #83791\nWashington, DC 20044"},{"eyebrow":"Topics","title":"Questions this route covers","body":"Action Learning\nCertification programs\nEvents\nGeneral WIAL inquiries"}]},{"type":"prose","title":"Why the old form was not copied","paragraphs":["The contact page on the current site depends on client-side form behavior that does not survive a safe server-rendered migration by itself.","Rather than carrying forward a brittle form shell with no working backend, this phase keeps the contact route focused on trustworthy direct contact information."]},{"type":"cta","title":"Looking for chapter-specific contact next?","body":"The tenant model already supports chapter-local overrides. The seeded USA tenant includes its own contact page to demonstrate how future chapters can inherit the shell and override only local content.","href":"/","label":"Return to the site home"}]}'::jsonb,
+  '{"description":"Contact details migrated from the current WIAL contact page.","sourceUrl":"https://wial.org/contact-us/","sourceStatus":"healthy-live-page","sourceNotes":"Mailing address and email were migrated. Legacy JavaScript form embed was intentionally omitted."}'::jsonb,
+  'https://wial.org/contact-us/',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0006',
+  '22222222-2222-4222-8222-222222222222',
+  'home',
+  'WIAL USA',
+  '<header><p>This seeded tenant demonstrates how a chapter can inherit the global shell while publishing local content on its own subdomain.</p></header><section><h2>What the USA tenant proves</h2><div><article><h3>Subdomain-aware rendering</h3><p>Requests for usa.wial.org are rewritten to a tenant-scoped internal route while the browser still sees clean chapter URLs.</p></article><article><h3>Global content stays available</h3><p>Pages without a chapter override inherit the global version automatically, which reduces duplication during chapter rollout.</p></article><article><h3>Tenant-bound data model</h3><p>Supabase tables, RLS policies, and public content queries all treat chapter_id as the isolation key.</p></article></div></section><section><h2>Review the tenant contact page</h2><p>The seeded chapter also includes a local contact override to show how chapter-specific information can sit inside the shared WIAL shell.</p><p><a href="/contact">Open USA contact</a></p></section>',
+  '{"heroIntro":"This seeded tenant demonstrates how a chapter can inherit the global shell while publishing local content on its own subdomain.","metrics":[{"label":"Tenant route","value":"usa"},{"label":"Shell ownership","value":"Global"},{"label":"Editable zones","value":"Local"}],"sections":[{"type":"feature_grid","title":"What the USA tenant proves","items":[{"eyebrow":"Routing","title":"Subdomain-aware rendering","body":"Requests for usa.wial.org are rewritten to a tenant-scoped internal route while the browser still sees clean chapter URLs."},{"eyebrow":"Fallbacks","title":"Global content stays available","body":"Pages without a chapter override inherit the global version automatically, which reduces duplication during chapter rollout."},{"eyebrow":"Isolation","title":"Tenant-bound data model","body":"Supabase tables, RLS policies, and public content queries all treat chapter_id as the isolation key."}]},{"type":"cta","title":"Review the tenant contact page","body":"The seeded chapter also includes a local contact override to show how chapter-specific information can sit inside the shared WIAL shell.","href":"/contact","label":"Open USA contact"}]}'::jsonb,
+  '{"description":"Seeded tenant homepage for WIAL USA used to demonstrate subdomain routing before DNS cutover.","sourceUrl":"seed://tenant/usa/home","sourceStatus":"seeded-demo-tenant","sourceNotes":"This page is intentionally synthetic so the platform can demonstrate multi-tenancy even before chapter migration begins."}'::jsonb,
+  'seed://tenant/usa/home',
+  true
+),
+(
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0007',
+  '22222222-2222-4222-8222-222222222222',
+  'contact',
+  'Contact WIAL USA',
+  '<header><p>Chapter-local contact information can override the global page without changing the shared layout, navigation, or footer enforcement.</p></header><section><h2>USA tenant contact details</h2><div><article><strong>Email</strong><h3>Chapter inbox</h3><p>usa@wial.org</p></article><article><strong>Use case</strong><h3>Pilot chapter support</h3><p>Seeded tenant content review<br />Subdomain routing validation<br />Future chapter onboarding</p></article></div></section>',
+  '{"heroIntro":"Chapter-local contact information can override the global page without changing the shared layout, navigation, or footer enforcement.","metrics":[{"label":"Contact pattern","value":"Override"},{"label":"Chapter email","value":"1"},{"label":"Shared shell","value":"Yes"}],"sections":[{"type":"contact_cards","title":"USA tenant contact details","items":[{"eyebrow":"Email","title":"Chapter inbox","body":"usa@wial.org","href":"mailto:usa@wial.org","label":"Email WIAL USA"},{"eyebrow":"Use case","title":"Pilot chapter support","body":"Seeded tenant content review\nSubdomain routing validation\nFuture chapter onboarding"}]}]}'::jsonb,
+  '{"description":"Seeded chapter contact override for the WIAL USA tenant.","sourceUrl":"seed://tenant/usa/contact","sourceStatus":"seeded-demo-tenant","sourceNotes":"Created to exercise tenant-scoped content lookup and fallback behavior."}'::jsonb,
+  'seed://tenant/usa/contact',
+  true
+)
+on conflict (id) do update
+set
+  chapter_id = excluded.chapter_id,
+  slug = excluded.slug,
+  title = excluded.title,
+  body_html = excluded.body_html,
+  body_richtext = excluded.body_richtext,
+  seo = excluded.seo,
+  source_url = excluded.source_url,
+  published = excluded.published;
+
+commit;

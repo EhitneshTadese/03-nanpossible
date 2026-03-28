@@ -1,0 +1,6 @@
+id,page_slug,title,asset_url,asset_kind,status,notes
+"asset-001","resources","WIAL Action Learning Brochure","https://wial.org/wp-content/uploads/WIAL-Action-Learning-Brochure-1.pdf","pdf","imported","Safe on-domain brochure linked from the rebuilt resources page."
+"asset-002","resources","The Power of Action Learning","https://wial.org/wp-content/uploads/The-power-of-Action-Learning-%E2%80%93-5-ways-to-create-a-better-world.pdf","pdf","imported","Healthy downloadable PDF retained in the resource set."
+"asset-003","resources","Leadership Development at the New York Public Library","https://wial.org/wp-content/uploads/Leadership-developent-at-the-NY-Library.pdf","pdf","imported","Used as a stable case study on the new resources page."
+"asset-004","about","About WIAL page","https://wial.org/about-us/","page","imported","Healthy replacement for the compromised /about-wial/ route."
+"asset-005","resources","Legacy archive.org references","https://wial.org/","legacy-link","skipped","Archive-hosted references were excluded by design during the safe-first migration pass."

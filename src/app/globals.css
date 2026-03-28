@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4efe5;
+  --foreground: #173533;
+  --surface: rgba(255, 250, 242, 0.82);
+  --surface-strong: #fffaf2;
+  --line: rgba(23, 53, 51, 0.14);
+  --accent: #c8642f;
+  --accent-soft: #efe0cf;
+  --teal: #205c59;
+  --teal-deep: #163f3d;
+  --gold: #b88f45;
+  --shadow: 0 18px 48px rgba(22, 63, 61, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-fraunces);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(184, 143, 69, 0.14), transparent 26%),
+    radial-gradient(circle at top right, rgba(32, 92, 89, 0.16), transparent 24%),
+    linear-gradient(180deg, rgba(255, 250, 242, 0.72), rgba(244, 239, 229, 0.92));
+  color: var(--foreground);
+  font-family: var(--font-source-sans), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(200, 100, 47, 0.22);
+}
+
+.site-shell {
+  margin-inline: auto;
+  width: min(1180px, calc(100% - 2rem));
+}
+
+.site-panel {
+  backdrop-filter: blur(20px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.page-frame {
+  padding-block: 3.5rem 5rem;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(23, 53, 51, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.78);
+  padding: 0.45rem 0.85rem;
+  color: var(--teal);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+}
+
+.section-title {
+  font-family: var(--font-fraunces), serif;
+  font-size: clamp(1.65rem, 2vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.metric-card {
+  border: 1px solid rgba(23, 53, 51, 0.12);
+  background: rgba(255, 250, 242, 0.72);
+  padding: 1rem;
+}
+
+.metric-value {
+  font-family: var(--font-fraunces), serif;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.section-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.section-copy {
+  display: grid;
+  gap: 0.9rem;
+  color: rgba(23, 53, 51, 0.9);
+  line-height: 1.72;
+}
+
+.feature-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.feature-card {
+  border: 1px solid rgba(23, 53, 51, 0.1);
+  background: rgba(255, 250, 242, 0.78);
+  padding: 1.15rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.feature-card h3 {
+  font-family: var(--font-fraunces), serif;
+  font-size: 1.15rem;
+  line-height: 1.15;
+}
+
+.feature-card p,
+.feature-card li {
+  color: rgba(23, 53, 51, 0.88);
+  line-height: 1.6;
+}
+
+.section-list {
+  display: grid;
+  gap: 0.6rem;
+  padding-left: 1rem;
+}
+
+.section-list li {
+  padding-left: 0.2rem;
+}
+
+.quote-block {
+  border-left: 4px solid var(--accent);
+  background: rgba(239, 224, 207, 0.45);
+  padding: 1.35rem 1.5rem;
+}
+
+.quote-block p {
+  font-family: var(--font-fraunces), serif;
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 999px;
+  padding: 0.8rem 1.1rem;
+  font-weight: 700;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.button-link:hover {
+  transform: translateY(-1px);
+}
+
+.button-link.primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal-deep));
+  color: white;
+}
+
+.button-link.secondary {
+  background: rgba(255, 250, 242, 0.72);
+  border: 1px solid rgba(23, 53, 51, 0.12);
+  color: var(--teal-deep);
+}
+
+.shell-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(23, 53, 51, 0.12),
+    transparent
+  );
+}
+
+@media (min-width: 780px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    align-items: start;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 779px) {
+  .page-frame {
+    padding-block: 2.5rem 4rem;
+  }
+}
