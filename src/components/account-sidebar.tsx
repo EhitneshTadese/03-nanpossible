@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { AccountNavItem } from "@/lib/types";
 
 type AccountSidebarProps = {
@@ -321,6 +322,48 @@ export function AccountSidebar({
 }: AccountSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const canPortal = typeof window !== "undefined";
+
+  useEffect(() => {
+    if (!canPortal || !open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [canPortal, open]);
+
+  const drawer = open && canPortal
+    ? createPortal(
+        <div
+          className="account-sidebar-drawer lg:hidden"
+          onClick={() => setOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="account-sidebar-panel account-sidebar-drawer-panel"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Workspace navigation"
+          >
+            <SidebarContent
+              items={items}
+              onClose={() => setOpen(false)}
+              onNavigate={() => setOpen(false)}
+              pathname={pathname}
+              platformLabel={platformLabel}
+              roleLabel={roleLabel}
+            />
+          </div>
+        </div>,
+        document.body,
+      )
+    : null;
 
   return (
     <>
@@ -349,20 +392,7 @@ export function AccountSidebar({
         </button>
       </div>
 
-      {open ? (
-        <div className="account-sidebar-drawer lg:hidden">
-          <div className="account-sidebar-panel account-sidebar-drawer-panel">
-            <SidebarContent
-              items={items}
-              onClose={() => setOpen(false)}
-              onNavigate={() => setOpen(false)}
-              pathname={pathname}
-              platformLabel={platformLabel}
-              roleLabel={roleLabel}
-            />
-          </div>
-        </div>
-      ) : null}
+      {drawer}
     </>
   );
 }

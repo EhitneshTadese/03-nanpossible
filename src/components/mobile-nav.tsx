@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { getAccountNavItems, getRoleLabel } from "@/lib/account";
 import type { NavigationItem, UserProfile } from "@/lib/types";
 
@@ -55,23 +56,36 @@ export function MobileNav({
   viewer,
 }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const canPortal = typeof window !== "undefined";
   const workspaceItems = viewer ? getAccountNavItems(viewer.role) : [];
 
-  return (
-    <div>
-      <button
-        aria-expanded={open}
-        aria-label="Toggle navigation"
-        className="inline-flex h-11 items-center justify-center rounded-full border border-line bg-white/70 px-4 text-sm font-semibold text-teal-deep"
-        onClick={() => setOpen(true)}
-        type="button"
-      >
-        Menu
-      </button>
+  useEffect(() => {
+    if (!canPortal || !open) {
+      return;
+    }
 
-      {open ? (
-        <div className="account-sidebar-drawer">
-          <div className="account-sidebar-panel account-sidebar-drawer-panel">
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [canPortal, open]);
+
+  const drawer = open && canPortal
+    ? createPortal(
+        <div
+          className="account-sidebar-drawer"
+          onClick={() => setOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="account-sidebar-panel account-sidebar-drawer-panel"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+          >
             <div className="account-sidebar-inner">
               <div className="account-sidebar-header">
                 <div className="account-sidebar-brand">
@@ -182,8 +196,24 @@ export function MobileNav({
               </div>
             </div>
           </div>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+    : null;
+
+  return (
+    <div>
+      <button
+        aria-expanded={open}
+        aria-label="Toggle navigation"
+        className="inline-flex h-11 items-center justify-center rounded-full border border-line bg-white/70 px-4 text-sm font-semibold text-teal-deep"
+        onClick={() => setOpen(true)}
+        type="button"
+      >
+        Menu
+      </button>
+
+      {drawer}
     </div>
   );
 }
