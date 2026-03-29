@@ -36,7 +36,7 @@ function renderSection(section: ContentSection) {
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
                 {item.eyebrow ? (
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-green">
                     {item.eyebrow}
                   </p>
                 ) : null}
@@ -62,7 +62,7 @@ function renderSection(section: ContentSection) {
                 className="feature-card rounded-[1.5rem] md:grid md:grid-cols-[120px_1fr] md:items-start md:gap-6"
                 key={`${item.title}-${item.year ?? "present"}`}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green">
                   {item.year ?? "Now"}
                 </p>
                 <div className="mt-3 space-y-2 md:mt-0">
@@ -95,7 +95,7 @@ function renderSection(section: ContentSection) {
           <div className="grid gap-4 md:grid-cols-2">
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-green">
                   {item.kind}
                 </p>
                 <h3 className="mt-3">{item.title}</h3>
@@ -120,7 +120,7 @@ function renderSection(section: ContentSection) {
           <div className="grid gap-4 md:grid-cols-3">
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-green">
                   {item.eyebrow}
                 </p>
                 <h3 className="mt-3">{item.title}</h3>
@@ -187,7 +187,7 @@ function renderSection(section: ContentSection) {
     case "cta":
       return (
         <section
-          className="rounded-[1.9rem] border border-line bg-[linear-gradient(135deg,rgba(32,92,89,0.08),rgba(200,100,47,0.08))] p-6 md:p-8"
+          className="rounded-[1.9rem] border border-line bg-[linear-gradient(135deg,rgba(209,0,52,0.05),rgba(138,143,0,0.04))] p-6 md:p-8"
           key={section.title}
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
