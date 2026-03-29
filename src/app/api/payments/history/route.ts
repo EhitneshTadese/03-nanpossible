@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (user.role !== "chapter_admin") {
+  // Allow both coaches (to check their own payments) and chapter_admins (to see all payments)
+  if (user.role !== "coach" && user.role !== "chapter_admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
