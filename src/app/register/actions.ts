@@ -69,6 +69,7 @@ export async function registerPublicVisitorAction(formData: FormData) {
   });
 
   if (error) {
+    console.error("Supabase registration error:", error.message, error.status); // Log the specific error
     const normalizedMessage = error.message.toLowerCase();
 
     if (normalizedMessage.includes("already registered")) {

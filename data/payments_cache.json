@@ -1,0 +1,17 @@
+[
+  {
+    "id": "4162fb79-0068-44a0-82b8-f8a0d0fbbf34",
+    "stripeSessionId": "cs_test_a1rdjv68BIKLj7URrBsdh675FPiqJRr9bccMXYDsGVQe3cFoCp6J0UHxdx",
+    "dueId": "dues-003",
+    "userId": "2ebc2953-9e55-4603-b25a-f331fb015478",
+    "userName": "Chirag",
+    "userRole": "coach",
+    "chapterId": "",
+    "chapterName": "WIAL North America",
+    "amount": 50,
+    "currency": "USD",
+    "reason": "Event registration",
+    "status": "paid",
+    "paidAt": "2026-03-29T18:15:59.649Z"
+  }
+]
