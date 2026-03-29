@@ -103,7 +103,7 @@ export function ChapterProvisionForm() {
             type="text"
           />
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
-            Preview: {slugPreview}.wial.org
+            Preview: {slugPreview}.{process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "localhost:3000"}
           </span>
         </label>
 

@@ -35,13 +35,8 @@ const contentPageColumns = [
   "title",
   "published",
   "body_html",
-  "body_json",
   "body_richtext",
   "seo",
-  "is_global",
-  "language",
-  "sort_order",
-  "ai_generated",
 ].join(", ");
 
 function getEmptyBody(): ContentBody {
@@ -185,7 +180,6 @@ export async function listChapterPages(
         .from("content_pages")
         .select(contentPageColumns)
         .eq("chapter_id", chapterId)
-        .order("sort_order", { ascending: true })
         .order("title", { ascending: true });
 
       if (options.publishedOnly ?? true) {
@@ -219,7 +213,6 @@ export async function listChapterPagesForAdmin(chapterId: string) {
     .from("content_pages")
     .select(contentPageColumns)
     .eq("chapter_id", chapterId)
-    .order("sort_order", { ascending: true })
     .order("title", { ascending: true });
 
   return ((data ?? []) as unknown as ContentPageRow[]).map(mapPageRow);

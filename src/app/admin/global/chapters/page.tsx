@@ -77,7 +77,7 @@ export default async function GlobalChaptersPage({
                     </p>
                     <h3 className="text-xl font-semibold text-teal-deep">{chapter.name}</h3>
                     <p className="text-sm text-foreground/65">
-                      {chapter.subdomain}.wial.org
+                      {chapter.subdomain}.{process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "localhost:3000"}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 text-sm text-foreground/65">

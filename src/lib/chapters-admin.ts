@@ -85,13 +85,8 @@ function buildDefaultPages(
     title: page.slug === "about" ? `About ${chapterName}` : page.title,
     body_html:
       page.slug === "contact" ? buildContactHtml(contactEmail, contactPhone) : "",
-    body_json: null,
     body_richtext: {},
-    is_global: false,
-    language,
-    sort_order: page.sortOrder,
     published: false,
-    ai_generated: false,
     seo: {},
   }));
 }
@@ -137,7 +132,6 @@ export async function syncUserAccess(input: UserAccessInput) {
     email: input.email,
     role: input.role,
     chapter_id: input.chapterId,
-    assigned_chapters: assignedChapters,
     name: input.name ?? null,
   });
 
@@ -314,26 +308,50 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
     leadName = existingUser.name;
     leadRole = existingUser.role === "platform_admin" ? "platform_admin" : "chapter_admin";
   } else {
-    const inviteResult = await client.auth.admin.inviteUserByEmail(leadEmail, {
-      data: {
-        name: leadEmail.split("@")[0],
-      },
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/login`,
+    const generatedName = leadEmail.split("@")[0];
+    const createResult = await client.auth.admin.createUser({
+      email: leadEmail,
+      password: "wial2026!",
+      email_confirm: true,
+      user_metadata: { name: generatedName },
     });
 
-    if (inviteResult.error || !inviteResult.data.user) {
-      return {
-        ok: false,
-        error: "lead-invite-failed",
-        message: "WIAL could not invite the chapter lead.",
-      };
-    }
+    if (createResult.error) {
+      // User exists in auth but not in our users table — look them up
+      if (createResult.error.code === "email_exists") {
+        const { data: listData } = await client.auth.admin.listUsers();
+        const authUser = listData?.users?.find(
+          (u) => u.email?.toLowerCase() === leadEmail.toLowerCase(),
+        );
 
-    leadUserId = inviteResult.data.user.id;
-    leadName =
-      typeof inviteResult.data.user.user_metadata?.name === "string"
-        ? inviteResult.data.user.user_metadata.name
-        : leadEmail.split("@")[0];
+        if (authUser) {
+          leadUserId = authUser.id;
+          leadName =
+            typeof authUser.user_metadata?.name === "string"
+              ? authUser.user_metadata.name
+              : generatedName;
+        } else {
+          return {
+            ok: false,
+            error: "lead-invite-failed",
+            message: "A user with this email exists but could not be resolved.",
+          };
+        }
+      } else {
+        console.error("[provision] createUser failed:", createResult.error);
+        return {
+          ok: false,
+          error: "lead-invite-failed",
+          message: `Could not create chapter lead: ${createResult.error.message}`,
+        };
+      }
+    } else if (createResult.data.user) {
+      leadUserId = createResult.data.user.id;
+      leadName =
+        typeof createResult.data.user.user_metadata?.name === "string"
+          ? createResult.data.user.user_metadata.name
+          : generatedName;
+    }
   }
 
   const { data: chapter, error: chapterError } = await client
@@ -341,24 +359,20 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
     .insert({
       name,
       subdomain,
-      region,
-      country,
-      language,
-      lead_user_id: leadUserId,
+      locale: language,
       contact_email: contactEmail,
-      contact_phone: contactPhone || null,
-      description: description || null,
+      tagline: description || "",
       status: "active",
-      config: {},
     })
     .select("id")
     .single();
 
   if (chapterError || !chapter) {
+    console.error("[provision] chapter insert failed:", chapterError);
     return {
       ok: false,
       error: "chapter-create-failed",
-      message: "WIAL could not create the chapter record.",
+      message: `Could not create chapter record: ${chapterError?.message ?? "unknown error"}`,
     };
   }
 
@@ -372,11 +386,12 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
   const { error: pagesError } = await client.from("content_pages").insert(seededPages);
 
   if (pagesError) {
+    console.error("[provision] seed pages failed:", pagesError);
     await client.from("chapters").delete().eq("id", chapter.id);
     return {
       ok: false,
       error: "default-pages-failed",
-      message: "WIAL could not seed the default chapter pages.",
+      message: `WIAL could not seed the default chapter pages: ${pagesError.message}`,
     };
   }
 
@@ -389,7 +404,8 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
       chapterId: chapter.id,
       assignedChapters: [],
     });
-  } catch {
+  } catch (err) {
+    console.error("[provision] user sync failed:", err);
     return {
       ok: false,
       error: "lead-sync-failed",
@@ -404,7 +420,7 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
   return {
     ok: true,
     chapterId: chapter.id,
-    url: `https://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}`,
+    url: `${process.env.NEXT_PUBLIC_SITE_DOMAIN?.includes("localhost") ? "http" : "https"}://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}`,
     warning: emailResult.warning,
   };
 }

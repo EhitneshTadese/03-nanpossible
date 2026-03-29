@@ -207,22 +207,13 @@ export async function POST(request: Request) {
     .from("content_pages")
     .update({
       body_html: clean,
-      body_json: null,
-      ai_generated: true,
+      body_richtext: null,
       published: false,
     })
     .eq("chapter_id", chapterId)
     .eq("slug", pageSlug);
 
-  await client.from("ai_generation_logs").insert({
-    chapter_id: chapterId,
-    page_slug: pageSlug,
-    model: result.model,
-    prompt_tokens: result.usage.promptTokens,
-    completion_tokens: result.usage.completionTokens,
-    total_tokens: result.usage.totalTokens,
-    created_by: viewer.id,
-  });
+
 
   return NextResponse.json({
     html: clean,

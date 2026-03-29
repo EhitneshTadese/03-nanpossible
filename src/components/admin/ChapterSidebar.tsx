@@ -26,7 +26,7 @@ export function ChapterSidebar({ chapter }: ChapterSidebarProps) {
         {chapter.name}
       </h2>
       <p className="mt-2 text-sm uppercase tracking-[0.16em] text-foreground/45">
-        {chapter.subdomain}.wial.org
+        {chapter.subdomain}.{process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "localhost:3000"}
       </p>
 
       <nav className="mt-6 flex flex-col gap-2">

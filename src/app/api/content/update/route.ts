@@ -57,10 +57,9 @@ export async function POST(request: Request) {
   const { error } = await client
     .from("content_pages")
     .update({
-      body_json: body.body_json ?? null,
+      body_richtext: body.body_json ?? null,
       body_html: cleanHtml,
       published: Boolean(body.published),
-      ai_generated: false,
     })
     .eq("id", pageId);
 
