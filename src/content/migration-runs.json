@@ -1,0 +1,14 @@
+[
+  {
+    "id": "run-20260328-foundation",
+    "executedAt": "2026-03-28T18:00:00Z",
+    "importer": "codex",
+    "summary": "Initial Phase 1 foundation import for global pages, chapter seed content, Supabase seed artifacts, and Dolt tracking tables.",
+    "skippedItems": [
+      "Compromised /about-wial/ content",
+      "Broken archive.org links from the legacy WordPress site",
+      "Legacy JavaScript contact form embeds",
+      "Unreliable live image extraction from wial.org in the current environment"
+    ]
+  }
+]

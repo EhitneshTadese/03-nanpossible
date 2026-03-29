@@ -1,0 +1,51 @@
+{
+  "authMode": "password_login_public_visitor_progression",
+  "profileFields": ["name", "email", "phone", "location", "bio", "photo_url"],
+  "roles": {
+    "public_visitor": {
+      "defaultHref": "/account/register-coach",
+      "items": [
+        { "href": "/account/register-coach", "label": "Register as coach" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "platform_admin": {
+      "defaultHref": "/admin/global",
+      "items": [
+        { "href": "/admin/global", "label": "Global admin" },
+        { "href": "/admin/global/chapters", "label": "Chapters" },
+        { "href": "/admin/approvals", "label": "Coach approvals" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "chapter_admin": {
+      "defaultHref": "/admin/chapter",
+      "items": [
+        { "href": "/admin/chapter", "label": "Change website content" },
+        { "href": "/admin/chapter/coaches", "label": "Coach approvals" },
+        { "href": "/admin/chapter/events", "label": "Events" },
+        { "href": "/admin/chapter/settings", "label": "Chapter settings" },
+        { "href": "/account/revenue", "label": "Chapter revenue dashboard" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "content_creator": {
+      "defaultHref": "/admin/chapter",
+      "items": [
+        { "href": "/admin/chapter", "label": "Change website content" },
+        { "href": "/admin/chapter/events", "label": "Events" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
+    "coach": {
+      "defaultHref": "/dashboard/profile",
+      "items": [
+        { "href": "/dashboard/profile", "label": "Coach directory profile" },
+        { "href": "/account/certifications", "label": "Certification courses" },
+        { "href": "/account/dues", "label": "Payment dues" },
+        { "href": "/account/register-chapter-head", "label": "Register as chapter head" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    }
+  }
+}
