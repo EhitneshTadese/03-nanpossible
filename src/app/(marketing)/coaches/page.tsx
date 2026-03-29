@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import AudioPlayer from "@/components/AudioPlayer";
+import { ensureStandalonePageAudio } from "@/lib/audio";
 import { CoachSearch } from "./CoachSearch";
 import { getCoachFacetOptions, listApprovedCoaches } from "@/lib/coaches";
 
@@ -11,9 +13,20 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function CoachesDirectoryPage() {
-  const [initialCoaches, facets] = await Promise.all([
+  const [initialCoaches, facets, audio] = await Promise.all([
     listApprovedCoaches({ limit: 20 }),
     getCoachFacetOptions(),
+    ensureStandalonePageAudio({
+      objectKey: "pages/global/coaches.mp3",
+      language: "en",
+      text: [
+        "Coach directory.",
+        "Find a WIAL-certified coach for your next high-stakes team challenge.",
+        "Search across languages, specializations, and certification levels.",
+        "The directory is designed for global discovery, so a Portuguese or Korean query can still surface the right coach.",
+        "WIAL chapters can publish one vetted coach roster while still supporting local markets, multilingual search, and chapter-level approvals.",
+      ].join(" "),
+    }),
   ]);
 
   return (
@@ -32,6 +45,13 @@ export default async function CoachesDirectoryPage() {
                 levels. The directory is designed for global discovery, so a
                 Portuguese or Korean query can still surface the right coach.
               </p>
+              <div className="max-w-3xl">
+                <AudioPlayer
+                  audioUrl={audio.audioUrl}
+                  duration={audio.durationSeconds}
+                  pageTitle="WIAL coach directory"
+                />
+              </div>
             </div>
 
             <div className="coach-callout">

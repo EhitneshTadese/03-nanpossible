@@ -16,6 +16,7 @@
     "content:sync": "node scripts/sync-content-artifacts.mjs",
     "seed:coaches": "tsx scripts/seed-coaches.ts",
     "backfill:credly": "tsx scripts/backfill-credly-badges.ts",
+    "backfill:page-audio": "tsx scripts/backfill-page-audio.ts",
     "dolt:setup": "bash ops/dolt/setup.sh",
     "dolt:status": "cd ops/dolt/repo && dolt status",
     "dolt:log": "cd ops/dolt/repo && dolt log --oneline"

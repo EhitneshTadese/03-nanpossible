@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { generateCoachAudioIntroById } from "@/lib/audio";
 import { embedCoachById } from "@/lib/coach-embeddings";
 import { requireAccountViewer } from "@/lib/auth";
 import { getCoachByIdForAdmin } from "@/lib/coaches";
@@ -90,6 +91,12 @@ export async function approveCoachAction(formData: FormData) {
     await syncCoachCredlyBadgeFields(coachId, coach.credlyBadgeUrl);
   } catch {
     // Badge enrichment is best-effort and should not block approval.
+  }
+
+  try {
+    await generateCoachAudioIntroById(coachId);
+  } catch {
+    // Audio intros are best-effort and must not block approval.
   }
 
   try {

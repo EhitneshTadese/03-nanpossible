@@ -38,6 +38,8 @@ const coachColumns = [
   "credly_badge_image_url",
   "credly_badge_title",
   "credly_badge_synced_at",
+  "audio_intro_url",
+  "audio_intro_source",
   "approved",
   "created_at",
   "updated_at",
@@ -68,6 +70,8 @@ type CoachDbRow = {
   credly_badge_image_url: string | null;
   credly_badge_title: string | null;
   credly_badge_synced_at: string | null;
+  audio_intro_url: string | null;
+  audio_intro_source: "ai" | "uploaded" | null;
   approved: boolean;
   created_at: string;
   updated_at: string;
@@ -176,6 +180,8 @@ function mapCoachRecord(row: CoachDbRow): CoachRecord {
     credlyBadgeImageUrl: row.credly_badge_image_url,
     credlyBadgeTitle: row.credly_badge_title,
     credlyBadgeSyncedAt: row.credly_badge_synced_at,
+    audioIntroUrl: row.audio_intro_url,
+    audioIntroSource: row.audio_intro_source,
     approved: row.approved,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

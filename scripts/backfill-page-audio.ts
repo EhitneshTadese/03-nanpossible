@@ -1,7 +1,7 @@
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
 
-import { syncCoachCredlyBadgeFields } from "@/lib/credly";
+import { generateContentPageAudioById } from "@/lib/audio";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 
 async function main() {
@@ -12,9 +12,9 @@ async function main() {
   }
 
   const { data, error } = await client
-    .from("coaches")
-    .select("id, name, credly_badge_url")
-    .not("credly_badge_url", "is", null)
+    .from("content_pages")
+    .select("id, title, slug, chapter_id, published")
+    .eq("published", true)
     .order("updated_at", { ascending: false })
     .limit(500);
 
@@ -25,15 +25,18 @@ async function main() {
   const rows = data ?? [];
 
   for (const [index, row] of rows.entries()) {
-    const label = `${row.name ?? "Unknown coach"} (${row.id})`;
+    const scope = row.chapter_id ? `chapter ${row.chapter_id}` : "global";
+    const label = `${row.title ?? row.slug} (${scope})`;
 
     try {
-      await syncCoachCredlyBadgeFields(row.id, row.credly_badge_url);
-      console.log(`Synced badge ${index + 1}/${rows.length}: ${label}`);
-    } catch (syncError) {
+      const result = await generateContentPageAudioById(row.id);
+      console.log(
+        `Generated page audio ${index + 1}/${rows.length}: ${label} -> ${result.audioUrl ?? "cleared"}`,
+      );
+    } catch (audioError) {
       console.error(
-        `Failed to sync badge ${index + 1}/${rows.length}: ${label}`,
-        syncError,
+        `Failed page audio ${index + 1}/${rows.length}: ${label}`,
+        audioError,
       );
     }
   }
@@ -43,4 +46,3 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-

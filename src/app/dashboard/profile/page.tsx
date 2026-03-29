@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { AccountPageShell } from "@/components/account-page-shell";
+import AudioPlayer from "@/components/AudioPlayer";
 import { requireAccountViewer } from "@/lib/auth";
 import { getClaimableCoachByEmail, getCoachByUserId, getCoachInitials } from "@/lib/coaches";
 import { saveCoachProfileAction } from "./actions";
@@ -48,6 +49,12 @@ function getError(error?: string) {
       return "Coach photos must be 2MB or smaller.";
     case "photo-upload":
       return "WIAL could not upload the coach photo. Try again.";
+    case "audio-type":
+      return "Upload an MP3 or WAV audio introduction only.";
+    case "audio-size":
+      return "Audio introductions must be 5MB or smaller.";
+    case "audio-upload":
+      return "WIAL could not upload the audio introduction. Try again.";
     case "claim-failed":
       return "WIAL could not claim the existing coach profile.";
     case "create-failed":
@@ -111,6 +118,11 @@ export default async function DashboardProfilePage({
           </div>
 
           <form action={saveCoachProfileAction} className="space-y-6">
+            <input
+              name="currentAudioIntroUrl"
+              type="hidden"
+              value={activeCoach?.audioIntroUrl ?? ""}
+            />
             <input
               name="currentPhotoUrl"
               type="hidden"
@@ -185,6 +197,46 @@ export default async function DashboardProfilePage({
                 type="file"
               />
             </label>
+
+            <div className="field-shell">
+              <span className="field-label">Audio introduction</span>
+              <div className="rounded-[1.45rem] border border-line bg-white/60 p-4">
+                <p className="text-sm leading-6 text-foreground/72">
+                  WIAL can generate a spoken introduction from your approved bio. If you
+                  prefer, upload your own MP3 or WAV intro and it will replace the AI
+                  version after approval.
+                </p>
+                {activeCoach?.audioIntroUrl ? (
+                  <div className="mt-4">
+                    <AudioPlayer
+                      audioUrl={activeCoach.audioIntroUrl}
+                      duration={null}
+                      mode="inline"
+                      pageTitle={`${activeCoach?.name ?? viewer.name} introduction`}
+                    />
+                  </div>
+                ) : null}
+                <div className="mt-4 grid gap-2">
+                  <span className="text-sm font-semibold text-teal-deep">
+                    Current source:{" "}
+                    {activeCoach?.audioIntroSource === "uploaded"
+                      ? "Uploaded by coach"
+                      : activeCoach?.audioIntroSource === "ai"
+                        ? "AI-generated from bio"
+                        : "No audio intro yet"}
+                  </span>
+                  <input
+                    accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/wave,audio/vnd.wave"
+                    className="field-input"
+                    name="audioIntro"
+                    type="file"
+                  />
+                  <span className="text-sm leading-6 text-foreground/58">
+                    Max 5MB. Keep the field empty to preserve the current intro source.
+                  </span>
+                </div>
+              </div>
+            </div>
 
             <label className="field-shell">
               <span className="field-label">Bio</span>

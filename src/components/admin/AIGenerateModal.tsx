@@ -7,7 +7,11 @@ type AIGenerateModalProps = {
   chapterId: string;
   defaultLanguage: string;
   onClose: () => void;
-  onGenerated: (html: string) => void;
+  onGenerated: (payload: {
+    html: string;
+    audioUrl: string | null;
+    audioDuration: number | null;
+  }) => void;
   open: boolean;
   pageSlug: string;
   pageTitle: string;
@@ -152,6 +156,8 @@ export function AIGenerateModal({
                 const payload = (await response.json()) as {
                   error?: string;
                   html?: string;
+                  audio_url?: string | null;
+                  audio_duration?: number | null;
                 };
 
                 if (!response.ok || !payload.html) {
@@ -159,7 +165,14 @@ export function AIGenerateModal({
                   return;
                 }
 
-                onGenerated(payload.html);
+                onGenerated({
+                  html: payload.html,
+                  audioUrl: payload.audio_url ?? null,
+                  audioDuration:
+                    typeof payload.audio_duration === "number"
+                      ? payload.audio_duration
+                      : null,
+                });
                 onClose();
               } catch {
                 setError("WIAL could not generate this page yet.");
@@ -170,7 +183,7 @@ export function AIGenerateModal({
             type="button"
           >
             {isGenerating
-              ? `Generating content for ${pageTitle}...`
+              ? `Generating content and audio for ${pageTitle}...`
               : "Generate content"}
           </button>
         </div>

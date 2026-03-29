@@ -26,6 +26,9 @@ type ContentPageRow = {
   language?: string | null;
   sort_order?: number | null;
   ai_generated?: boolean | null;
+  audio_url?: string | null;
+  audio_duration_seconds?: number | null;
+  audio_generated_at?: string | null;
 };
 
 const contentPageColumns = [
@@ -35,8 +38,16 @@ const contentPageColumns = [
   "title",
   "published",
   "body_html",
+  "body_json",
   "body_richtext",
   "seo",
+  "is_global",
+  "language",
+  "sort_order",
+  "ai_generated",
+  "audio_url",
+  "audio_duration_seconds",
+  "audio_generated_at",
 ].join(", ");
 
 function getEmptyBody(): ContentBody {
@@ -48,11 +59,23 @@ function getEmptyBody(): ContentBody {
 }
 
 function mapPageRecord(
-  data: Omit<ContentPageRecord, "bodyRichtext" | "seo"> & {
+  data: {
+    id: string;
+    chapterId: string | null;
+    slug: string;
+    title: string;
+    isGlobal: boolean;
+    language: string;
+    sortOrder: number;
+    published: boolean;
+    aiGenerated: boolean;
     body_json?: unknown;
     body_richtext?: ContentBody | null;
     body_html?: string | null;
     seo?: ContentPageRecord["seo"] | null;
+    audio_url?: string | null;
+    audio_duration_seconds?: number | null;
+    audio_generated_at?: string | null;
   },
 ) {
   return {
@@ -74,6 +97,21 @@ function mapPageRecord(
       sourceStatus: "unknown",
       sourceNotes: "",
     },
+    ...(data.audio_url
+      ? {
+          audioUrl: data.audio_url,
+        }
+      : {}),
+    ...(typeof data.audio_duration_seconds === "number"
+      ? {
+          audioDurationSeconds: data.audio_duration_seconds,
+        }
+      : {}),
+    ...(data.audio_generated_at
+      ? {
+          audioGeneratedAt: data.audio_generated_at,
+        }
+      : {}),
   } satisfies ContentPageRecord;
 }
 
@@ -92,6 +130,9 @@ function mapPageRow(data: ContentPageRow) {
     body_json: data.body_json ?? null,
     body_richtext: data.body_richtext ?? null,
     seo: data.seo ?? null,
+    audio_url: data.audio_url ?? null,
+    audio_duration_seconds: data.audio_duration_seconds ?? null,
+    audio_generated_at: data.audio_generated_at ?? null,
   });
 }
 
