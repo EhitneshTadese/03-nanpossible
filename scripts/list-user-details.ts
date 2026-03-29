@@ -68,7 +68,7 @@ async function main() {
       console.log(`[${i}] ${u.email}`);
       console.log(`    Name:     ${u.name || "N/A"}`);
       console.log(`    Role:     ${u.role}`);
-      console.log(`    Chapter:  ${u.chapters?.name || "Global / None"} (${u.chapter_id || "N/A"})`);
+      console.log(`    Chapter:  ${Array.isArray(u.chapters) && u.chapters[0]?.name ? u.chapters[0].name : "Global / None"} (${u.chapter_id || "N/A"})`);
       console.log(`    Location: ${u.location || "N/A"}`);
       console.log(`    Phone:    ${u.phone || "N/A"}`);
       if (u.bio) {
