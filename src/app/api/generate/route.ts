@@ -1,5 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import { NextResponse } from "next/server";
+import { generateDraftPageAudioPreview } from "@/lib/audio";
 import { canEditChapter, getCurrentUser } from "@/lib/auth";
 import { chatCompletionDetailed } from "@/lib/openrouter";
 import { listApprovedCoaches } from "@/lib/coaches";
@@ -208,15 +209,36 @@ export async function POST(request: Request) {
     .update({
       body_html: clean,
       body_richtext: null,
+      ai_generated: true,
       published: false,
     })
     .eq("chapter_id", chapterId)
     .eq("slug", pageSlug);
 
+  let audioPreview: Awaited<ReturnType<typeof generateDraftPageAudioPreview>> = {
+    audioUrl: null,
+    durationSeconds: null,
+  };
 
+  try {
+    audioPreview = await generateDraftPageAudioPreview({
+      chapterId,
+      pageSlug,
+      language: body.language ?? chapter.language ?? "en",
+      html: clean,
+    });
+  } catch (error) {
+    console.error("WIAL AI draft audio preview failed", {
+      chapterId,
+      pageSlug,
+      error,
+    });
+  }
 
   return NextResponse.json({
     html: clean,
+    audio_url: audioPreview.audioUrl,
+    audio_duration: audioPreview.durationSeconds,
     tokens_used: result.usage.totalTokens,
     model: result.model,
   });

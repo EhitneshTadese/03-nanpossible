@@ -44,6 +44,9 @@ export default async function ChapterAdminPage({
           <ContentEditor
             chapterId={chapter.id}
             defaultLanguage={chapter.language}
+            initialAudioDuration={selectedPage.audioDurationSeconds}
+            initialAudioGeneratedAt={selectedPage.audioGeneratedAt}
+            initialAudioUrl={selectedPage.audioUrl}
             initialContent={selectedPage.bodyJson ?? selectedPage.bodyRichtext}
             initialHtml={selectedPage.bodyHtml ?? ""}
             pageId={selectedPage.id}

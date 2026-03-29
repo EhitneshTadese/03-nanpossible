@@ -16,6 +16,7 @@
     "content:sync": "node scripts/sync-content-artifacts.mjs",
     "seed:coaches": "tsx scripts/seed-coaches.ts",
     "backfill:credly": "tsx scripts/backfill-credly-badges.ts",
+    "backfill:page-audio": "tsx scripts/backfill-page-audio.ts",
     "manage:roles": "tsx scripts/manage-roles.ts",
     "list:users": "tsx scripts/list-user-details.ts",
     "clear:payments": "echo '[]' > data/payments_cache.json",

@@ -2,12 +2,21 @@
 
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
+import { uploadCoachAudioIntro } from "@/lib/audio";
 import { requireAccountViewer } from "@/lib/auth";
 import { getClaimableCoachByEmail, getCoachByUserId } from "@/lib/coaches";
 import { syncCoachCredlyBadgeFields } from "@/lib/credly";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 
 const allowedPhotoTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const allowedAudioTypes = new Set([
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/wav",
+  "audio/x-wav",
+  "audio/wave",
+  "audio/vnd.wave",
+]);
 
 function buildDashboardProfilePath(params: Record<string, string>) {
   return `/dashboard/profile?${new URLSearchParams(params).toString()}`;
@@ -49,6 +58,7 @@ export async function saveCoachProfileAction(formData: FormData) {
   const linkedin = String(formData.get("linkedin") ?? "").trim();
   const credlyBadgeUrl = String(formData.get("credlyBadgeUrl") ?? "").trim();
   const currentPhotoUrl = String(formData.get("currentPhotoUrl") ?? "").trim();
+  const currentAudioIntroUrl = String(formData.get("currentAudioIntroUrl") ?? "").trim();
   const specializations = parseList(
     formData.getAll("specializations").map(String),
     String(formData.get("customSpecializations") ?? ""),
@@ -65,6 +75,11 @@ export async function saveCoachProfileAction(formData: FormData) {
   if (!locationCountry) {
     redirect(buildDashboardProfilePath({ error: "country-required" }));
   }
+
+  const [existingCoach, claimableCoach] = await Promise.all([
+    getCoachByUserId(viewer.id),
+    getClaimableCoachByEmail(viewer.email),
+  ]);
 
   let photoUrl = currentPhotoUrl || null;
   const photo = formData.get("photo");
@@ -93,11 +108,39 @@ export async function saveCoachProfileAction(formData: FormData) {
 
     photoUrl = client.storage.from("coach-photos").getPublicUrl(objectPath).data.publicUrl;
   }
+  let uploadedAudioIntro:
+    | {
+        audioUrl: string;
+        audioIntroSource: "uploaded";
+      }
+    | null = null;
+  const audioIntro = formData.get("audioIntro");
+  const targetCoachId = existingCoach?.id ?? claimableCoach?.id ?? null;
 
-  const [existingCoach, claimableCoach] = await Promise.all([
-    getCoachByUserId(viewer.id),
-    getClaimableCoachByEmail(viewer.email),
-  ]);
+  if (audioIntro instanceof File && audioIntro.size > 0) {
+    if (!allowedAudioTypes.has(audioIntro.type)) {
+      redirect(buildDashboardProfilePath({ error: "audio-type" }));
+    }
+
+    if (audioIntro.size > 5 * 1024 * 1024) {
+      redirect(buildDashboardProfilePath({ error: "audio-size" }));
+    }
+
+    if (targetCoachId) {
+      try {
+        uploadedAudioIntro = await uploadCoachAudioIntro({
+          coachId: targetCoachId,
+          file: audioIntro,
+          currentAudioUrl:
+            existingCoach?.audioIntroUrl ??
+            claimableCoach?.audioIntroUrl ??
+            currentAudioIntroUrl,
+        });
+      } catch {
+        redirect(buildDashboardProfilePath({ error: "audio-upload" }));
+      }
+    }
+  }
 
   const payload = {
     chapter_id: existingCoach?.chapterId ?? claimableCoach?.chapterId ?? viewer.chapterId,
@@ -119,6 +162,12 @@ export async function saveCoachProfileAction(formData: FormData) {
     embedding: null,
     rejection_reason: null,
     rejected_at: null,
+    ...(uploadedAudioIntro
+      ? {
+          audio_intro_url: uploadedAudioIntro.audioUrl,
+          audio_intro_source: uploadedAudioIntro.audioIntroSource,
+        }
+      : {}),
   };
 
   if (existingCoach) {
@@ -162,6 +211,26 @@ export async function saveCoachProfileAction(formData: FormData) {
 
     if (error) {
       redirect(buildDashboardProfilePath({ error: "create-failed" }));
+    }
+
+    if (audioIntro instanceof File && audioIntro.size > 0) {
+      try {
+        uploadedAudioIntro = await uploadCoachAudioIntro({
+          coachId: data.id,
+          file: audioIntro,
+          currentAudioUrl: currentAudioIntroUrl,
+        });
+
+        await client
+          .from("coaches")
+          .update({
+            audio_intro_url: uploadedAudioIntro.audioUrl,
+            audio_intro_source: uploadedAudioIntro.audioIntroSource,
+          })
+          .eq("id", data.id);
+      } catch {
+        redirect(buildDashboardProfilePath({ error: "audio-upload" }));
+      }
     }
 
     try {

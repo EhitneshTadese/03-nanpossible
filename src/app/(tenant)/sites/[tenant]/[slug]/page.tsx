@@ -1,4 +1,6 @@
 import { notFound, redirect } from "next/navigation";
+import AudioPlayer from "@/components/AudioPlayer";
+import { ensureContentPageAudio } from "@/lib/audio";
 import { getContentPage } from "@/lib/content";
 import { normalizeChapterSlug } from "@/lib/routing";
 import { getChapterBySubdomain } from "@/lib/tenant";
@@ -42,6 +44,8 @@ export default async function TenantChapterPage({
     notFound();
   }
 
+  const audio = await ensureContentPageAudio(page);
+
   return (
     <div className="page-frame">
       <div className="site-shell">
@@ -50,6 +54,13 @@ export default async function TenantChapterPage({
           <h1 className="mt-5 font-display text-4xl tracking-[-0.05em] text-teal-deep md:text-6xl">
             {page.title}
           </h1>
+          <div className="mt-6">
+            <AudioPlayer
+              audioUrl={audio.audioUrl ?? page.audioUrl ?? null}
+              duration={audio.durationSeconds ?? page.audioDurationSeconds ?? null}
+              pageTitle={page.title}
+            />
+          </div>
           <div
             className="prose mt-8 max-w-none"
             dangerouslySetInnerHTML={{ __html: page.bodyHtml }}

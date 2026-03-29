@@ -15,6 +15,30 @@ function getTenantPaths(subdomain: string, slug: string) {
   ];
 }
 
+function triggerAudioGeneration(request: Request, pageId: string) {
+  const secret = process.env.AUDIO_GENERATION_SECRET?.trim();
+
+  if (!secret) {
+    return;
+  }
+
+  const url = new URL("/api/audio/generate", request.url);
+
+  void fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-wial-audio-secret": secret,
+    },
+    body: JSON.stringify({ page_id: pageId }),
+  }).catch((error) => {
+    console.error("WIAL page audio trigger failed", {
+      pageId,
+      error,
+    });
+  });
+}
+
 export async function POST(request: Request) {
   const viewer = await getCurrentUser();
 
@@ -75,6 +99,8 @@ export async function POST(request: Request) {
         revalidatePath(path);
       }
     }
+
+    triggerAudioGeneration(request, pageId);
   }
 
   return NextResponse.json({ success: true });

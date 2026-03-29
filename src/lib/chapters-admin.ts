@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { isReservedSubdomain, isValidSubdomain } from "@/lib/routing";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
@@ -316,7 +317,7 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
     const generatedName = leadEmail.split("@")[0];
     const createResult = await client.auth.admin.createUser({
       email: leadEmail,
-      password: "wial2026!",
+      password: randomBytes(16).toString("hex"),
       email_confirm: true,
       user_metadata: { name: generatedName },
     });

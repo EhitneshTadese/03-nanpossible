@@ -6,12 +6,17 @@ import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import AudioPlayer from "@/components/AudioPlayer";
 import { AIGenerateModal } from "@/components/admin/AIGenerateModal";
 import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
+import { regeneratePageAudioAction } from "@/app/admin/chapter/actions";
 
 type ContentEditorProps = {
   chapterId: string;
   defaultLanguage: string;
+  initialAudioDuration?: number | null;
+  initialAudioGeneratedAt?: string | null;
+  initialAudioUrl?: string | null;
   initialContent: unknown;
   initialHtml: string;
   pageId: string;
@@ -50,6 +55,9 @@ function ToolbarButton({
 export function ContentEditor({
   chapterId,
   defaultLanguage,
+  initialAudioDuration,
+  initialAudioGeneratedAt,
+  initialAudioUrl,
   initialContent,
   initialHtml,
   pageId,
@@ -58,13 +66,34 @@ export function ContentEditor({
   published,
 }: ContentEditorProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const skipNextAudioStaleRef = useRef(false);
   const [status, setStatus] = useState<"idle" | "saved" | "saving" | "error">("idle");
   const [publishNotice, setPublishNotice] = useState<{
     message: string;
     tone: "success" | "error";
   } | null>(null);
+  const [draftAudioPreview, setDraftAudioPreview] = useState<{
+    audioUrl: string | null;
+    duration: number | null;
+    stale: boolean;
+  } | null>(null);
   const [showGenerate, setShowGenerate] = useState(false);
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+
+  const [officialAudio, setOfficialAudio] = useState({
+    url: initialAudioUrl ?? null,
+    duration: initialAudioDuration ?? null,
+    generatedAt: initialAudioGeneratedAt ?? null,
+  });
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  useEffect(() => {
+    setOfficialAudio({
+      url: initialAudioUrl ?? null,
+      duration: initialAudioDuration ?? null,
+      generatedAt: initialAudioGeneratedAt ?? null,
+    });
+  }, [initialAudioUrl, initialAudioDuration, initialAudioGeneratedAt]);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -95,6 +124,19 @@ export function ContentEditor({
 
     let timeout: number | null = null;
     const handleUpdate = () => {
+      if (skipNextAudioStaleRef.current) {
+        skipNextAudioStaleRef.current = false;
+      } else if (draftAudioPreview && !draftAudioPreview.stale) {
+        setDraftAudioPreview((current) =>
+          current
+            ? {
+                ...current,
+                stale: true,
+              }
+            : current,
+        );
+      }
+
       if (timeout) {
         window.clearTimeout(timeout);
       }
@@ -135,7 +177,39 @@ export function ContentEditor({
         window.clearTimeout(timeout);
       }
     };
-  }, [editor, pageId]);
+  }, [draftAudioPreview, editor, pageId]);
+
+  async function handleRegenerateAudio() {
+    if (isRegenerating) return;
+
+    setIsRegenerating(true);
+    try {
+      const result = await regeneratePageAudioAction(pageId);
+      if (result.success) {
+        setOfficialAudio({
+          url: result.audioUrl ?? null,
+          duration: result.duration ?? null,
+          generatedAt: result.generatedAt ?? null,
+        });
+        setPublishNotice({
+          message: "WIAL successfully regenerated the page audio.",
+          tone: "success",
+        });
+      } else {
+        setPublishNotice({
+          message: `Audio regeneration failed: ${result.error}`,
+          tone: "error",
+        });
+      }
+    } catch {
+      setPublishNotice({
+        message: "WIAL encountered an unexpected error during audio regeneration.",
+        tone: "error",
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  }
 
   if (!editor) {
     return null;
@@ -216,11 +290,15 @@ export function ContentEditor({
                 return;
               }
 
+              // Actively trigger regeneration on publish
+              void handleRegenerateAudio();
+
               setPublishNotice({
                 message:
-                  "Page published. Refresh the public site to confirm the latest output.",
+                  "Page published. WIAL is regenerating the final public audio from the latest content.",
                 tone: "success",
               });
+              setDraftAudioPreview(null);
             }}
             type="button"
           >
@@ -321,6 +399,75 @@ export function ContentEditor({
         <EditorContent className="chapter-editor prose max-w-none" editor={editor} />
       </div>
 
+      <div className="mt-5 rounded-[1.6rem] border border-line bg-white/72 p-5 md:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="eyebrow">Official page audio</p>
+            <p className="text-sm leading-6 text-foreground/68">
+              This is the narration audio currently visible to public visitors.
+              {officialAudio.generatedAt ? (
+                <> Last updated {new Date(officialAudio.generatedAt).toLocaleString()}.</>
+              ) : (
+                <> No official audio has been generated yet.</>
+              )}
+            </p>
+          </div>
+          <button
+            className="button-link secondary shrink-0"
+            disabled={isRegenerating}
+            onClick={handleRegenerateAudio}
+            type="button"
+          >
+            {isRegenerating ? "Regenerating..." : "Regenerate Official Audio"}
+          </button>
+        </div>
+
+        {officialAudio.url ? (
+          <div className="mt-5">
+            <AudioPlayer
+              audioUrl={officialAudio.url}
+              duration={officialAudio.duration}
+              mode="inline"
+              pageTitle={`${pageTitle} official audio`}
+            />
+          </div>
+        ) : null}
+      </div>
+
+      {draftAudioPreview ? (
+        <div className="mt-5 rounded-[1.6rem] border border-line bg-white/72 p-5 md:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-2">
+              <p className="eyebrow">Draft audio preview</p>
+              <p className="text-sm leading-6 text-foreground/68">
+                Preview the narration generated for this draft. Publishing will
+                regenerate the final public audio from the latest page content.
+              </p>
+            </div>
+            {draftAudioPreview.stale ? (
+              <span className="rounded-full border border-accent/25 bg-accent/8 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+                Audio preview is stale
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-4">
+            {draftAudioPreview.audioUrl ? (
+              <AudioPlayer
+                audioUrl={draftAudioPreview.audioUrl}
+                duration={draftAudioPreview.duration}
+                mode="inline"
+                pageTitle={`${pageTitle} draft audio preview`}
+              />
+            ) : (
+              <div className="rounded-[1.35rem] border border-line/70 bg-white/55 px-4 py-3 text-sm leading-6 text-foreground/68">
+                Audio preview is not available in this environment yet.
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <span className="text-sm font-semibold uppercase tracking-[0.16em] text-foreground/45">
           {published ? "Published view loaded" : "Draft view loaded"}
@@ -351,7 +498,15 @@ export function ContentEditor({
         chapterId={chapterId}
         defaultLanguage={defaultLanguage}
         onClose={() => setShowGenerate(false)}
-        onGenerated={(html) => editor.commands.setContent(html)}
+        onGenerated={({ audioDuration, audioUrl, html }) => {
+          skipNextAudioStaleRef.current = true;
+          editor.commands.setContent(html);
+          setDraftAudioPreview({
+            audioUrl,
+            duration: audioDuration,
+            stale: false,
+          });
+        }}
         open={showGenerate}
         pageSlug={pageSlug}
         pageTitle={pageTitle}

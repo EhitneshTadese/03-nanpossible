@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccessibilityPreferencesWidget } from "@/components/accessibility-preferences";
 import { MobileNav } from "@/components/mobile-nav";
 import { WialLogo } from "@/components/wial-logo";
 import { navigationItems } from "@/lib/routing";
@@ -39,6 +40,8 @@ export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
             ))}
           </nav>
 
+          <AccessibilityPreferencesWidget variant="desktop" />
+
           <div className="flex items-center gap-3">
             <div className="hidden text-right md:block">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/50">
@@ -64,12 +67,15 @@ export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
             >
               {accountLink.label}
             </Link>
-            <MobileNav
-              accountLink={accountLink}
-              chapterLabel={chapterLabel}
-              items={navigationItems}
-              viewer={viewer}
-            />
+            <div className="flex items-center gap-2 md:hidden">
+              <AccessibilityPreferencesWidget variant="mobile" />
+              <MobileNav
+                accountLink={accountLink}
+                chapterLabel={chapterLabel}
+                items={navigationItems}
+                viewer={viewer}
+              />
+            </div>
           </div>
         </div>
       </div>
