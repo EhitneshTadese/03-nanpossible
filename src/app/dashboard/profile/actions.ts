@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { requireAccountViewer } from "@/lib/auth";
 import { getClaimableCoachByEmail, getCoachByUserId } from "@/lib/coaches";
+import { syncCoachCredlyBadgeFields } from "@/lib/credly";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 
 const allowedPhotoTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -130,6 +131,12 @@ export async function saveCoachProfileAction(formData: FormData) {
     if (error) {
       redirect(buildDashboardProfilePath({ error: "save-failed" }));
     }
+
+    try {
+      await syncCoachCredlyBadgeFields(existingCoach.id, payload.credly_badge_url);
+    } catch {
+      // Badge enrichment is best-effort and must not block profile submission.
+    }
   } else if (claimableCoach) {
     const { error } = await client
       .from("coaches")
@@ -140,11 +147,27 @@ export async function saveCoachProfileAction(formData: FormData) {
     if (error) {
       redirect(buildDashboardProfilePath({ error: "claim-failed" }));
     }
+
+    try {
+      await syncCoachCredlyBadgeFields(claimableCoach.id, payload.credly_badge_url);
+    } catch {
+      // Badge enrichment is best-effort and must not block profile submission.
+    }
   } else {
-    const { error } = await client.from("coaches").insert(payload);
+    const { data, error } = await client
+      .from("coaches")
+      .insert(payload)
+      .select("id")
+      .single();
 
     if (error) {
       redirect(buildDashboardProfilePath({ error: "create-failed" }));
+    }
+
+    try {
+      await syncCoachCredlyBadgeFields(data.id, payload.credly_badge_url);
+    } catch {
+      // Badge enrichment is best-effort and must not block profile submission.
     }
   }
 

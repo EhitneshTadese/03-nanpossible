@@ -52,8 +52,13 @@ export default async function CoachDetailPage({ params }: CoachDetailPageProps) 
   }
 
   const location = formatCoachLocation(coach);
-  const credlyIsImage = Boolean(
-    coach.credlyBadgeUrl?.match(/\.(png|jpg|jpeg|webp|svg)$/i),
+  const credlyBadgeImage =
+    coach.credlyBadgeImageUrl ??
+    (coach.credlyBadgeUrl?.match(/\.(png|jpg|jpeg|webp|svg)(?:\?.*)?$/i)
+      ? coach.credlyBadgeUrl
+      : null);
+  const showCredlyBadgeImage = Boolean(
+    credlyBadgeImage?.match(/^https:\/\/(images\.credly\.com|wial\.org|www\.wial\.org)\//i),
   );
 
   return (
@@ -172,24 +177,28 @@ export default async function CoachDetailPage({ params }: CoachDetailPageProps) 
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/46">
                     Credly badge
                   </p>
-                  {credlyIsImage ? (
+                  {coach.credlyBadgeTitle ? (
+                    <p className="mt-3 text-sm font-semibold text-teal-deep">
+                      {coach.credlyBadgeTitle}
+                    </p>
+                  ) : null}
+                  {showCredlyBadgeImage && credlyBadgeImage ? (
                     <Image
-                      alt={`${coach.name} Credly badge`}
-                      className="mt-4 rounded-[1.25rem] border border-line"
+                      alt={coach.credlyBadgeTitle ?? `${coach.name} Credly badge`}
+                      className="mt-4 rounded-[1.25rem] border border-line bg-white/80"
                       height={180}
-                      src={coach.credlyBadgeUrl}
+                      src={credlyBadgeImage}
                       width={180}
                     />
-                  ) : (
-                    <a
-                      className="button-link secondary mt-4"
-                      href={coach.credlyBadgeUrl}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      View Credly badge
-                    </a>
-                  )}
+                  ) : null}
+                  <a
+                    className="button-link secondary mt-4"
+                    href={coach.credlyBadgeUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    View Credly badge
+                  </a>
                 </section>
               ) : null}
             </aside>

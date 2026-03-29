@@ -28,6 +28,14 @@ export function CoachCard({ coach }: CoachCardProps) {
   const languages = coach.languages
     .map((language) => language.toUpperCase())
     .join(", ");
+  const credlyBadgeImage =
+    coach.credlyBadgeImageUrl ??
+    (coach.credlyBadgeUrl?.match(/\.(png|jpg|jpeg|webp|svg)(?:\?.*)?$/i)
+      ? coach.credlyBadgeUrl
+      : null);
+  const showCredlyBadgeImage = Boolean(
+    credlyBadgeImage?.match(/^https:\/\/(images\.credly\.com|wial\.org|www\.wial\.org)\//i),
+  );
 
   return (
     <article className="site-panel group overflow-hidden rounded-[2rem] p-5 transition-transform duration-200 hover:-translate-y-1">
@@ -90,12 +98,33 @@ export function CoachCard({ coach }: CoachCardProps) {
         </div>
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
-        <span className="text-sm font-semibold text-foreground/58">
-          {coach.similarity != null
-            ? `Similarity ${(coach.similarity * 100).toFixed(0)}%`
-            : "Approved WIAL coach"}
-        </span>
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
+        <div className="flex min-w-0 items-center gap-3">
+          {showCredlyBadgeImage && credlyBadgeImage ? (
+            <a
+              className="overflow-hidden rounded-[0.9rem] border border-line bg-white/80 p-1 transition hover:border-accent"
+              href={coach.credlyBadgeUrl ?? credlyBadgeImage}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Image
+                alt={coach.credlyBadgeTitle ?? `${coach.name} Credly badge`}
+                className="h-10 w-10 rounded-[0.55rem] object-cover"
+                height={40}
+                loading="lazy"
+                src={credlyBadgeImage}
+                width={40}
+              />
+            </a>
+          ) : null}
+          <span className="text-sm font-semibold text-foreground/58">
+            {coach.similarity != null
+              ? `Similarity ${(coach.similarity * 100).toFixed(0)}%`
+              : showCredlyBadgeImage
+                ? "Credly badge linked"
+                : "Approved WIAL coach"}
+          </span>
+        </div>
         <Link
           className="inline-flex items-center gap-2 text-sm font-semibold text-teal transition group-hover:text-accent"
           href={`/coaches/${coach.id}`}

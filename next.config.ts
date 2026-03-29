@@ -5,7 +5,7 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
-  distDir: "node_modules/.cache/next-build",
+  distDir: ".next.nosync",
   images: {
     remotePatterns: [
       {
@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "www.wial.org",
+      },
+      {
+        protocol: "https",
+        hostname: "images.credly.com",
       },
       ...(supabaseHost
         ? [

@@ -41,6 +41,9 @@ type SearchRow = {
   website: string | null;
   linkedin: string | null;
   credly_badge_url: string | null;
+  credly_badge_image_url: string | null;
+  credly_badge_title: string | null;
+  credly_badge_synced_at: string | null;
   approved: boolean;
   created_at: string;
   updated_at: string;
@@ -271,6 +274,9 @@ export async function searchCoachesByName(
         "website",
         "linkedin",
         "credly_badge_url",
+        "credly_badge_image_url",
+        "credly_badge_title",
+        "credly_badge_synced_at",
         "approved",
         "created_at",
         "updated_at",
@@ -326,6 +332,9 @@ export async function searchCoachesByName(
     website: row.website,
     linkedin: row.linkedin,
     credlyBadgeUrl: row.credly_badge_url,
+    credlyBadgeImageUrl: row.credly_badge_image_url,
+    credlyBadgeTitle: row.credly_badge_title,
+    credlyBadgeSyncedAt: row.credly_badge_synced_at,
     approved: row.approved,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -405,6 +414,16 @@ export async function vectorSearchCoaches(options: {
     linkedin: typeof row.linkedin === "string" ? row.linkedin : null,
     credlyBadgeUrl:
       typeof row.credly_badge_url === "string" ? row.credly_badge_url : null,
+    credlyBadgeImageUrl:
+      typeof row.credly_badge_image_url === "string"
+        ? row.credly_badge_image_url
+        : null,
+    credlyBadgeTitle:
+      typeof row.credly_badge_title === "string" ? row.credly_badge_title : null,
+    credlyBadgeSyncedAt:
+      typeof row.credly_badge_synced_at === "string"
+        ? row.credly_badge_synced_at
+        : null,
     approved: true,
     createdAt: typeof row.created_at === "string" ? row.created_at : "",
     updatedAt: typeof row.updated_at === "string" ? row.updated_at : "",

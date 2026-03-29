@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { embedCoachById } from "@/lib/coach-embeddings";
 import { requireAccountViewer } from "@/lib/auth";
 import { getCoachByIdForAdmin } from "@/lib/coaches";
+import { syncCoachCredlyBadgeFields } from "@/lib/credly";
 import { sanitizeNextPath } from "@/lib/account";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 
@@ -83,6 +84,12 @@ export async function approveCoachAction(formData: FormData) {
 
   if (error) {
     redirect(buildReturnPath(redirectTo, { error: "approve-failed" }));
+  }
+
+  try {
+    await syncCoachCredlyBadgeFields(coachId, coach.credlyBadgeUrl);
+  } catch {
+    // Badge enrichment is best-effort and should not block approval.
   }
 
   try {

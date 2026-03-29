@@ -282,6 +282,10 @@ export default async function DashboardProfilePage({
                   placeholder="https://www.credly.com/..."
                   type="url"
                 />
+                <span className="text-sm leading-6 text-foreground/58">
+                  Paste the public Credly badge page URL. WIAL will pull the public badge
+                  image automatically for the directory when it can be resolved.
+                </span>
               </label>
             </div>
 

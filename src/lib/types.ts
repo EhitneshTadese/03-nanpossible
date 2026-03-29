@@ -14,6 +14,52 @@ export type AppRole =
 
 export type CertificationLevel = "CALC" | "PALC" | "SALC" | "MALC";
 
+export type CertificationTrackKey = "calc" | "palc" | "salc" | "malc";
+
+export type CertificationDocumentKind =
+  | "requirements"
+  | "application"
+  | "recertification"
+  | "sample"
+  | "faq";
+
+export type CertificationDocument = {
+  id: string;
+  track: CertificationTrackKey | "global";
+  kind: CertificationDocumentKind;
+  label: string;
+  href: string;
+  sourceUrl: string | null;
+  mirrored: boolean;
+  fileType: "pdf" | "doc" | "external";
+  updatedLabel: string;
+};
+
+export type CertificationTrack = {
+  key: CertificationTrackKey;
+  level: CertificationLevel;
+  anchor: string;
+  title: string;
+  tagline: string;
+  summary: string;
+  eligibility: string[];
+  requirements: string[];
+  progressionLabel: string;
+  lmsSummary: string;
+};
+
+export type CertificationRecertificationRule = {
+  track: CertificationTrackKey;
+  validity: string;
+  annualRequirements: string[];
+  expiredPolicy?: string[];
+};
+
+export type LmsLinkConfig = {
+  globalUrl: string | null;
+  levelUrls: Partial<Record<CertificationTrackKey, string>>;
+};
+
 export type NavigationItem = {
   href: string;
   label: string;
@@ -68,6 +114,9 @@ export type CoachRecord = {
   website: string | null;
   linkedin: string | null;
   credlyBadgeUrl: string | null;
+  credlyBadgeImageUrl?: string | null;
+  credlyBadgeTitle?: string | null;
+  credlyBadgeSyncedAt?: string | null;
   approved: boolean;
   createdAt: string;
   updatedAt: string;
