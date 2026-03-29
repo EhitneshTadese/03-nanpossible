@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -43,3 +44,18 @@ next-env.d.ts
 # dolt
 ops/dolt/repo/.dolt/
 ops/dolt/repo/.dolt_*/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+eslint.config 2.mjs
+.next.nosync/
