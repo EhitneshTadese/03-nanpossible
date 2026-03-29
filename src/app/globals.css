@@ -41,6 +41,18 @@ html {
   scroll-behavior: smooth;
 }
 
+html.text-scale-default {
+  font-size: 16px;
+}
+
+html.text-scale-large {
+  font-size: 19.2px;
+}
+
+html.text-scale-xl {
+  font-size: 22.4px;
+}
+
 body {
   background:
     radial-gradient(circle at top left, rgba(184, 143, 69, 0.14), transparent 26%),
@@ -48,6 +60,20 @@ body {
     linear-gradient(180deg, rgba(255, 250, 242, 0.72), rgba(244, 239, 229, 0.92));
   color: var(--foreground);
   font-family: var(--font-source-sans), sans-serif;
+}
+
+html.reduce-motion,
+html.reduce-motion body {
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 a {
@@ -1076,4 +1102,234 @@ a {
   .site-chatbot-trigger {
     align-self: flex-end;
   }
+}
+
+.a11y-widget-trigger {
+  position: relative;
+}
+
+.a11y-widget-trigger svg {
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.a11y-widget-panel {
+  max-height: min(36rem, calc(100vh - 7rem));
+  overflow-y: auto;
+}
+
+.a11y-widget-option,
+.a11y-widget-switch,
+.a11y-widget-trigger,
+.a11y-widget-reset {
+  outline-offset: 3px;
+}
+
+html.contrast-high {
+  --background: #ffffff;
+  --foreground: #000000;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --line: #000000;
+  --accent: #0000ee;
+  --accent-soft: #f3f6ff;
+  --teal: #000000;
+  --teal-deep: #000000;
+  --gold: #0000ee;
+  --shadow: none;
+}
+
+html.contrast-high body {
+  background: #ffffff;
+  color: #000000;
+}
+
+html.contrast-high a {
+  color: #0000ee;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+html.contrast-high :where(
+  .button-link,
+  .site-chatbot-trigger,
+  .account-sidebar-link,
+  .admin-sidebar-link,
+  .a11y-widget-trigger
+) {
+  text-decoration: none;
+}
+
+html.contrast-high :where(
+  .site-panel,
+  .feature-card,
+  .metric-card,
+  .quote-block,
+  .field-shell.is-readonly,
+  .field-input,
+  .field-textarea,
+  .coach-callout,
+  .coach-pill,
+  .coach-result-chip,
+  .auth-panel-dark,
+  .auth-panel-light,
+  .auth-role-card,
+  .auth-register-card,
+  .account-sidebar-panel,
+  .account-sidebar-note,
+  .account-sidebar-link,
+  .account-sidebar-signout,
+  .account-sidebar-launcher,
+  .admin-sidebar-link,
+  .site-chatbot-panel,
+  .site-chatbot-trigger,
+  .site-chatbot-chip,
+  .site-chatbot-input,
+  .a11y-widget-trigger,
+  .a11y-widget-panel,
+  .a11y-widget-option,
+  .a11y-widget-switch
+) {
+  border-color: #000000 !important;
+  box-shadow: none !important;
+}
+
+html.contrast-high :where(
+  .site-panel,
+  .feature-card,
+  .metric-card,
+  .quote-block,
+  .field-shell.is-readonly,
+  .field-input,
+  .field-textarea,
+  .coach-callout,
+  .coach-pill,
+  .coach-result-chip,
+  .auth-panel-dark,
+  .auth-panel-light,
+  .auth-role-card,
+  .auth-register-card,
+  .account-sidebar-panel,
+  .account-sidebar-note,
+  .account-sidebar-link,
+  .account-sidebar-signout,
+  .site-chatbot-panel,
+  .site-chatbot-trigger,
+  .site-chatbot-chip,
+  .site-chatbot-input,
+  .a11y-widget-trigger,
+  .a11y-widget-panel,
+  .a11y-widget-option,
+  .a11y-widget-switch
+) {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.contrast-high [class*="text-foreground/"] {
+  color: #595959 !important;
+}
+
+html.contrast-high [class*="text-teal-deep/"] {
+  color: #000000 !important;
+}
+
+html.contrast-high :where(
+  .auth-copy-dark,
+  .auth-role-card-body,
+  .account-sidebar-overline,
+  .account-sidebar-section-title,
+  .account-sidebar-note-label,
+  .account-sidebar-note-body,
+  .account-sidebar-launcher-kicker,
+  .coach-callout-label,
+  .field-label,
+  .site-chatbot-kicker,
+  .site-chatbot-copy,
+  .site-chatbot-message-label
+) {
+  color: #595959 !important;
+}
+
+html.contrast-high :where(
+  .auth-title-dark,
+  .auth-role-card-title,
+  .account-sidebar-title,
+  .account-sidebar-launcher-title,
+  .site-chatbot-title,
+  .field-static
+) {
+  color: #000000 !important;
+}
+
+html.contrast-high :where(
+  .button-link.secondary,
+  .button-link.primary
+) {
+  border: 1px solid #000000 !important;
+}
+
+html.contrast-high .button-link.primary {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.contrast-high .button-link.secondary {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.contrast-high :where(
+  .eyebrow,
+  .account-sidebar-pill,
+  .account-sidebar-launcher-pill,
+  .coach-pill,
+  .coach-result-chip
+) {
+  background: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+html.contrast-high :where(
+  .coach-result-chip.is-ai,
+  .coach-result-chip.is-error
+) {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.contrast-high .account-sidebar-panel {
+  background: #ffffff !important;
+}
+
+html.contrast-high .account-sidebar-inner {
+  color: #000000 !important;
+}
+
+html.contrast-high .account-sidebar-mark {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.contrast-high .site-chatbot-message.is-assistant {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+html.contrast-high .site-chatbot-message.is-user {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.contrast-high .site-chatbot-trigger-dot,
+html.contrast-high .eyebrow::before {
+  background: #0000ee !important;
+  box-shadow: none !important;
+}
+
+html.contrast-high :focus-visible {
+  outline: 3px solid #0000ee !important;
+  outline-offset: 3px !important;
 }

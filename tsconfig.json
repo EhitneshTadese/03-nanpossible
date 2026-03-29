@@ -35,14 +35,16 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/dev/types/**/*.ts",
-    ".next/types/**/*.ts",
     "next-env.d.ts",
     "node_modules/.cache/next-build/types/**/*.ts",
     ".next.nosync/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
+    ".next",
+    ".next.nosync",
+    "node_modules/.cache/next-build",
+    "**/* [0-9].*",
     "**/* 2.*"
   ]
 }

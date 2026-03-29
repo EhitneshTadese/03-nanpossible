@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { headers } from "next/headers";
+import { getAccessibilityBootScript } from "@/lib/accessibility-preferences";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteChatbot } from "@/components/site-chatbot";
@@ -33,9 +34,17 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full bg-background antialiased"
+      className="h-full bg-background antialiased text-scale-default contrast-default"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: getAccessibilityBootScript(),
+          }}
+        />
+      </head>
       <body className="min-h-full bg-background text-foreground">
         <div className="flex min-h-full flex-col">
           <SiteHeader siteContext={siteContext} viewer={viewer} />
