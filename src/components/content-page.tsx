@@ -212,7 +212,7 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
     <div className="page-frame">
       <div className="site-shell">
         <div className="hero-grid">
-          <section className="site-panel rounded-[2rem] p-7 md:p-10">
+          <section className="site-panel hero-panel-warm rounded-[2rem] p-7 md:p-10">
             <div className="space-y-5">
               <span className="eyebrow">
                 {siteContext.isGlobal ? "Global WIAL" : `${siteContext.tenant?.name} chapter`}
@@ -222,7 +222,7 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                   {page.title}
                 </h1>
                 {body.heroIntro ? (
-                  <p className="max-w-3xl text-lg leading-8 text-foreground/82">
+                  <p className="max-w-3xl whitespace-pre-line text-lg leading-8 text-foreground/82">
                     {body.heroIntro}
                   </p>
                 ) : null}
