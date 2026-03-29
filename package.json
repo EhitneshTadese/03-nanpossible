@@ -18,6 +18,7 @@
     "backfill:credly": "tsx scripts/backfill-credly-badges.ts",
     "manage:roles": "tsx scripts/manage-roles.ts",
     "list:users": "tsx scripts/list-user-details.ts",
+    "clear:payments": "echo '[]' > data/payments_cache.json",
     "dolt:setup": "bash ops/dolt/setup.sh",
     "dolt:status": "cd ops/dolt/repo && dolt status",
     "dolt:log": "cd ops/dolt/repo && dolt log --oneline"

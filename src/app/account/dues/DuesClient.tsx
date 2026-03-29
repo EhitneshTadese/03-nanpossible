@@ -35,20 +35,31 @@ export function DuesClient({ userName }: DuesClientProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch dues
-    fetch("/api/payments/dues")
-      .then((res) => res.json())
-      .then((data) => setDues(data))
-      .catch((err) => {
-        console.error("Failed to fetch dues:", err);
-        setErrorMessage("Failed to load dues");
-      });
+    const loadData = async () => {
+      try {
+        // Fetch dues
+        const duesRes = await fetch("/api/payments/dues");
+        const duesData = await duesRes.json();
+        setDues(duesData);
 
-    // Load payments from localStorage
-    const cached = localStorage.getItem("wial_payments");
-    if (cached) {
-      setPayments(JSON.parse(cached));
-    }
+        // Fetch payment history (source of truth from payments_cache.json)
+        const historyRes = await fetch("/api/payments/history");
+        const historyData = await historyRes.json();
+        setPayments(Array.isArray(historyData) ? historyData : []);
+
+        // Store in localStorage for client-side optimization
+        if (Array.isArray(historyData)) {
+          localStorage.setItem("wial_payments", JSON.stringify(historyData));
+        }
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setErrorMessage("Failed to load dues");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
 
     // Check for payment success in URL
     const params = new URLSearchParams(window.location.search);
@@ -61,8 +72,6 @@ export function DuesClient({ userName }: DuesClientProps) {
       setErrorMessage(`Payment error: ${params.get("error")}`);
       window.history.replaceState({}, "", "/account/dues");
     }
-
-    setLoading(false);
   }, []);
 
   const isPaid = (dueId: string) => {
