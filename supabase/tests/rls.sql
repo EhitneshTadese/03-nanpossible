@@ -83,6 +83,29 @@ insert into public.users (
   photo_url
 )
 values (
+  '55555555-5555-4555-8555-555555555555',
+  'visitor@wial.org',
+  'public_visitor',
+  null,
+  'Visitor Profile',
+  null,
+  null,
+  null,
+  null
+);
+
+insert into public.users (
+  id,
+  email,
+  role,
+  chapter_id,
+  name,
+  phone,
+  location,
+  bio,
+  photo_url
+)
+values (
   '66666666-6666-4666-8666-666666666666',
   'coach@wial.org',
   'coach',
@@ -96,6 +119,37 @@ values (
 
 set local session_replication_role = origin;
 set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"55555555-5555-4555-8555-555555555555","role":"authenticated","app_metadata":{"role":"public_visitor"}}',
+  true
+);
+
+select public.promote_self_to_coach();
+
+select public.assert_true(
+  exists(
+    select 1
+    from public.users
+    where id = '55555555-5555-4555-8555-555555555555'
+      and role = 'coach'
+      and chapter_id is null
+  ),
+  'public visitor should be able to promote themselves to coach'
+);
+
+do $$
+begin
+  perform public.promote_self_to_chapter_admin();
+  raise exception 'expected chapter assignment check to fail';
+exception
+  when others then
+    if position('chapter assignment' in lower(sqlerrm)) = 0 then
+      raise;
+    end if;
+end;
+$$;
+
 select set_config(
   'request.jwt.claims',
   '{"sub":"66666666-6666-4666-8666-666666666666","role":"authenticated","app_metadata":{"role":"coach","chapter_id":"22222222-2222-4222-8222-222222222222"}}',
@@ -133,6 +187,19 @@ select public.assert_true(
       and photo_url = 'https://example.com/profile.png'
   ),
   'update_my_profile should update safe profile fields without changing role'
+);
+
+select public.promote_self_to_chapter_admin();
+
+select public.assert_true(
+  exists(
+    select 1
+    from public.users
+    where id = '66666666-6666-4666-8666-666666666666'
+      and role = 'chapter_admin'
+      and chapter_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  'coach should be able to promote themselves to chapter admin for their assigned chapter'
 );
 
 rollback;

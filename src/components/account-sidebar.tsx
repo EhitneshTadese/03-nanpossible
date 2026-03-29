@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import type { AccountNavItem } from "@/lib/types";
+import type { AccountNavItem, AppRole } from "@/lib/types";
 
 type AccountSidebarProps = {
   items: AccountNavItem[];
   platformLabel: string;
+  role: AppRole;
   roleLabel: string;
 };
 
@@ -245,6 +246,7 @@ function SidebarContent({
   onNavigate,
   pathname,
   platformLabel,
+  role,
   roleLabel,
 }: {
   items: AccountNavItem[];
@@ -252,9 +254,18 @@ function SidebarContent({
   onNavigate?: () => void;
   pathname: string;
   platformLabel: string;
+  role: AppRole;
   roleLabel: string;
 }) {
   const sections = splitItemsIntoGroups(items);
+  const note =
+    role === "public_visitor"
+      ? "This account starts as a public visitor. Register as a coach to unlock certification and dues routes."
+      : role === "coach"
+        ? "If your account is already attached to a chapter, you can register as chapter head for that chapter."
+        : role === "chapter_admin"
+          ? "Chapter-head access applies only to the chapter currently assigned to your account."
+          : "Platform admins can oversee chapter assignments and elevated access across the WIAL network.";
 
   return (
     <div className="account-sidebar-inner">
@@ -299,10 +310,7 @@ function SidebarContent({
       <div className="account-sidebar-footer">
         <div className="account-sidebar-note">
           <p className="account-sidebar-note-label">Access model</p>
-          <p className="account-sidebar-note-body">
-            Public registrations start with coach access. Admin and chapter-head
-            permissions are assigned by WIAL.
-          </p>
+          <p className="account-sidebar-note-body">{note}</p>
         </div>
 
         <form action="/auth/sign-out" method="post">
@@ -318,6 +326,7 @@ function SidebarContent({
 export function AccountSidebar({
   items,
   platformLabel,
+  role,
   roleLabel,
 }: AccountSidebarProps) {
   const pathname = usePathname();
@@ -357,6 +366,7 @@ export function AccountSidebar({
               onNavigate={() => setOpen(false)}
               pathname={pathname}
               platformLabel={platformLabel}
+              role={role}
               roleLabel={roleLabel}
             />
           </div>
@@ -372,6 +382,7 @@ export function AccountSidebar({
           items={items}
           pathname={pathname}
           platformLabel={platformLabel}
+          role={role}
           roleLabel={roleLabel}
         />
       </aside>

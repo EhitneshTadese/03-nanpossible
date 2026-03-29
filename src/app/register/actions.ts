@@ -79,7 +79,7 @@ export async function registerPublicVisitorAction(formData: FormData) {
   }
 
   if (data.session) {
-    redirect(getDefaultAccountHref("coach"));
+    redirect(getDefaultAccountHref("public_visitor"));
   }
 
   redirect(

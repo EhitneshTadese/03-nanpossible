@@ -5,7 +5,11 @@ export type CanonicalPageSlug =
   | "resources"
   | "contact";
 
-export type AppRole = "platform_admin" | "chapter_admin" | "coach";
+export type AppRole =
+  | "platform_admin"
+  | "chapter_admin"
+  | "coach"
+  | "public_visitor";
 
 export type NavigationItem = {
   href: string;
@@ -24,7 +28,7 @@ export type AccountRoleConfig = {
 };
 
 export type AccountNavigationConfig = {
-  authMode: "password_login_public_registration";
+  authMode: "password_login_public_visitor_progression";
   profileFields: string[];
   roles: Record<AppRole, AccountRoleConfig>;
 };

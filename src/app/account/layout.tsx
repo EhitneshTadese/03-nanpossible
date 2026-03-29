@@ -28,6 +28,7 @@ export default async function AccountLayout({
           <AccountSidebar
             items={getAccountNavItems(viewer.role)}
             platformLabel={platformLabel}
+            role={viewer.role}
             roleLabel={getRoleLabel(viewer.role)}
           />
           <div className="account-stage">{children}</div>

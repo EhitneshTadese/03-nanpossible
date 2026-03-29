@@ -4,7 +4,7 @@ import { getTenantCandidate, shouldBypassTenantRewrite } from "@/lib/routing";
 
 const STATIC_FILE_PATTERN = /\.(.*)$/;
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const siteDomain = process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org";
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get("host") ?? "";

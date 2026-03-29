@@ -10,11 +10,15 @@ import { createServerSupabaseAuthClient, hasSupabaseAuthConfig } from "@/lib/sup
 import type { AppRole, UserProfile } from "@/lib/types";
 
 function coerceRole(value?: string | null): AppRole {
-  if (value === "platform_admin" || value === "chapter_admin") {
+  if (
+    value === "public_visitor" ||
+    value === "platform_admin" ||
+    value === "chapter_admin"
+  ) {
     return value;
   }
 
-  return "coach";
+  return value === "coach" ? "coach" : "public_visitor";
 }
 
 function mapProfileRow(data: {

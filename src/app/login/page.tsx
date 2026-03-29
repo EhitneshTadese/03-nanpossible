@@ -65,9 +65,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </h1>
                 <p className="auth-copy-dark">
                   Admins, chapter heads, and coaches all enter through the same
-                  sign-in route. Public visitors can register separately and
-                  start with standard coach-level access until WIAL assigns a
-                  different role.
+                  sign-in route. Public visitors register separately, then
+                  promote their own account inside the WIAL workspace before
+                  coach and chapter-head tools unlock.
                 </p>
               </div>
 
@@ -162,9 +162,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 Need an account?
               </h3>
               <p className="mt-3 text-sm leading-6 text-foreground/72">
-                Register a public account, then sign in normally. New public
-                registrations start as coach accounts and can update their own
-                profile details immediately.
+                Register a public visitor account, then sign in normally.
+                Public visitors can update their own profile immediately and
+                register as coaches from inside the account area.
               </p>
               <Link className="button-link secondary mt-5 w-full" href={registerHref}>
                 Register

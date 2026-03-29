@@ -1,7 +1,14 @@
 {
-  "authMode": "password_login_public_registration",
+  "authMode": "password_login_public_visitor_progression",
   "profileFields": ["name", "email", "phone", "location", "bio", "photo_url"],
   "roles": {
+    "public_visitor": {
+      "defaultHref": "/account/register-coach",
+      "items": [
+        { "href": "/account/register-coach", "label": "Register as coach" },
+        { "href": "/account/profile", "label": "Update account details" }
+      ]
+    },
     "platform_admin": {
       "defaultHref": "/account/dashboard",
       "items": [
@@ -24,6 +31,7 @@
       "items": [
         { "href": "/account/certifications", "label": "Certification courses" },
         { "href": "/account/dues", "label": "Payment dues" },
+        { "href": "/account/register-chapter-head", "label": "Register as chapter head" },
         { "href": "/account/profile", "label": "Update account details" }
       ]
     }

@@ -63,16 +63,17 @@ export default async function RegisterPage({
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-foreground/78">
                 This registration path is for public visitors who need a WIAL
-                account. New registrations start with coach access. Admin and
-                chapter-head permissions are assigned later by WIAL.
+                account. New registrations start as public visitors, then
+                upgrade themselves to coach from inside the account area.
+                Chapter-head and admin permissions remain elevated roles.
               </p>
             </div>
 
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {[
                 "Profile updates remain self-service.",
-                "Certification and dues routes unlock immediately after sign-in.",
-                "Higher roles remain admin-managed.",
+                "Coach access unlocks only after you register as a coach from inside the account area.",
+                "Chapter-head and admin permissions remain elevated roles.",
               ].map((item) => (
                 <article className="feature-card rounded-[1.35rem]" key={item}>
                   <p className="text-base font-semibold leading-7 text-teal-deep">
@@ -87,11 +88,12 @@ export default async function RegisterPage({
             <div className="auth-panel-content">
               <p className="auth-kicker">Register</p>
               <h2 className="mt-3 font-display text-3xl leading-none tracking-[-0.04em] text-white">
-                Start with coach access.
+                Start as a public visitor.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-300">
                 Use an email address as the username. That same username and
-                password will be used on the sign-in page.
+                password will be used on the sign-in page after the account is
+                created.
               </p>
 
               {error ? (
@@ -163,7 +165,7 @@ export default async function RegisterPage({
                   disabled={!authReady}
                   type="submit"
                 >
-                  Register account
+                  Register public visitor account
                 </button>
               </form>
 

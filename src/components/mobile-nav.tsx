@@ -188,8 +188,10 @@ export function MobileNav({
                   <div className="account-sidebar-note">
                     <p className="account-sidebar-note-label">Public signup</p>
                     <p className="account-sidebar-note-body">
-                      Registration creates a standard coach account. Elevated
-                      roles are still assigned by WIAL.
+                      Registration creates a public visitor account. After
+                      sign-in, public visitors can register as coaches and
+                      coaches assigned to a chapter can register as chapter
+                      heads.
                     </p>
                   </div>
                 )}

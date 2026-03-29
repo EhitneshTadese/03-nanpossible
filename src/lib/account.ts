@@ -9,6 +9,7 @@ const accountNavigation =
   accountNavigationSource as AccountNavigationConfig;
 
 export const appRoles: AppRole[] = [
+  "public_visitor",
   "platform_admin",
   "chapter_admin",
   "coach",
@@ -58,6 +59,8 @@ export function getDefaultAccountHref(role: AppRole) {
 
 export function getRoleLabel(role: AppRole) {
   switch (role) {
+    case "public_visitor":
+      return "Public Visitor";
     case "platform_admin":
       return "Admin";
     case "chapter_admin":

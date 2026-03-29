@@ -144,8 +144,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 Save account details
               </button>
               <p className="text-sm leading-6 text-foreground/60">
-                Email changes go through Supabase confirmation. Role and chapter
-                assignment remain admin-managed.
+                Email changes go through Supabase confirmation. Role upgrades
+                happen through the dedicated workspace routes, while chapter
+                assignment itself remains admin-managed.
               </p>
             </div>
           </form>
