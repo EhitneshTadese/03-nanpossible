@@ -49,7 +49,7 @@ export function SiteFooter({ siteContext }: SiteFooterProps) {
                 <Link href="/">Home</Link>
                 <Link href="/about">About WIAL</Link>
                 <Link href="/certification">Certification</Link>
-                <Link href="/resources">Resources</Link>
+                <Link href="/clients">Our Clients</Link>
                 <Link href="/contact">Contact</Link>
               </div>
             </div>

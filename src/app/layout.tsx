@@ -18,6 +18,16 @@ export const metadata: Metadata = {
   },
   description:
     "A multi-tenant WIAL platform built with Next.js, Supabase, Vercel, and Dolt-backed migration tracking.",
+  icons: {
+    icon: [
+      { url: "/assets/logo.webp", sizes: "16x16", type: "image/webp" },
+      { url: "/assets/logo.webp", sizes: "32x32", type: "image/webp" },
+      { url: "/assets/logo.webp", sizes: "48x48", type: "image/webp" },
+    ],
+    apple: [
+      { url: "/assets/logo.webp", sizes: "180x180", type: "image/webp" },
+    ],
+  },
 };
 
 export default async function RootLayout({

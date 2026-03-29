@@ -37,7 +37,7 @@ function renderSection(section: ContentSection) {
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
                 {item.eyebrow ? (
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-green">
                     {item.eyebrow}
                   </p>
                 ) : null}
@@ -63,7 +63,7 @@ function renderSection(section: ContentSection) {
                 className="feature-card rounded-[1.5rem] md:grid md:grid-cols-[120px_1fr] md:items-start md:gap-6"
                 key={`${item.title}-${item.year ?? "present"}`}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green">
                   {item.year ?? "Now"}
                 </p>
                 <div className="mt-3 space-y-2 md:mt-0">
@@ -96,7 +96,7 @@ function renderSection(section: ContentSection) {
           <div className="grid gap-4 md:grid-cols-2">
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-green">
                   {item.kind}
                 </p>
                 <h3 className="mt-3">{item.title}</h3>
@@ -121,7 +121,7 @@ function renderSection(section: ContentSection) {
           <div className="grid gap-4 md:grid-cols-3">
             {section.items.map((item) => (
               <article className="feature-card rounded-[1.5rem]" key={item.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-green">
                   {item.eyebrow}
                 </p>
                 <h3 className="mt-3">{item.title}</h3>
@@ -136,10 +136,59 @@ function renderSection(section: ContentSection) {
           </div>
         </section>
       );
+    case "logo_grid":
+      return (
+        <section className="section-stack" key={section.title}>
+          <h2 className="section-title text-teal-deep">{section.title}</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {section.items.map((item) => (
+              <article
+                className="feature-card flex aspect-[4/3] items-center justify-center rounded-[1.5rem] p-8 transition-transform duration-200 hover:scale-[1.03]"
+                key={item.name}
+              >
+                <img
+                  alt={`${item.name} logo`}
+                  className="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all"
+                  src={item.logo}
+                />
+              </article>
+            ))}
+          </div>
+        </section>
+      );
+    case "media_prose":
+      return (
+        <section className="section-stack" key={section.title}>
+          <div className="grid gap-8 md:grid-cols-2 md:items-center">
+            <div className={section.imagePosition === "right" ? "md:order-2" : ""}>
+              <div className="overflow-hidden rounded-[2rem] border border-line shadow-shadow">
+                <img
+                  alt={section.imageAlt}
+                  className="aspect-video w-full object-cover md:aspect-square"
+                  src={section.image}
+                />
+              </div>
+              {section.caption ? (
+                <p className="mt-3 text-center text-sm italic text-foreground/60">
+                  {section.caption}
+                </p>
+              ) : null}
+            </div>
+            <div className={`space-y-4 ${section.imagePosition === "right" ? "md:order-1" : ""}`}>
+              <h2 className="section-title text-teal-deep">{section.title}</h2>
+              <div className="section-copy">
+                {section.paragraphs.map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
     case "cta":
       return (
         <section
-          className="rounded-[1.9rem] border border-line bg-[linear-gradient(135deg,rgba(32,92,89,0.08),rgba(200,100,47,0.08))] p-6 md:p-8"
+          className="rounded-[1.9rem] border border-line bg-[linear-gradient(135deg,rgba(209,0,52,0.05),rgba(138,143,0,0.04))] p-6 md:p-8"
           key={section.title}
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -164,7 +213,7 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
     <div className="page-frame">
       <div className="site-shell">
         <div className="hero-grid">
-          <section className="site-panel rounded-[2rem] p-7 md:p-10">
+          <section className="site-panel hero-panel-warm rounded-[2rem] p-7 md:p-10">
             <div className="space-y-5">
               <span className="eyebrow">
                 {siteContext.isGlobal ? "Global WIAL" : `${siteContext.tenant?.name} chapter`}
@@ -174,7 +223,7 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                   {page.title}
                 </h1>
                 {body.heroIntro ? (
-                  <p className="max-w-3xl text-lg leading-8 text-foreground/82">
+                  <p className="max-w-3xl whitespace-pre-line text-lg leading-8 text-foreground/82">
                     {body.heroIntro}
                   </p>
                 ) : null}
@@ -188,8 +237,8 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                 <Link className="button-link primary" href="/contact">
                   Contact WIAL
                 </Link>
-                <Link className="button-link secondary" href="/resources">
-                  Explore resources
+                <Link className="button-link secondary" href="/clients">
+                  View our clients
                 </Link>
               </div>
             </div>

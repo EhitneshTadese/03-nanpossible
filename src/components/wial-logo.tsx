@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 type WialLogoProps = {
   chapterLabel?: string | null;
@@ -6,10 +7,16 @@ type WialLogoProps = {
 
 export function WialLogo({ chapterLabel }: WialLogoProps) {
   return (
-    <Link className="inline-flex items-center gap-3" href="/">
-      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--color-teal),var(--color-teal-deep))] text-lg font-bold text-white shadow-[0_18px_38px_rgba(23,53,51,0.18)]">
-        W
-      </span>
+    <Link className="inline-flex items-center gap-4" href="/">
+      <div className="relative h-10 w-24">
+        <Image
+          src="/assets/logo.webp"
+          alt="WIAL logo"
+          fill
+          priority
+          className="object-contain"
+        />
+      </div>
       <span className="flex flex-col">
         <span className="font-display text-[1.35rem] leading-none tracking-[-0.05em] text-teal-deep">
           WIAL

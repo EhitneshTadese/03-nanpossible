@@ -4,21 +4,21 @@ export const navigationItems: NavigationItem[] = [
   { href: "/coaches", label: "Find a Coach" },
   { href: "/about", label: "About WIAL" },
   { href: "/certification", label: "Certification" },
-  { href: "/resources", label: "Resources & Library" },
+  { href: "/clients", label: "Our Clients" },
   { href: "/contact", label: "Contact" },
 ];
 
 const aliasMap = new Map<string, string>([
   ["about-wial", "/about"],
   ["contact-us", "/contact"],
-  ["library", "/resources"],
+  ["library", "/clients"],
 ]);
 
 const canonicalMap = new Map<string, CanonicalPageSlug>([
   ["", "home"],
   ["about", "about"],
   ["certification", "certification"],
-  ["resources", "resources"],
+  ["clients", "clients"],
   ["contact", "contact"],
 ]);
 
