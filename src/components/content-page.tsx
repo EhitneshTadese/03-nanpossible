@@ -135,6 +135,26 @@ function renderSection(section: ContentSection) {
           </div>
         </section>
       );
+    case "logo_grid":
+      return (
+        <section className="section-stack" key={section.title}>
+          <h2 className="section-title text-teal-deep">{section.title}</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {section.items.map((item) => (
+              <article
+                className="feature-card flex aspect-[4/3] items-center justify-center rounded-[1.5rem] p-8 transition-transform duration-200 hover:scale-[1.03]"
+                key={item.name}
+              >
+                <img
+                  alt={`${item.name} logo`}
+                  className="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all"
+                  src={item.logo}
+                />
+              </article>
+            ))}
+          </div>
+        </section>
+      );
     case "cta":
       return (
         <section
@@ -182,8 +202,8 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                 <Link className="button-link primary" href="/contact">
                   Contact WIAL
                 </Link>
-                <Link className="button-link secondary" href="/resources">
-                  Explore resources
+                <Link className="button-link secondary" href="/clients">
+                  View our clients
                 </Link>
               </div>
             </div>

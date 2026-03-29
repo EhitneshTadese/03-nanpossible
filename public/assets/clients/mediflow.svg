@@ -1,0 +1,6 @@
+<svg width="200" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="100" fill="transparent" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#205c59">MediFlow</text>
+  <circle cx="20" cy="20" r="10" fill="#205c59" opacity="0.5" />
+  <circle cx="180" cy="80" r="15" fill="#205c59" opacity="0.3" />
+</svg>

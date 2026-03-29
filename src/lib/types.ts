@@ -2,7 +2,7 @@ export type CanonicalPageSlug =
   | "home"
   | "about"
   | "certification"
-  | "resources"
+  | "clients"
   | "contact";
 
 export type AppRole =
@@ -225,6 +225,11 @@ export type ContentSection =
       type: "contact_cards";
       title: string;
       items: FeatureItem[];
+    }
+  | {
+      type: "logo_grid";
+      title: string;
+      items: { name: string; logo: string }[];
     }
   | {
       type: "cta";

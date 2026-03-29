@@ -207,67 +207,49 @@
   {
     "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0004",
     "chapterId": null,
-    "slug": "resources",
-    "title": "Resources & Library",
+    "slug": "clients",
+    "title": "Our Clients",
     "published": true,
     "bodyRichtext": {
-      "heroIntro": "This first-pass resources page favors reliable, on-domain WIAL materials over legacy links that now point to archive pages or unhealthy destinations.",
+      "heroIntro": "These are some of the organizations that have worked with us to advance Action Learning across industries and communities worldwide.",
       "metrics": [
-        { "label": "Seeded resources", "value": "3" },
-        { "label": "Archive links imported", "value": "0" },
-        { "label": "Content strategy", "value": "Safe-first" }
+        { "label": "Sectors served", "value": "15+" },
+        { "label": "Global partners", "value": "120+" },
+        { "label": "Success stories", "value": "500+" }
       ],
       "sections": [
         {
-          "type": "resource_list",
-          "title": "Verified resources from the current domain",
-          "description": "The current site references WIAL Talk, a library, and downloadable material. This phase keeps the resource set tight and verifiable by prioritizing on-domain PDF assets that are still accessible.",
+          "type": "logo_grid",
+          "title": "Organizations we’ve worked with",
           "items": [
-            {
-              "kind": "Brochure",
-              "title": "WIAL Action Learning Brochure",
-              "body": "A concise overview of the WIAL approach, suitable for onboarding and introductory review.",
-              "href": "https://wial.org/wp-content/uploads/WIAL-Action-Learning-Brochure-1.pdf",
-              "label": "Open brochure"
-            },
-            {
-              "kind": "Article",
-              "title": "The Power of Action Learning",
-              "body": "A current on-domain PDF about the impact of Action Learning and its relevance for creating a better world.",
-              "href": "https://wial.org/wp-content/uploads/The-power-of-Action-Learning-%E2%80%93-5-ways-to-create-a-better-world.pdf",
-              "label": "Read article"
-            },
-            {
-              "kind": "Case study",
-              "title": "Leadership Development at the New York Public Library",
-              "body": "A WIAL-hosted PDF that can anchor the new library page with an applied example instead of broken legacy links.",
-              "href": "https://wial.org/wp-content/uploads/Leadership-developent-at-the-NY-Library.pdf",
-              "label": "Read case study"
-            }
-          ]
-        },
-        {
-          "type": "prose",
-          "title": "What was intentionally skipped",
-          "paragraphs": [
-            "The current environment revealed broken or archived links on the legacy site. Those destinations were not imported into this phase because they would weaken trust in the new foundation.",
-            "As more healthy source material is recovered through WordPress export or direct admin access, this page can expand without changing the public route structure."
+            { "name": "TechCorp", "logo": "/assets/clients/techcorp.svg" },
+            { "name": "GlobalHealth", "logo": "/assets/clients/globalhealth.svg" },
+            { "name": "EcoSolutions", "logo": "/assets/clients/ecosolutions.svg" },
+            { "name": "FinStream", "logo": "/assets/clients/finstream.svg" },
+            { "name": "EduVantage", "logo": "/assets/clients/eduvantage.svg" },
+            { "name": "LogiRoute", "logo": "/assets/clients/logiroute.svg" },
+            { "name": "SkyPeak", "logo": "/assets/clients/skypeak.svg" },
+            { "name": "ZenithSys", "logo": "/assets/clients/zenithsys.svg" },
+            { "name": "MediFlow", "logo": "/assets/clients/mediflow.svg" },
+            { "name": "AquaPure", "logo": "/assets/clients/aquapure.svg" },
+            { "name": "TerraForm", "logo": "/assets/clients/terraform.svg" },
+            { "name": "NovaNova", "logo": "/assets/clients/novanova.svg" }
           ]
         },
         {
           "type": "cta",
-          "title": "Need a missing library item migrated?",
-          "body": "Use the shared contact route to flag source files that should be restored in a later migration pass once a healthy origin is available.",
+          "title": "Ready to bring Action Learning to your organization?",
+          "body": "Use the shared contact route to coordinate a tailored Action Learning program for your team or organization.",
           "href": "/contact",
-          "label": "Request a migration review"
+          "label": "Talk with WIAL"
         }
       ]
     },
     "seo": {
-      "description": "Safe-first WIAL resources page seeded with verified, on-domain downloadable materials.",
-      "sourceUrl": "https://wial.org/action-learning/library/",
-      "sourceStatus": "curated-safe-rebuild",
-      "sourceNotes": "Library page content was reconstructed from healthy on-domain assets because the legacy library path was not reliably fetchable from this environment."
+      "description": "Organizations and communities that have advanced Action Learning with WIAL worldwide.",
+      "sourceUrl": "https://wial.org/clients/",
+      "sourceStatus": "newly-created",
+      "sourceNotes": "Replaced the previous Resources & Library page with a dedicated Clients showcase."
     }
   },
   {
