@@ -8,24 +8,28 @@ export async function getChapterBySubdomain(subdomain: string) {
   const client = createSupabaseContentClient({ tenantSubdomain: subdomain });
 
   if (client) {
-    const { data } = await client
-      .from("chapters")
-      .select("id, name, subdomain, locale, status, contact_email, theme_json, tagline")
-      .eq("subdomain", subdomain)
-      .eq("status", "active")
-      .maybeSingle();
+    try {
+      const { data } = await client
+        .from("chapters")
+        .select("id, name, subdomain, locale, status, contact_email, theme_json, tagline")
+        .eq("subdomain", subdomain)
+        .eq("status", "active")
+        .maybeSingle();
 
-    if (data) {
-      return {
-        id: data.id,
-        name: data.name,
-        subdomain: data.subdomain,
-        locale: data.locale,
-        status: data.status,
-        contactEmail: data.contact_email,
-        themeJson: data.theme_json ?? {},
-        tagline: data.tagline,
-      } satisfies ChapterRecord;
+      if (data) {
+        return {
+          id: data.id,
+          name: data.name,
+          subdomain: data.subdomain,
+          locale: data.locale,
+          status: data.status,
+          contactEmail: data.contact_email,
+          themeJson: data.theme_json ?? {},
+          tagline: data.tagline,
+        } satisfies ChapterRecord;
+      }
+    } catch {
+      // Supabase unreachable — fall through to fixtures
     }
   }
 
@@ -41,24 +45,28 @@ export async function getChapterById(id: string) {
   const client = createSupabaseContentClient();
 
   if (client) {
-    const { data } = await client
-      .from("chapters")
-      .select("id, name, subdomain, locale, status, contact_email, theme_json, tagline")
-      .eq("id", id)
-      .eq("status", "active")
-      .maybeSingle();
+    try {
+      const { data } = await client
+        .from("chapters")
+        .select("id, name, subdomain, locale, status, contact_email, theme_json, tagline")
+        .eq("id", id)
+        .eq("status", "active")
+        .maybeSingle();
 
-    if (data) {
-      return {
-        id: data.id,
-        name: data.name,
-        subdomain: data.subdomain,
-        locale: data.locale,
-        status: data.status,
-        contactEmail: data.contact_email,
-        themeJson: data.theme_json ?? {},
-        tagline: data.tagline,
-      } satisfies ChapterRecord;
+      if (data) {
+        return {
+          id: data.id,
+          name: data.name,
+          subdomain: data.subdomain,
+          locale: data.locale,
+          status: data.status,
+          contactEmail: data.contact_email,
+          themeJson: data.theme_json ?? {},
+          tagline: data.tagline,
+        } satisfies ChapterRecord;
+      }
+    } catch {
+      // Supabase unreachable — fall through to fixtures
     }
   }
 

@@ -46,36 +46,40 @@ export async function getContentPage({
   const client = createSupabaseContentClient({ tenantSubdomain });
 
   if (client) {
-    if (chapterId) {
-      const { data: chapterPage } = await client
+    try {
+      if (chapterId) {
+        const { data: chapterPage } = await client
+          .from("content_pages")
+          .select("id, chapter_id, slug, title, published, body_html, body_richtext, seo")
+          .eq("chapter_id", chapterId)
+          .eq("slug", slug)
+          .eq("published", true)
+          .maybeSingle();
+
+        if (chapterPage) {
+          return mapPageRecord({
+            ...chapterPage,
+            chapterId: chapterPage.chapter_id,
+          });
+        }
+      }
+
+      const { data: globalPage } = await client
         .from("content_pages")
         .select("id, chapter_id, slug, title, published, body_html, body_richtext, seo")
-        .eq("chapter_id", chapterId)
+        .is("chapter_id", null)
         .eq("slug", slug)
         .eq("published", true)
         .maybeSingle();
 
-      if (chapterPage) {
+      if (globalPage) {
         return mapPageRecord({
-          ...chapterPage,
-          chapterId: chapterPage.chapter_id,
+          ...globalPage,
+          chapterId: globalPage.chapter_id,
         });
       }
-    }
-
-    const { data: globalPage } = await client
-      .from("content_pages")
-      .select("id, chapter_id, slug, title, published, body_html, body_richtext, seo")
-      .is("chapter_id", null)
-      .eq("slug", slug)
-      .eq("published", true)
-      .maybeSingle();
-
-    if (globalPage) {
-      return mapPageRecord({
-        ...globalPage,
-        chapterId: globalPage.chapter_id,
-      });
+    } catch {
+      // Supabase unreachable — fall through to fixtures
     }
   }
 

@@ -26,6 +26,8 @@ export function createSupabaseContentClient(options: ClientOptions = {}) {
     },
     global: {
       headers,
+      fetch: (input, init) =>
+        fetch(input, { ...init, signal: AbortSignal.timeout(5000) }),
     },
   });
 }

@@ -2,6 +2,9 @@
   "name": "wial-platform",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9 <23"
+  },
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "dev:next": "next dev",

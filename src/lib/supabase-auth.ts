@@ -62,6 +62,8 @@ export async function createServerSupabaseAuthClient(
   return createServerClient(env.url, env.anonKey, {
     global: {
       headers: getGlobalHeaders(options.tenantSubdomain),
+      fetch: (input, init) =>
+        fetch(input, { ...init, signal: AbortSignal.timeout(5000) }),
     },
     cookies: {
       getAll() {

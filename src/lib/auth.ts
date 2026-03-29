@@ -50,48 +50,52 @@ export const getCurrentViewer = cache(async () => {
     return null;
   }
 
-  const supabase = await createServerSupabaseAuthClient();
+  try {
+    const supabase = await createServerSupabaseAuthClient();
 
-  if (!supabase) {
+    if (!supabase) {
+      return null;
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return null;
+    }
+
+    const { data } = await supabase
+      .from("users")
+      .select("id, email, name, role, chapter_id, phone, location, bio, photo_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (data) {
+      return mapProfileRow(data);
+    }
+
+    return {
+      id: user.id,
+      email: user.email ?? "",
+      name: typeof user.user_metadata?.name === "string" ? user.user_metadata.name : "",
+      role: coerceRole(
+        typeof user.app_metadata?.role === "string"
+          ? user.app_metadata.role
+          : null,
+      ),
+      chapterId:
+        typeof user.app_metadata?.chapter_id === "string"
+          ? user.app_metadata.chapter_id
+          : null,
+      phone: null,
+      location: null,
+      bio: null,
+      photoUrl: null,
+    } satisfies UserProfile;
+  } catch {
     return null;
   }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return null;
-  }
-
-  const { data } = await supabase
-    .from("users")
-    .select("id, email, name, role, chapter_id, phone, location, bio, photo_url")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (data) {
-    return mapProfileRow(data);
-  }
-
-  return {
-    id: user.id,
-    email: user.email ?? "",
-    name: typeof user.user_metadata?.name === "string" ? user.user_metadata.name : "",
-    role: coerceRole(
-      typeof user.app_metadata?.role === "string"
-        ? user.app_metadata.role
-        : null,
-    ),
-    chapterId:
-      typeof user.app_metadata?.chapter_id === "string"
-        ? user.app_metadata.chapter_id
-        : null,
-    phone: null,
-    location: null,
-    bio: null,
-    photoUrl: null,
-  } satisfies UserProfile;
 });
 
 export async function requireAccountViewer(
