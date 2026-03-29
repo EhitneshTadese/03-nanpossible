@@ -1,12 +1,7 @@
 # 2026_spring_wics_asu Hackathon Project
 
-## Quick Links
-- [Hackathon Details](https://www.ohack.dev/hack/2026_spring_wics_asu)
-- [DevPost Submission](https://wics-ohack-sp26-hackathon.devpost.com/)
-- [Team Slack Channel](https://opportunity-hack.slack.com/app_redirect?channel=team-03-nanpossible)
-
 ## Team "NaNpossible"
-- Pranav Sunil
+- Ryan Sam Varghese
 - Pragyan Jyoti Borthakur
 - Chirag Manjeshwar
 - Sai Manaswi Seela
