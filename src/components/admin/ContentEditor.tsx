@@ -31,10 +31,10 @@ function ToolbarButton({
 }>) {
   return (
     <button
-      className={`rounded-full border px-3 py-2 text-sm font-semibold ${
+      className={`shrink-0 rounded-[1rem] px-3 py-2 text-sm font-semibold tracking-[0.01em] transition-colors ${
         active
-          ? "border-accent bg-accent/10 text-teal-deep"
-          : "border-line bg-white/70 text-foreground/72"
+          ? "bg-teal-deep text-white shadow-[0_10px_24px_rgba(22,63,61,0.14)]"
+          : "bg-transparent text-foreground/62 hover:bg-teal-deep/6 hover:text-teal-deep"
       }`}
       onClick={(event) => {
         event.preventDefault();
@@ -143,46 +143,143 @@ export function ContentEditor({
 
   return (
     <div className="site-panel rounded-[2rem] p-6 md:p-8">
-      <div className="flex flex-wrap gap-2">
-        <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
-          Bold
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
-          Italic
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-          H2
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-          H3
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-          Bullet list
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-          Numbered list
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => {
-            const previousUrl = editor.getAttributes("link").href;
-            const url = window.prompt("Enter URL", previousUrl);
+      <div className="flex flex-col gap-4 border-b border-line/70 pb-5 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-2">
+          <p className="eyebrow">Editing page</p>
+          <div>
+            <h2 className="font-display text-3xl tracking-[-0.04em] text-teal-deep md:text-4xl">
+              {pageTitle}
+            </h2>
+            <p className="mt-2 text-sm uppercase tracking-[0.16em] text-foreground/45">
+              /{pageSlug} · {published ? "Published" : "Draft"}
+            </p>
+          </div>
+        </div>
 
-            if (!url) {
-              editor.chain().focus().unsetLink().run();
-              return;
-            }
+        <div className="flex flex-wrap items-center gap-3 md:justify-end">
+          <button
+            className="button-link secondary"
+            onClick={async () => {
+              setStatus("saving");
 
-            editor.chain().focus().setLink({ href: url }).run();
-          }}
-        >
-          Link
-        </ToolbarButton>
-        <ToolbarButton onClick={() => fileInputRef.current?.click()}>
-          Image
-        </ToolbarButton>
-        <ToolbarButton active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-          Quote
-        </ToolbarButton>
+              try {
+                const response = await fetch("/api/content/save-draft", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    page_id: pageId,
+                    body_json: editor.getJSON(),
+                  }),
+                });
+
+                if (!response.ok) {
+                  throw new Error("save failed");
+                }
+
+                setStatus("saved");
+              } catch {
+                setStatus("error");
+              }
+            }}
+            type="button"
+          >
+            Save draft
+          </button>
+
+          <button
+            className="button-link primary"
+            onClick={async () => {
+              setPublishNotice(null);
+
+              const response = await fetch("/api/content/update", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  page_id: pageId,
+                  body_json: editor.getJSON(),
+                  body_html: editor.getHTML(),
+                  published: true,
+                }),
+              });
+
+              const payload = (await response.json()) as { error?: string };
+
+              if (!response.ok) {
+                setPublishNotice({
+                  message: payload.error ?? "WIAL could not publish this page.",
+                  tone: "error",
+                });
+                return;
+              }
+
+              setPublishNotice({
+                message:
+                  "Page published. Refresh the public site to confirm the latest output.",
+                tone: "success",
+              });
+            }}
+            type="button"
+          >
+            Publish
+          </button>
+
+          <button
+            className="button-link secondary"
+            onClick={() => setShowGenerate(true)}
+            type="button"
+          >
+            AI Generate
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-5 overflow-x-auto pb-1">
+        <div className="inline-flex min-w-full items-center gap-1.5 rounded-[1.5rem] border border-line/80 bg-white/76 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:min-w-0">
+          <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
+            Bold
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
+            Italic
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+            H2
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+            H3
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+            Bullets
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+            Numbers
+          </ToolbarButton>
+          <ToolbarButton
+            active={editor.isActive("link")}
+            onClick={() => {
+              const previousUrl = editor.getAttributes("link").href;
+              const url = window.prompt("Enter URL", previousUrl);
+
+              if (!url) {
+                editor.chain().focus().unsetLink().run();
+                return;
+              }
+
+              editor.chain().focus().setLink({ href: url }).run();
+            }}
+          >
+            Link
+          </ToolbarButton>
+          <ToolbarButton onClick={() => fileInputRef.current?.click()}>
+            Image
+          </ToolbarButton>
+          <ToolbarButton active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+            Quote
+          </ToolbarButton>
+        </div>
       </div>
 
       <input
@@ -220,87 +317,13 @@ export function ContentEditor({
         type="file"
       />
 
-      <div className="mt-5 rounded-[1.6rem] border border-line bg-white/72 px-5 py-5">
+      <div className="mt-5 rounded-[1.6rem] border border-line bg-white/72 px-5 py-6 md:px-8 md:py-7">
         <EditorContent className="chapter-editor prose max-w-none" editor={editor} />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <button
-          className="button-link secondary"
-          onClick={async () => {
-            setStatus("saving");
-
-            try {
-              const response = await fetch("/api/content/save-draft", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  page_id: pageId,
-                  body_json: editor.getJSON(),
-                }),
-              });
-
-              if (!response.ok) {
-                throw new Error("save failed");
-              }
-
-              setStatus("saved");
-            } catch {
-              setStatus("error");
-            }
-          }}
-          type="button"
-        >
-          Save draft
-        </button>
-
-        <button
-          className="button-link primary"
-          onClick={async () => {
-            setPublishNotice(null);
-
-            const response = await fetch("/api/content/update", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                page_id: pageId,
-                body_json: editor.getJSON(),
-                body_html: editor.getHTML(),
-                published: true,
-              }),
-            });
-
-            const payload = (await response.json()) as { error?: string };
-
-            if (!response.ok) {
-              setPublishNotice({
-                message: payload.error ?? "WIAL could not publish this page.",
-                tone: "error",
-              });
-              return;
-            }
-
-            setPublishNotice({
-              message:
-                "Page published. Refresh the public site to confirm the latest output.",
-              tone: "success",
-            });
-          }}
-          type="button"
-        >
-          Publish
-        </button>
-
-        <button className="button-link secondary" onClick={() => setShowGenerate(true)} type="button">
-          AI Generate
-        </button>
-
         <span className="text-sm font-semibold uppercase tracking-[0.16em] text-foreground/45">
-          {published ? "Currently published" : "Currently draft"}
+          {published ? "Published view loaded" : "Draft view loaded"}
         </span>
 
         {status === "saved" ? (

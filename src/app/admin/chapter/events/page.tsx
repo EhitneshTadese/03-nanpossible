@@ -150,7 +150,7 @@ export default async function ChapterEventsPage({
 
         <aside className="site-panel rounded-[2rem] p-6">
           <p className="eyebrow">{selectedEvent ? "Edit event" : "Add event"}</p>
-          <form action={upsertEventAction} className="mt-5 space-y-4">
+          <form action={upsertEventAction} className="mt-5 space-y-4" key={selectedEvent?.id ?? "new"}>
             <input name="eventId" type="hidden" value={selectedEvent?.id ?? ""} />
             <input name="chapterId" type="hidden" value={chapter.id} />
             <label className="field-shell">

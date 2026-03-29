@@ -85,8 +85,13 @@ function buildDefaultPages(
     title: page.slug === "about" ? `About ${chapterName}` : page.title,
     body_html:
       page.slug === "contact" ? buildContactHtml(contactEmail, contactPhone) : "",
+    body_json: null,
     body_richtext: {},
+    is_global: false,
+    language,
+    sort_order: page.sortOrder,
     published: false,
+    ai_generated: false,
     seo: {},
   }));
 }
@@ -359,9 +364,16 @@ export async function provisionChapter(input: ChapterProvisionInput): Promise<Pr
     .insert({
       name,
       subdomain,
+      region: region || null,
+      language,
+      country: country || null,
+      lead_user_id: leadUserId,
       locale: language,
       contact_email: contactEmail,
+      contact_phone: contactPhone || null,
+      description: description || null,
       tagline: description || "",
+      config: {},
       status: "active",
     })
     .select("id")

@@ -38,7 +38,7 @@ export default async function ChapterAdminPage({
       eyebrow="Chapter workspace"
       title={chapter.name}
     >
-      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="space-y-5">
         <PageList currentPageId={selectedPage?.id ?? null} pages={pages} />
         {selectedPage ? (
           <ContentEditor

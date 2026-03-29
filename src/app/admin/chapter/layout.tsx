@@ -1,4 +1,3 @@
-import { ChapterSidebar } from "@/components/admin/ChapterSidebar";
 import { ChapterProvider } from "@/components/providers/ChapterProvider";
 import { requireAccountViewer } from "@/lib/auth";
 import { resolveWorkspaceChapter } from "@/lib/chapter-workspace";
@@ -39,10 +38,7 @@ export default async function ChapterAdminLayout({
         language: chapter.language,
       }}
     >
-      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <ChapterSidebar chapter={chapter} />
-        <div className="space-y-5">{children}</div>
-      </div>
+      <>{children}</>
     </ChapterProvider>
   );
 }

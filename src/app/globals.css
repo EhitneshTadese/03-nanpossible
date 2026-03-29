@@ -844,3 +844,34 @@ a {
     align-items: end;
   }
 }
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  background: transparent;
+  padding: 0.56rem 0.72rem;
+  color: rgba(23, 53, 51, 0.72);
+  font-weight: 700;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.admin-sidebar-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(32, 92, 89, 0.12);
+  background: rgba(32, 92, 89, 0.04);
+  color: var(--teal-deep);
+}
+
+.admin-sidebar-link.is-active {
+  border-color: rgba(32, 92, 89, 0.2);
+  background: white;
+  color: var(--teal-deep);
+  box-shadow: 0 4px 12px rgba(32, 92, 89, 0.04);
+}

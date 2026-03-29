@@ -5,7 +5,7 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
-  reactCompiler: false,
+  distDir: "node_modules/.cache/next-build",
   images: {
     remotePatterns: [
       {
