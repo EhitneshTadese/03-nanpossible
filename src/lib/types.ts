@@ -8,8 +8,11 @@ export type CanonicalPageSlug =
 export type AppRole =
   | "platform_admin"
   | "chapter_admin"
+  | "content_creator"
   | "coach"
   | "public_visitor";
+
+export type CertificationLevel = "CALC" | "PALC" | "SALC" | "MALC";
 
 export type NavigationItem = {
   href: string;
@@ -39,21 +42,91 @@ export type UserProfile = {
   name: string;
   role: AppRole;
   chapterId: string | null;
+  assignedChapters: string[];
   phone: string | null;
   location: string | null;
   bio: string | null;
   photoUrl: string | null;
 };
 
+export type CoachRecord = {
+  id: string;
+  userId: string | null;
+  chapterId: string | null;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  photoUrl: string | null;
+  certLevel: CertificationLevel | null;
+  locationCity: string | null;
+  locationCountry: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  bio: string | null;
+  specializations: string[];
+  languages: string[];
+  website: string | null;
+  linkedin: string | null;
+  credlyBadgeUrl: string | null;
+  approved: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastApprovedAt: string | null;
+  rejectionReason: string | null;
+  rejectedAt: string | null;
+  similarity?: number;
+};
+
+export type CoachFacetOptions = {
+  countries: string[];
+  languages: string[];
+};
+
+export type CoachSearchFilters = {
+  certLevel?: CertificationLevel | null;
+  country?: string | null;
+  city?: string | null;
+  language?: string | null;
+  specializations?: string[] | null;
+};
+
+export type ParsedCoachQuery = {
+  cert_level: CertificationLevel | null;
+  country: string | null;
+  city: string | null;
+  specializations: string[] | null;
+  language: string | null;
+  semantic_query: string;
+};
+
+export type CoachSearchMode = "filters" | "semantic" | "hybrid" | "name_fallback";
+
+export type CoachSearchResponse = {
+  coaches: CoachRecord[];
+  parsedQuery: ParsedCoachQuery | null;
+  mode: CoachSearchMode;
+  total: number;
+  nextOffset: number | null;
+};
+
 export type ChapterRecord = {
   id: string;
   name: string;
   subdomain: string;
-  locale: string;
+  region: string | null;
+  language: string;
+  country: string | null;
+  leadUserId: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  description: string | null;
+  logoUrl: string | null;
+  stripeAccountId: string | null;
+  config: Record<string, unknown>;
   status: "active" | "draft" | "inactive";
-  contactEmail: string;
-  themeJson: Record<string, string>;
-  tagline: string;
+  locale?: string;
+  themeJson?: Record<string, string>;
+  tagline?: string;
 };
 
 export type MetricItem = {
@@ -128,13 +201,52 @@ export type SeoRecord = {
 export type ContentPageRecord = {
   id: string;
   chapterId: string | null;
-  slug: CanonicalPageSlug;
+  slug: string;
   title: string;
+  isGlobal: boolean;
+  language: string;
+  sortOrder: number;
   published: boolean;
+  aiGenerated: boolean;
   bodyHtml?: string;
+  bodyJson?: unknown;
   bodyRichtext: ContentBody;
   seo: SeoRecord;
 };
+
+export type ChapterContextValue = {
+  id: string;
+  subdomain: string;
+  name: string;
+  language: string;
+} | null;
+
+export type EventRecord = {
+  id: string;
+  chapterId: string;
+  title: string;
+  startAt: string;
+  endAt: string | null;
+  location: string | null;
+  description: string | null;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ChapterProvisionInput = {
+  name: string;
+  subdomain: string;
+  region: string;
+  country: string;
+  language: string;
+  leadEmail: string;
+  contactEmail: string;
+  contactPhone: string;
+  description: string;
+};
+
+export type GenerationTone = "professional" | "warm" | "academic";
 
 export type SiteContext =
   | {

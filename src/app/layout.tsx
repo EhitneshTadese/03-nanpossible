@@ -1,23 +1,10 @@
 import type { Metadata } from "next";
-import { Fraunces, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getCurrentViewer } from "@/lib/auth";
 import { getLayoutSiteContext } from "@/lib/site-context";
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const sourceSans = Source_Sans_3({
-  variable: "--font-source-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -45,7 +32,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${sourceSans.variable} h-full bg-background antialiased`}
+      className="h-full bg-background antialiased"
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full bg-background text-foreground">

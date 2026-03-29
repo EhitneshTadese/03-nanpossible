@@ -12,9 +12,10 @@ import {
 describe("account navigation", () => {
   it("maps each role to its default destination", () => {
     expect(getDefaultAccountHref("public_visitor")).toBe("/account/register-coach");
-    expect(getDefaultAccountHref("platform_admin")).toBe("/account/dashboard");
-    expect(getDefaultAccountHref("chapter_admin")).toBe("/account/content");
-    expect(getDefaultAccountHref("coach")).toBe("/account/certifications");
+    expect(getDefaultAccountHref("platform_admin")).toBe("/admin/global");
+    expect(getDefaultAccountHref("chapter_admin")).toBe("/admin/chapter");
+    expect(getDefaultAccountHref("content_creator")).toBe("/admin/chapter");
+    expect(getDefaultAccountHref("coach")).toBe("/dashboard/profile");
   });
 
   it("returns role-specific menu items", () => {
@@ -23,17 +24,26 @@ describe("account navigation", () => {
       "Update account details",
     ]);
     expect(getAccountNavItems("platform_admin").map((item) => item.label)).toEqual([
-      "Dashboard",
-      "Chapters and Chapter Heads",
+      "Global admin",
+      "Chapters",
+      "Coach approvals",
       "Update account details",
     ]);
     expect(getAccountNavItems("chapter_admin").map((item) => item.label)).toEqual([
       "Change website content",
-      "Coaches",
+      "Coach approvals",
+      "Events",
+      "Chapter settings",
       "Chapter revenue dashboard",
       "Update account details",
     ]);
+    expect(getAccountNavItems("content_creator").map((item) => item.label)).toEqual([
+      "Change website content",
+      "Events",
+      "Update account details",
+    ]);
     expect(getAccountNavItems("coach").map((item) => item.label)).toEqual([
+      "Coach directory profile",
       "Certification courses",
       "Payment dues",
       "Register as chapter head",
@@ -46,14 +56,31 @@ describe("account navigation", () => {
       "public_visitor",
       "platform_admin",
       "chapter_admin",
+      "content_creator",
       "coach",
+    ]);
+    expect(getAllowedRolesForAccountRoute("/dashboard/profile")).toEqual([
+      "coach",
+    ]);
+    expect(getAllowedRolesForAccountRoute("/admin/chapter/coaches")).toEqual([
+      "chapter_admin",
+    ]);
+    expect(getAllowedRolesForAccountRoute("/admin/approvals")).toEqual([
+      "platform_admin",
+    ]);
+    expect(getAllowedRolesForAccountRoute("/admin/chapter")).toEqual([
+      "chapter_admin",
+      "content_creator",
     ]);
     expect(isAccountRouteAccessible("public_visitor", "/account/profile")).toBe(true);
     expect(isAccountRouteAccessible("public_visitor", "/account/register-coach")).toBe(true);
     expect(isAccountRouteAccessible("public_visitor", "/account/certifications")).toBe(false);
     expect(isAccountRouteAccessible("coach", "/account/profile")).toBe(true);
     expect(isAccountRouteAccessible("coach", "/account/register-chapter-head")).toBe(true);
-    expect(isAccountRouteAccessible("coach", "/account/dashboard")).toBe(false);
+    expect(isAccountRouteAccessible("coach", "/dashboard/profile")).toBe(true);
+    expect(isAccountRouteAccessible("coach", "/admin/approvals")).toBe(false);
+    expect(isAccountRouteAccessible("content_creator", "/admin/chapter")).toBe(true);
+    expect(isAccountRouteAccessible("content_creator", "/admin/chapter/coaches")).toBe(false);
   });
 });
 

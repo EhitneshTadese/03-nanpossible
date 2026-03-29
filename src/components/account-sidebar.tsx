@@ -19,10 +19,13 @@ type SidebarGroup = {
 };
 
 type IconName =
+  | "approvals"
   | "dashboard"
   | "chapters"
   | "content"
   | "coaches"
+  | "events"
+  | "settings"
   | "revenue"
   | "certifications"
   | "dues"
@@ -30,6 +33,24 @@ type IconName =
 
 function getIconName(href: string): IconName {
   switch (href) {
+    case "/admin/approvals":
+      return "approvals";
+    case "/admin/global":
+      return "dashboard";
+    case "/admin/global/chapters":
+      return "chapters";
+    case "/admin/chapter":
+      return "content";
+    case "/admin/chapter/coaches":
+      return "coaches";
+    case "/admin/chapter/events":
+      return "events";
+    case "/admin/chapter/settings":
+      return "settings";
+    case "/dashboard/profile":
+      return "profile";
+    case "/dashboard/coaches":
+      return "approvals";
     case "/account/dashboard":
       return "dashboard";
     case "/account/chapters":
@@ -73,6 +94,18 @@ function splitItemsIntoGroups(items: AccountNavItem[]): SidebarGroup[] {
 
 function SidebarIcon({ name }: { name: IconName }) {
   switch (name) {
+    case "approvals":
+      return (
+        <svg fill="none" viewBox="0 0 24 24">
+          <path
+            d="M7.75 4.75H16.25C17.4926 4.75 18.5 5.75736 18.5 7V18C18.5 19.2426 17.4926 20.25 16.25 20.25H7.75C6.50736 20.25 5.5 19.2426 5.5 18V7C5.5 5.75736 6.50736 4.75 7.75 4.75ZM8.75 10.75L11 13L15.25 8.75M8.75 16H15.25"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
     case "dashboard":
       return (
         <svg fill="none" viewBox="0 0 24 24">
@@ -130,6 +163,30 @@ function SidebarIcon({ name }: { name: IconName }) {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "events":
+      return (
+        <svg fill="none" viewBox="0 0 24 24">
+          <path
+            d="M7 4.75V7.25M17 4.75V7.25M5.75 8.5H18.25M6.75 6.25H17.25C18.3546 6.25 19.25 7.14543 19.25 8.25V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V8.25C4.75 7.14543 5.64543 6.25 6.75 6.25ZM8 11.75H12.5M8 15.25H15.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "settings":
+      return (
+        <svg fill="none" viewBox="0 0 24 24">
+          <path
+            d="M12 8.75A3.25 3.25 0 1 0 12 15.25A3.25 3.25 0 1 0 12 8.75ZM19.25 13.25V10.75L17.2 10.1C17.05 9.61 16.85 9.15 16.57 8.73L17.55 6.8L15.2 4.45L13.27 5.43C12.85 5.15 12.39 4.95 11.9 4.8L11.25 2.75H8.75L8.1 4.8C7.61 4.95 7.15 5.15 6.73 5.43L4.8 4.45L2.45 6.8L3.43 8.73C3.15 9.15 2.95 9.61 2.8 10.1L0.75 10.75V13.25L2.8 13.9C2.95 14.39 3.15 14.85 3.43 15.27L2.45 17.2L4.8 19.55L6.73 18.57C7.15 18.85 7.61 19.05 8.1 19.2L8.75 21.25H11.25L11.9 19.2C12.39 19.05 12.85 18.85 13.27 18.57L15.2 19.55L17.55 17.2L16.57 15.27C16.85 14.85 17.05 14.39 17.2 13.9L19.25 13.25Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.4"
           />
         </svg>
       );
@@ -262,10 +319,10 @@ function SidebarContent({
     role === "public_visitor"
       ? "This account starts as a public visitor. Register as a coach to unlock certification and dues routes."
       : role === "coach"
-        ? "If your account is already attached to a chapter, you can register as chapter head for that chapter."
+        ? "Coaches manage their public directory profile in the new dashboard workspace, then use the account area for certification and dues."
         : role === "chapter_admin"
-          ? "Chapter-head access applies only to the chapter currently assigned to your account."
-          : "Platform admins can oversee chapter assignments and elevated access across the WIAL network.";
+          ? "Chapter-head access applies only to the chapter currently assigned to your account, including coach approvals and directory review."
+          : "Platform admins can oversee coach approvals, chapter assignments, and elevated access across the full WIAL network.";
 
   return (
     <div className="account-sidebar-inner">

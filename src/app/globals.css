@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  --font-source-sans:
+    "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-fraunces:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --background: #f4efe5;
   --foreground: #173533;
   --surface: rgba(255, 250, 242, 0.82);
@@ -732,6 +736,98 @@ a {
   box-shadow: 0 16px 36px rgba(22, 63, 61, 0.16);
 }
 
+.coach-hero-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.coach-callout {
+  align-self: end;
+  border: 1px solid rgba(23, 53, 51, 0.1);
+  border-radius: 1.8rem;
+  background:
+    linear-gradient(135deg, rgba(32, 92, 89, 0.08), rgba(184, 143, 69, 0.06)),
+    rgba(255, 250, 242, 0.7);
+  padding: 1.3rem 1.35rem;
+}
+
+.coach-callout-label {
+  color: rgba(23, 53, 51, 0.52);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.coach-avatar-frame {
+  display: grid;
+  height: 6rem;
+  width: 6rem;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(23, 53, 51, 0.08);
+  border-radius: 1.65rem;
+  background:
+    radial-gradient(circle at top left, rgba(32, 92, 89, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(239, 224, 207, 0.8));
+}
+
+.coach-avatar-fallback {
+  color: var(--teal-deep);
+  font-family: var(--font-fraunces), serif;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.coach-pill,
+.coach-result-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(23, 53, 51, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.85);
+  padding: 0.5rem 0.85rem;
+  color: var(--teal-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.coach-pill {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.coach-result-chip.is-ai {
+  border-color: rgba(32, 92, 89, 0.18);
+  background: rgba(32, 92, 89, 0.11);
+}
+
+.coach-result-chip.is-error {
+  border-color: rgba(200, 100, 47, 0.22);
+  background: rgba(200, 100, 47, 0.08);
+  color: #7f3416;
+}
+
+.coach-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(23, 53, 51, 0.1);
+  border-radius: 1rem;
+  background: rgba(255, 250, 242, 0.72);
+  padding: 0.8rem 0.9rem;
+  color: var(--foreground);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.coach-checkbox input {
+  accent-color: var(--teal);
+}
+
 @media (min-width: 1024px) {
   .account-grid {
     grid-template-columns: 320px minmax(0, 1fr);
@@ -741,5 +837,10 @@ a {
   .auth-grid {
     grid-template-columns: minmax(0, 1.08fr) 430px;
     align-items: stretch;
+  }
+
+  .coach-hero-grid {
+    grid-template-columns: minmax(0, 1.6fr) 320px;
+    align-items: end;
   }
 }

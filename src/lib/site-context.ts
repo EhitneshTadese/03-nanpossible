@@ -13,6 +13,34 @@ export async function getLayoutSiteContext(
   const host = normalizeHost(
     headerStore.get("x-forwarded-host") ?? headerStore.get("host"),
   );
+  const chapterId = headerStore.get("x-chapter-id");
+  const chapterSubdomain = headerStore.get("x-chapter-subdomain");
+  const chapterName = headerStore.get("x-chapter-name");
+  const chapterLanguage = headerStore.get("x-chapter-language");
+
+  if (chapterId && chapterSubdomain && chapterName) {
+    return {
+      isGlobal: false,
+      tenant: {
+        id: chapterId,
+        name: chapterName,
+        subdomain: chapterSubdomain,
+        region: null,
+        language: chapterLanguage ?? "en",
+        country: null,
+        leadUserId: null,
+        contactEmail: null,
+        contactPhone: null,
+        description: null,
+        logoUrl: null,
+        stripeAccountId: null,
+        config: {},
+        status: "active",
+      },
+      host,
+    };
+  }
+
   const hintedTenant = headerStore.get("x-wial-tenant");
   const tenantCandidate =
     hintedTenant ??

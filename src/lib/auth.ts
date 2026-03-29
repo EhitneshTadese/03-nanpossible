@@ -13,7 +13,8 @@ function coerceRole(value?: string | null): AppRole {
   if (
     value === "public_visitor" ||
     value === "platform_admin" ||
-    value === "chapter_admin"
+    value === "chapter_admin" ||
+    value === "content_creator"
   ) {
     return value;
   }
@@ -27,6 +28,7 @@ function mapProfileRow(data: {
   name: string | null;
   role: string | null;
   chapter_id: string | null;
+  assigned_chapters: string[] | null;
   phone: string | null;
   location: string | null;
   bio: string | null;
@@ -38,6 +40,7 @@ function mapProfileRow(data: {
     name: data.name ?? "",
     role: coerceRole(data.role),
     chapterId: data.chapter_id,
+    assignedChapters: data.assigned_chapters ?? [],
     phone: data.phone,
     location: data.location,
     bio: data.bio,
@@ -45,7 +48,7 @@ function mapProfileRow(data: {
   } satisfies UserProfile;
 }
 
-export const getCurrentViewer = cache(async () => {
+export const getCurrentUser = cache(async () => {
   if (!hasSupabaseAuthConfig()) {
     return null;
   }
@@ -67,7 +70,9 @@ export const getCurrentViewer = cache(async () => {
 
     const { data } = await supabase
       .from("users")
-      .select("id, email, name, role, chapter_id, phone, location, bio, photo_url")
+      .select(
+        "id, email, name, role, chapter_id, assigned_chapters, phone, location, bio, photo_url",
+      )
       .eq("id", user.id)
       .maybeSingle();
 
@@ -88,6 +93,10 @@ export const getCurrentViewer = cache(async () => {
         typeof user.app_metadata?.chapter_id === "string"
           ? user.app_metadata.chapter_id
           : null,
+      assignedChapters: Array.isArray(user.app_metadata?.assigned_chapters)
+        ? user.app_metadata.assigned_chapters
+            .filter((value): value is string => typeof value === "string")
+        : [],
       phone: null,
       location: null,
       bio: null,
@@ -98,11 +107,13 @@ export const getCurrentViewer = cache(async () => {
   }
 });
 
-export async function requireAccountViewer(
+export const getCurrentViewer = getCurrentUser;
+
+export async function requireRole(
   nextPath: string,
   allowedRoles: AppRole[] = appRoles,
 ) {
-  const viewer = await getCurrentViewer();
+  const viewer = await getCurrentUser();
 
   if (!viewer) {
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
@@ -113,6 +124,41 @@ export async function requireAccountViewer(
   }
 
   return viewer;
+}
+
+export async function requireAccountViewer(
+  nextPath: string,
+  allowedRoles: AppRole[] = appRoles,
+) {
+  return requireRole(nextPath, allowedRoles);
+}
+
+export function canEditChapter(user: UserProfile, chapterId: string) {
+  if (user.role === "platform_admin") {
+    return true;
+  }
+
+  if (user.role === "chapter_admin") {
+    return user.chapterId === chapterId;
+  }
+
+  if (user.role === "content_creator") {
+    return user.assignedChapters.includes(chapterId);
+  }
+
+  return false;
+}
+
+export function canManageCoaches(user: UserProfile, chapterId: string) {
+  if (user.role === "platform_admin") {
+    return true;
+  }
+
+  return user.role === "chapter_admin" && user.chapterId === chapterId;
+}
+
+export function canProvisionChapter(user: UserProfile) {
+  return user.role === "platform_admin";
 }
 
 export async function buildAbsoluteUrl(pathname: string) {

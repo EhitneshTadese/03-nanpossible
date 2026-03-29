@@ -117,6 +117,66 @@ values (
   null
 );
 
+insert into public.coaches (
+  id,
+  chapter_id,
+  user_id,
+  name,
+  email,
+  cert_level,
+  location_city,
+  location_country,
+  bio,
+  specializations,
+  languages,
+  approved,
+  embedding
+)
+select
+  '77777777-7777-4777-8777-777777777777',
+  '22222222-2222-4222-8222-222222222222',
+  '66666666-6666-4666-8666-666666666666',
+  'Visible Coach',
+  'coach@wial.org',
+  'SALC',
+  'Sao Paulo',
+  'Brazil',
+  'Approved coach record used for coach-directory policy tests',
+  array['government', 'leadership development'],
+  array['pt', 'en'],
+  true,
+  ('[' || array_to_string(array_fill('0'::text, array[1024]), ',') || ']')::vector(1024)
+;
+
+insert into public.coaches (
+  id,
+  chapter_id,
+  user_id,
+  name,
+  email,
+  cert_level,
+  location_city,
+  location_country,
+  bio,
+  specializations,
+  languages,
+  approved
+)
+values (
+  '88888888-8888-4888-8888-888888888888',
+  '22222222-2222-4222-8222-222222222222',
+  null,
+  'Pending Coach',
+  'pending@wial.org',
+  'CALC',
+  'Phoenix',
+  'USA',
+  'Pending coach changes should stay hidden from the public',
+  array['manufacturing'],
+  array['en'],
+  false
+);
+
 set local session_replication_role = origin;
 set local role authenticated;
 select set_config(
@@ -138,6 +198,27 @@ select public.assert_true(
   'public visitor should be able to promote themselves to coach'
 );
 
+reset role;
+set local role anon;
+
+select public.assert_true(
+  exists(
+    select 1
+    from public.coaches
+    where id = '77777777-7777-4777-8777-777777777777'
+  ),
+  'anon should be able to read approved coach rows'
+);
+
+select public.assert_true(
+  not exists(
+    select 1
+    from public.coaches
+    where id = '88888888-8888-4888-8888-888888888888'
+  ),
+  'anon should not read pending coach rows'
+);
+
 do $$
 begin
   perform public.promote_self_to_chapter_admin();
@@ -154,6 +235,17 @@ select set_config(
   'request.jwt.claims',
   '{"sub":"66666666-6666-4666-8666-666666666666","role":"authenticated","app_metadata":{"role":"coach","chapter_id":"22222222-2222-4222-8222-222222222222"}}',
   true
+);
+
+with own_row_update as (
+  update public.coaches
+  set phone = '555-0199'
+  where id = '77777777-7777-4777-8777-777777777777'
+  returning id
+)
+select public.assert_true(
+  exists(select 1 from own_row_update),
+  'coach should be able to update their own coach row'
 );
 
 with attempted_role_change as (
@@ -187,6 +279,24 @@ select public.assert_true(
       and photo_url = 'https://example.com/profile.png'
   ),
   'update_my_profile should update safe profile fields without changing role'
+);
+
+select public.assert_true(
+  exists(
+    select 1
+    from public.search_coaches(
+      ('[' || array_to_string(array_fill('0'::text, array[1024]), ',') || ']')::vector(1024),
+      'SALC',
+      'Brazil',
+      null,
+      'pt',
+      array['government'],
+      20,
+      0
+    )
+    where id = '77777777-7777-4777-8777-777777777777'
+  ),
+  'search_coaches should return approved rows that match semantic filters'
 );
 
 select public.promote_self_to_chapter_admin();

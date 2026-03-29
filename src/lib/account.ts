@@ -12,6 +12,7 @@ export const appRoles: AppRole[] = [
   "public_visitor",
   "platform_admin",
   "chapter_admin",
+  "content_creator",
   "coach",
 ];
 
@@ -65,6 +66,8 @@ export function getRoleLabel(role: AppRole) {
       return "Admin";
     case "chapter_admin":
       return "Chapter Head";
+    case "content_creator":
+      return "Content Creator";
     case "coach":
       return "Coach";
   }

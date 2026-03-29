@@ -52,6 +52,8 @@ describe("shouldBypassTenantRewrite", () => {
     expect(shouldBypassTenantRewrite("/register")).toBe(true);
     expect(shouldBypassTenantRewrite("/auth/callback")).toBe(true);
     expect(shouldBypassTenantRewrite("/account/profile")).toBe(true);
+    expect(shouldBypassTenantRewrite("/dashboard/profile")).toBe(true);
+    expect(shouldBypassTenantRewrite("/admin/approvals")).toBe(true);
     expect(shouldBypassTenantRewrite("/resources")).toBe(false);
   });
 });
