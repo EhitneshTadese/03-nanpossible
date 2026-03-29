@@ -232,6 +232,15 @@ export type ContentSection =
       items: { name: string; logo: string }[];
     }
   | {
+      type: "media_prose";
+      title: string;
+      image: string;
+      imageAlt: string;
+      paragraphs: string[];
+      caption?: string;
+      imagePosition?: "left" | "right";
+    }
+  | {
       type: "cta";
       title: string;
       body: string;

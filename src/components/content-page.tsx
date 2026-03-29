@@ -155,6 +155,35 @@ function renderSection(section: ContentSection) {
           </div>
         </section>
       );
+    case "media_prose":
+      return (
+        <section className="section-stack" key={section.title}>
+          <div className="grid gap-8 md:grid-cols-2 md:items-center">
+            <div className={section.imagePosition === "right" ? "md:order-2" : ""}>
+              <div className="overflow-hidden rounded-[2rem] border border-line shadow-shadow">
+                <img
+                  alt={section.imageAlt}
+                  className="aspect-video w-full object-cover md:aspect-square"
+                  src={section.image}
+                />
+              </div>
+              {section.caption ? (
+                <p className="mt-3 text-center text-sm italic text-foreground/60">
+                  {section.caption}
+                </p>
+              ) : null}
+            </div>
+            <div className={`space-y-4 ${section.imagePosition === "right" ? "md:order-1" : ""}`}>
+              <h2 className="section-title text-teal-deep">{section.title}</h2>
+              <div className="section-copy">
+                {section.paragraphs.map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
     case "cta":
       return (
         <section

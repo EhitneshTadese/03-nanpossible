@@ -75,13 +75,39 @@
     "title": "About WIAL",
     "published": true,
     "bodyRichtext": {
-      "heroIntro": "The healthy About Us page on the current site describes WIAL as the world's leading certifying body for Action Learning and a global organization helping clients solve urgent business challenges.",
+      "heroIntro": "The World Institute for Action Learning (WIAL) is the world's leading certifying body for Action Learning, a powerful tool for solving problems and developing leaders simultaneously.",
       "metrics": [
         { "label": "Origin era", "value": "1940s" },
         { "label": "WIAL model roots", "value": "1995" },
         { "label": "Classic books cited", "value": "3" }
       ],
       "sections": [
+        {
+          "type": "timeline",
+          "title": "Our Perspective",
+          "items": [
+            {
+              "year": "CURRENT STATE",
+              "title": "",
+              "body": "In our rapidly changing world, organizations struggle to meet their ambitious performance and people development goals with the methods they have used in the past."
+            },
+            {
+              "year": "VISION",
+              "title": "",
+              "body": "We believe that ambitious organizations need new ways of thinking, doing business, and collaborating to solve their complex problems and achieve their desired results."
+            },
+            {
+              "year": "MISSION",
+              "title": "",
+              "body": "WIAL coaches elevate team performance through action learning. They support teams in identifying breakthrough solutions to real problems, while accelerating individual, team and organizational development. WIAL’s team coaching leads to more effective organizations, positive business impact and a learning culture."
+            },
+            {
+              "year": "PURPOSE",
+              "title": "",
+              "body": "We transform ambitious organizations into places of continuous learning, making them capable of solving today’s challenges and embracing the opportunities of tomorrow through the promotion and practice of action learning."
+            }
+          ]
+        },
         {
           "type": "prose",
           "title": "What the current site says about WIAL",
@@ -96,6 +122,18 @@
           ]
         },
         {
+          "type": "media_prose",
+          "title": "WIAL History",
+          "image": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=800",
+          "imageAlt": "Reginald Revans and the concept of Action Learning",
+          "paragraphs": [
+            "Professor Reginald Revans is the originator of Action Learning. He invented and developed this method in the United Kingdom in the 1940s, working in the Coal Board. He encouraged managers to meet together in small groups, to share their experiences and ask each other questions about what they saw and heard. The approach increased productivity by over 30%.",
+            "In 1995, WIAL co-founder Michael Marquardt met Reg Revans, widely recognized as the father of Action Learning. The two men began a dialogue that led to the development of the WIAL model of Action Learning, which focuses on continual learning. After years of testing, research and refinement, the model took final form in the renowned six components and two ground rules of Action Learning."
+          ],
+          "caption": "Action Learning's foundation was built on collaborative problem solving.",
+          "imagePosition": "right"
+        },
+        {
           "type": "timeline",
           "title": "A compact history",
           "items": [
@@ -107,12 +145,12 @@
             {
               "year": "1995",
               "title": "Michael Marquardt meets Reg Revans",
-              "body": "WIAL co-founder Michael Marquardt began the dialogue that later shaped the WIAL model of Action Learning with its six components and two ground rules."
+              "body": "The two men began a dialogue that led to the development of the WIAL model, synthesizing decades of research and practice."
             },
             {
               "year": "Today",
               "title": "A global certification body",
-              "body": "WIAL now uses a shared certification standard and a distributed affiliate network, which this platform foundation is designed to support."
+              "body": "WIAL now uses a shared certification standard and a distributed affiliate network, supporting organizations across the globe."
             }
           ]
         },
@@ -126,10 +164,10 @@
       ]
     },
     "seo": {
-      "description": "Healthy About Us content migrated from the current WIAL site.",
+      "description": "Organizational vision, mission, and the historical foundation of WIAL Action Learning.",
       "sourceUrl": "https://wial.org/about-us/",
-      "sourceStatus": "healthy-live-page",
-      "sourceNotes": "Used the healthy About Us page instead of /about-wial/, which appeared compromised in indexed content."
+      "sourceStatus": "enhanced-migration",
+      "sourceNotes": "Expanded with Vision, Mission, Purpose, and detailed History narrative as requested."
     }
   },
   {
