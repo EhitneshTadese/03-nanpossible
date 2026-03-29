@@ -171,7 +171,7 @@ Static data (certification levels, requirements, documents) lives in `src/conten
 https://03-nanpossible.vercel.app/
 
 ## DevPost Submission
-
+https://devpost.com/software/team-03-nanpossible
 
 ---
 
