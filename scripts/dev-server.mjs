@@ -21,7 +21,7 @@ function resolveNodeBin() {
 
 const nodeBin = resolveNodeBin();
 
-const devServer = spawn(nodeBin, [nextBin, "dev", "--turbo"], {
+const devServer = spawn(nodeBin, [nextBin, "dev"], {
   cwd: root,
   stdio: "inherit",
 });

@@ -13,6 +13,7 @@ export default defineConfig([
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   globalIgnores([
     ".next/**",
+    ".next.nosync/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

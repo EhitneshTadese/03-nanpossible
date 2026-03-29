@@ -3,6 +3,7 @@ import "./globals.css";
 import { headers } from "next/headers";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SiteChatbot } from "@/components/site-chatbot";
 import { getCurrentViewer } from "@/lib/auth";
 import { getLayoutSiteContext } from "@/lib/site-context";
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
           <SiteHeader siteContext={siteContext} viewer={viewer} />
           <main className="flex-1">{children}</main>
           <SiteFooter siteContext={siteContext} />
+          <SiteChatbot />
         </div>
       </body>
     </html>
