@@ -137,6 +137,7 @@ export function shouldBypassTenantRewrite(pathname: string) {
   return (
     pathname === "/login" ||
     pathname === "/register" ||
+    pathname === "/reset-password" ||
     pathname === "/auth" ||
     pathname.startsWith("/auth/") ||
     pathname === "/dashboard" ||
