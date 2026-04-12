@@ -39,29 +39,6 @@ begin
 end;
 $$;
 
-create or replace function public.current_app_role()
-returns public.app_role
-language sql
-stable
-as $$
-  select coalesce(
-    nullif(auth.jwt() -> 'app_metadata' ->> 'role', '')::public.app_role,
-    (select u.role from public.users u where u.id = auth.uid()),
-    'coach'::public.app_role
-  );
-$$;
-
-create or replace function public.current_app_chapter_id()
-returns uuid
-language sql
-stable
-as $$
-  select coalesce(
-    nullif(auth.jwt() -> 'app_metadata' ->> 'chapter_id', '')::uuid,
-    (select u.chapter_id from public.users u where u.id = auth.uid())
-  );
-$$;
-
 create or replace function public.current_request_tenant()
 returns text
 language sql
@@ -76,20 +53,6 @@ as $$
     ),
     ''
   );
-$$;
-
-create or replace function public.can_access_chapter(target_chapter_id uuid)
-returns boolean
-language sql
-stable
-as $$
-  select
-    public.current_app_role() = 'platform_admin'
-    or (
-      target_chapter_id is not null
-      and public.current_app_chapter_id() = target_chapter_id
-      and public.current_app_role() in ('chapter_admin', 'coach')
-    );
 $$;
 
 create table if not exists public.chapters (
@@ -114,6 +77,43 @@ create table if not exists public.users (
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+create or replace function public.current_app_role()
+returns public.app_role
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(auth.jwt() -> 'app_metadata' ->> 'role', '')::public.app_role,
+    (select u.role from public.users u where u.id = auth.uid()),
+    'coach'::public.app_role
+  );
+$$;
+
+create or replace function public.current_app_chapter_id()
+returns uuid
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(auth.jwt() -> 'app_metadata' ->> 'chapter_id', '')::uuid,
+    (select u.chapter_id from public.users u where u.id = auth.uid())
+  );
+$$;
+
+create or replace function public.can_access_chapter(target_chapter_id uuid)
+returns boolean
+language sql
+stable
+as $$
+  select
+    public.current_app_role() = 'platform_admin'
+    or (
+      target_chapter_id is not null
+      and public.current_app_chapter_id() = target_chapter_id
+      and public.current_app_role() in ('chapter_admin', 'coach')
+    );
+$$;
 
 create table if not exists public.content_pages (
   id uuid primary key default gen_random_uuid(),

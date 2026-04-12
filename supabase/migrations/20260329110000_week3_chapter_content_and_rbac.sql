@@ -1,17 +1,6 @@
 create extension if not exists pgcrypto;
 
-do $$
-begin
-  if not exists (
-    select 1
-    from pg_enum
-    where enumtypid = 'public.app_role'::regtype
-      and enumlabel = 'content_creator'
-  ) then
-    alter type public.app_role add value 'content_creator';
-  end if;
-end
-$$;
+-- content_creator enum value added in 20260329100000_add_content_creator_enum.sql
 
 alter table public.chapters
   add column if not exists region text,
