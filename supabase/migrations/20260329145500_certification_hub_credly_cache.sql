@@ -3,6 +3,8 @@ alter table public.coaches
   add column if not exists credly_badge_title text,
   add column if not exists credly_badge_synced_at timestamptz;
 
+drop function if exists public.search_coaches(vector(1024), text, text, text, text, text[], int, int);
+
 create or replace function public.search_coaches(
   query_embedding vector(1024),
   filter_cert_level text default null,

@@ -15,6 +15,7 @@
         { "href": "/admin/global", "label": "Global admin" },
         { "href": "/admin/global/chapters", "label": "Chapters" },
         { "href": "/admin/approvals", "label": "Coach approvals" },
+        { "href": "/guide", "label": "Platform guide" },
         { "href": "/account/profile", "label": "Update account details" }
       ]
     },
@@ -26,6 +27,7 @@
         { "href": "/admin/chapter/events", "label": "Events" },
         { "href": "/admin/chapter/settings", "label": "Chapter settings" },
         { "href": "/account/revenue", "label": "Chapter revenue dashboard" },
+        { "href": "/guide", "label": "Platform guide" },
         { "href": "/account/profile", "label": "Update account details" }
       ]
     },
@@ -34,6 +36,7 @@
       "items": [
         { "href": "/admin/chapter", "label": "Change website content" },
         { "href": "/admin/chapter/events", "label": "Events" },
+        { "href": "/guide", "label": "Platform guide" },
         { "href": "/account/profile", "label": "Update account details" }
       ]
     },

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIAL Platform Guide</title>
+  <style>
+    :root {
+      --teal: #205c59;
+      --teal-light: #e8f0ef;
+      --copper: #c8642f;
+      --cream: #fffaf2;
+      --ink: #1a1a1a;
+      --muted: #555;
+      --border: #e0ddd8;
+      --radius: 0.75rem;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: var(--cream);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--teal); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Layout */
+    .page { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 280px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--border);
+      padding: 2rem 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+    .sidebar-brand h2 { font-size: 1.1rem; color: var(--teal); }
+    .sidebar-brand p { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .sidebar nav { padding: 0 0.75rem; }
+    .sidebar nav ul { list-style: none; }
+    .sidebar nav > ul > li { margin-bottom: 0.25rem; }
+    .nav-section {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); padding: 1rem 0.75rem 0.5rem; border-top: 1px solid var(--border);
+      margin-top: 0.5rem;
+    }
+    .nav-section:first-child { border-top: none; margin-top: 0; }
+    .sidebar nav a {
+      display: block; padding: 0.4rem 0.75rem; border-radius: 0.5rem;
+      font-size: 0.88rem; color: var(--ink); transition: background 0.15s;
+    }
+    .sidebar nav a:hover { background: var(--teal-light); text-decoration: none; }
+    .sidebar nav a.active { background: var(--teal); color: #fff; }
+
+    .main { flex: 1; min-width: 0; }
+    .hero {
+      background: var(--teal); color: #fff; padding: 4rem 3rem 3rem;
+    }
+    .hero h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.2; }
+    .hero p { font-size: 1.15rem; margin-top: 1rem; opacity: 0.88; max-width: 640px; }
+    .content { max-width: 800px; padding: 2.5rem 3rem 5rem; }
+    .content h2 {
+      font-size: 1.6rem; font-weight: 700; color: var(--teal);
+      margin-top: 3rem; margin-bottom: 0.75rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .content h2:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .content h3 {
+      font-size: 1.15rem; font-weight: 600; color: var(--ink);
+      margin-top: 2rem; margin-bottom: 0.5rem;
+    }
+    .content p, .content li { font-size: 0.95rem; color: #333; }
+    .content p { margin-bottom: 0.75rem; }
+    .content ul, .content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    .content li { margin-bottom: 0.35rem; }
+    .content code {
+      background: var(--teal-light); padding: 0.15em 0.4em; border-radius: 4px;
+      font-size: 0.88em; font-family: "SF Mono", Menlo, monospace;
+    }
+    .content pre {
+      background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: var(--radius);
+      overflow-x: auto; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.6;
+    }
+    .content pre code { background: none; padding: 0; color: inherit; }
+
+    /* Cards */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1rem 0 1.5rem; }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.25rem; box-shadow: var(--shadow);
+    }
+    .card h4 { font-size: 0.95rem; font-weight: 600; color: var(--teal); margin-bottom: 0.35rem; }
+    .card p { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+    /* Callouts */
+    .callout {
+      border-left: 4px solid var(--copper); background: #fff8f0;
+      padding: 1rem 1.25rem; border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 1rem 0 1.5rem;
+    }
+    .callout.info { border-left-color: var(--teal); background: var(--teal-light); }
+    .callout strong { display: block; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .callout p { font-size: 0.88rem; margin: 0; }
+
+    /* Table */
+    .content table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+    .content th, .content td {
+      text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .content th { font-weight: 600; color: var(--teal); background: var(--teal-light); }
+
+    /* Responsive */
+    .mobile-nav { display: none; }
+    @media (max-width: 860px) {
+      .sidebar { display: none; }
+      .mobile-nav {
+        display: block; background: var(--teal); padding: 0.75rem 1.5rem;
+        position: sticky; top: 0; z-index: 100;
+      }
+      .mobile-nav summary { color: #fff; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+      .mobile-nav nav { background: #fff; margin-top: 0.5rem; border-radius: var(--radius); padding: 0.5rem; }
+      .mobile-nav a { display: block; padding: 0.5rem 0.75rem; color: var(--ink); font-size: 0.9rem; }
+      .hero { padding: 2.5rem 1.5rem 2rem; }
+      .hero h1 { font-size: 1.8rem; }
+      .content { padding: 1.5rem 1.5rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>WIAL Platform Guide</h2>
+        <p>Documentation for administrators, chapter leads, and coaches</p>
+      </div>
+      <nav>
+        <ul>
+          <li class="nav-section">Getting Started</li>
+          <li><a href="#welcome">Welcome</a></li>
+          <li><a href="#platform-overview">Platform overview</a></li>
+          <li><a href="#signing-in">Signing in</a></li>
+          <li><a href="#understanding-roles">Understanding roles</a></li>
+
+          <li class="nav-section">Platform Administration</li>
+          <li><a href="#global-dashboard">Global dashboard</a></li>
+          <li><a href="#adding-a-chapter">Adding a new chapter</a></li>
+          <li><a href="#managing-chapters">Managing chapters</a></li>
+          <li><a href="#coach-approvals-global">Coach approvals (global)</a></li>
+          <li><a href="#assigning-content-creators">Assigning content creators</a></li>
+
+          <li class="nav-section">Chapter Administration</li>
+          <li><a href="#chapter-workspace">Your chapter workspace</a></li>
+          <li><a href="#editing-pages">Editing website pages</a></li>
+          <li><a href="#ai-content">AI content generation</a></li>
+          <li><a href="#managing-events">Managing events</a></li>
+          <li><a href="#chapter-coaches">Chapter coach approvals</a></li>
+          <li><a href="#chapter-settings">Chapter settings</a></li>
+          <li><a href="#revenue-dashboard">Revenue dashboard</a></li>
+
+          <li class="nav-section">Coach Workflows</li>
+          <li><a href="#registering-as-coach">Registering as a coach</a></li>
+          <li><a href="#coach-profile">Coach profile</a></li>
+          <li><a href="#certifications">Certifications</a></li>
+          <li><a href="#dues-payments">Dues and payments</a></li>
+          <li><a href="#becoming-chapter-head">Becoming a chapter head</a></li>
+
+          <li class="nav-section">Public Features</li>
+          <li><a href="#coach-directory">Coach directory</a></li>
+          <li><a href="#certification-hub">Certification hub</a></li>
+          <li><a href="#chatbot">AI chatbot</a></li>
+          <li><a href="#accessibility">Accessibility</a></li>
+
+          <li class="nav-section">Multi-Tenancy</li>
+          <li><a href="#how-subdomains-work">How subdomains work</a></li>
+          <li><a href="#content-inheritance">Content inheritance</a></li>
+
+          <li class="nav-section">Reference</li>
+          <li><a href="#api-keys">API keys and integrations</a></li>
+          <li><a href="#role-permissions">Role permissions table</a></li>
+          <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <!-- Mobile Nav -->
+      <div class="mobile-nav">
+        <details>
+          <summary>&#9776; Guide Navigation</summary>
+          <nav>
+            <a href="#welcome">Welcome</a>
+            <a href="#platform-overview">Platform overview</a>
+            <a href="#adding-a-chapter">Adding a chapter</a>
+            <a href="#editing-pages">Editing pages</a>
+            <a href="#ai-content">AI content</a>
+            <a href="#managing-events">Events</a>
+            <a href="#certifications">Certifications</a>
+            <a href="#role-permissions">Role permissions</a>
+            <a href="#troubleshooting">Troubleshooting</a>
+          </nav>
+        </details>
+      </div>
+
+      <!-- Hero -->
+      <header class="hero">
+        <h1>WIAL Platform Guide</h1>
+        <p>Everything you need to run your chapter, manage coaches, and publish content on the World Institute for Action Learning platform.</p>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- ============================================ -->
+        <!-- GETTING STARTED -->
+        <!-- ============================================ -->
+
+        <h2 id="welcome">Welcome</h2>
+        <p>This guide helps you get started with the WIAL platform &mdash; a multi-tenant website that gives every WIAL chapter its own branded microsite while maintaining a shared global standard for certification, coach discovery, and content.</p>
+        <p>Whether you are a <strong>platform administrator</strong> overseeing the whole network, a <strong>chapter lead</strong> managing your local site, or a <strong>coach</strong> maintaining your certification profile, this guide walks you through every feature step by step.</p>
+
+        <h2 id="platform-overview">Platform Overview</h2>
+        <p>The WIAL platform is organized around four main areas:</p>
+        <div class="card-grid">
+          <div class="card">
+            <h4>Public Website</h4>
+            <p>Marketing pages, coach directory, certification info, and the AI chatbot &mdash; visible to everyone.</p>
+          </div>
+          <div class="card">
+            <h4>Account Area</h4>
+            <p>Personal profile, coach registration, certifications, and payment dues for authenticated users.</p>
+          </div>
+          <div class="card">
+            <h4>Chapter Admin</h4>
+            <p>Content editor, event management, coach approvals, settings, and revenue for chapter leads.</p>
+          </div>
+          <div class="card">
+            <h4>Global Admin</h4>
+            <p>Chapter provisioning, cross-network coach approvals, and network-wide metrics for platform admins.</p>
+          </div>
+        </div>
+
+        <h2 id="signing-in">Signing In</h2>
+        <p>Navigate to <code>/login</code> and enter your email and password. After signing in, you will be redirected to the appropriate dashboard for your role:</p>
+        <ul>
+          <li><strong>Platform admin</strong> &rarr; Global admin dashboard</li>
+          <li><strong>Chapter admin</strong> &rarr; Chapter content workspace</li>
+          <li><strong>Content creator</strong> &rarr; Chapter content workspace</li>
+          <li><strong>Coach</strong> &rarr; Coach directory profile</li>
+          <li><strong>Public visitor</strong> &rarr; Coach registration page</li>
+        </ul>
+        <p>If you do not have an account, visit <code>/register</code> to create one. New accounts start with the <strong>public visitor</strong> role.</p>
+
+        <h2 id="understanding-roles">Understanding Roles</h2>
+        <p>The platform uses a five-tier role system. Each role unlocks a specific set of capabilities:</p>
+        <table>
+          <tr><th>Role</th><th>Who is this?</th><th>Key capabilities</th></tr>
+          <tr>
+            <td><strong>Platform admin</strong></td>
+            <td>WIAL headquarters staff</td>
+            <td>Provision chapters, approve coaches globally, manage the entire network</td>
+          </tr>
+          <tr>
+            <td><strong>Chapter admin</strong></td>
+            <td>Country or regional chapter leads</td>
+            <td>Edit chapter website, manage events, approve local coaches, view revenue</td>
+          </tr>
+          <tr>
+            <td><strong>Content creator</strong></td>
+            <td>Assigned content editors</td>
+            <td>Edit chapter pages and events (no coach approvals or settings)</td>
+          </tr>
+          <tr>
+            <td><strong>Coach</strong></td>
+            <td>Certified Action Learning coaches</td>
+            <td>Manage directory profile, view certifications, pay dues</td>
+          </tr>
+          <tr>
+            <td><strong>Public visitor</strong></td>
+            <td>Anyone who creates an account</td>
+            <td>Browse directory, view certifications, register as coach</td>
+          </tr>
+        </table>
+        <div class="callout info">
+          <strong>Role progression</strong>
+          <p>Users can self-promote through certain paths: Public visitor &rarr; Coach (via registration) &rarr; Chapter admin (via chapter head registration, once assigned to a chapter by a platform admin).</p>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- PLATFORM ADMINISTRATION -->
+        <!-- ============================================ -->
+
+        <h2 id="global-dashboard">Global Dashboard</h2>
+        <p>As a platform admin, your home screen at <code>/admin/global</code> shows network-wide metrics:</p>
+        <ul>
+          <li><strong>Active chapters</strong> &mdash; number of published chapter sites</li>
+          <li><strong>Total chapters</strong> &mdash; all chapters including drafts</li>
+          <li><strong>Pending approvals</strong> &mdash; coaches waiting for review across the network</li>
+        </ul>
+        <p>Quick-action links let you jump directly to chapter management or the approvals queue.</p>
+
+        <h2 id="adding-a-chapter">Adding a New Chapter</h2>
+        <p>This is one of the most important workflows in the platform. Each chapter gets its own subdomain (e.g., <code>usa.wial.org</code>) and a full set of web pages.</p>
+
+        <h3>Step 1: Open the provisioning form</h3>
+        <p>Navigate to <code>/admin/global/chapters</code> and click <strong>"Add new chapter"</strong>, or go directly to <code>/admin/global/chapters/new</code>.</p>
+
+        <h3>Step 2: Fill out the chapter details</h3>
+        <ul>
+          <li><strong>Chapter name</strong> &mdash; e.g., "WIAL Japan". The subdomain is auto-generated from this (e.g., <code>japan</code>).</li>
+          <li><strong>Region</strong> &mdash; select from Americas, Europe, Asia-Pacific, Africa, or Middle East.</li>
+          <li><strong>Country</strong> &mdash; the chapter&rsquo;s home country.</li>
+          <li><strong>Language</strong> &mdash; primary language for content (English, Spanish, Portuguese, or French).</li>
+          <li><strong>Chapter lead email</strong> &mdash; email of the person who will manage this chapter. They will be invited or have their role upgraded automatically.</li>
+          <li><strong>Contact email &amp; phone</strong> &mdash; public contact info shown on the chapter site.</li>
+          <li><strong>Description</strong> &mdash; a short blurb about the chapter.</li>
+        </ul>
+
+        <h3>Step 3: Submit</h3>
+        <p>When you submit the form, the system automatically:</p>
+        <ol>
+          <li>Creates the chapter record with its unique subdomain</li>
+          <li>Seeds <strong>six default pages</strong>: About, Team, Events, Resources, Testimonials, and Contact</li>
+          <li>Invites or assigns the chapter lead user</li>
+          <li>Sends a welcome email to the chapter lead (if Resend API is configured)</li>
+          <li>Returns the chapter&rsquo;s public URL</li>
+        </ol>
+        <div class="callout">
+          <strong>After provisioning</strong>
+          <p>The chapter lead can immediately sign in and start editing their pages. If DNS is not yet configured for the subdomain, the chapter is accessible via the middleware rewrite on localhost during development.</p>
+        </div>
+
+        <h2 id="managing-chapters">Managing Chapters</h2>
+        <p>The chapters list at <code>/admin/global/chapters</code> shows every chapter with:</p>
+        <ul>
+          <li>Name and subdomain</li>
+          <li>Country, language, and region</li>
+          <li>Status (active, draft, or inactive)</li>
+        </ul>
+        <p>From here you can also assign content creators to any chapter by entering their email address. Content creators can edit pages and events but cannot manage coach approvals or chapter settings.</p>
+
+        <h2 id="coach-approvals-global">Coach Approvals (Global)</h2>
+        <p>At <code>/admin/approvals</code>, you see every pending coach submission across the entire network. For each coach you can:</p>
+        <ul>
+          <li><strong>Approve</strong> &mdash; the coach profile is published to the directory, search embeddings are regenerated, and the coach directory is re-indexed.</li>
+          <li><strong>Reject</strong> &mdash; enter an optional reason. The coach receives a rejection notification email and their profile remains unpublished.</li>
+        </ul>
+
+        <h2 id="assigning-content-creators">Assigning Content Creators</h2>
+        <p>Platform admins can assign any user as a content creator for a specific chapter. This is done from the chapter list at <code>/admin/global/chapters</code>. Content creators get access to:</p>
+        <ul>
+          <li>Page editing (rich text and AI generation)</li>
+          <li>Event management</li>
+        </ul>
+        <p>They do <strong>not</strong> have access to coach approvals, chapter settings, or revenue dashboards.</p>
+
+        <!-- ============================================ -->
+        <!-- CHAPTER ADMINISTRATION -->
+        <!-- ============================================ -->
+
+        <h2 id="chapter-workspace">Your Chapter Workspace</h2>
+        <p>Chapter admins and content creators work from <code>/admin/chapter</code>. This is your central workspace for managing your chapter&rsquo;s microsite. The workspace shows all chapter pages in a list, and each page can be opened for inline editing with a live preview.</p>
+
+        <div class="callout info">
+          <strong>Accessing your workspace</strong>
+          <p>You must either be on your chapter&rsquo;s subdomain (e.g., <code>usa.localhost:3000</code>) or be assigned to a chapter by a platform admin. If you see "No chapter workspace selected," contact your WIAL platform administrator.</p>
+        </div>
+
+        <h2 id="editing-pages">Editing Website Pages</h2>
+        <p>Each chapter starts with six pre-built pages. To edit a page:</p>
+        <ol>
+          <li>Go to <code>/admin/chapter</code></li>
+          <li>Click on the page you want to edit</li>
+          <li>The editor opens with two views:
+            <ul>
+              <li><strong>Rich text editor</strong> &mdash; a structured JSON schema with hero intro, metrics, and content sections</li>
+              <li><strong>HTML source view</strong> &mdash; direct access to the page HTML</li>
+            </ul>
+          </li>
+          <li>Make your changes</li>
+          <li>Toggle the <strong>Published</strong> switch to make the page live</li>
+          <li>Save your work</li>
+        </ol>
+
+        <h3>Content section types</h3>
+        <p>Pages are built from modular content sections. The available types are:</p>
+        <div class="card-grid">
+          <div class="card"><h4>Prose</h4><p>Paragraphs and bullet lists for narrative content.</p></div>
+          <div class="card"><h4>Feature Grid</h4><p>Cards highlighting capabilities or benefits.</p></div>
+          <div class="card"><h4>Timeline</h4><p>Chronological milestones or history.</p></div>
+          <div class="card"><h4>Quote</h4><p>Highlighted quote with attribution.</p></div>
+          <div class="card"><h4>Resource List</h4><p>Downloadable files and links.</p></div>
+          <div class="card"><h4>Contact Cards</h4><p>Email, address, and topic cards.</p></div>
+          <div class="card"><h4>Logo Grid</h4><p>Partner or client logos.</p></div>
+          <div class="card"><h4>Media &amp; Prose</h4><p>Image or video alongside text.</p></div>
+          <div class="card"><h4>Call to Action</h4><p>CTA with heading, body text, and a button link.</p></div>
+        </div>
+
+        <h2 id="ai-content">AI Content Generation</h2>
+        <p>The platform includes an AI content assistant that can generate or rewrite page content for your chapter. This is available to platform admins and chapter admins.</p>
+
+        <h3>How to use it</h3>
+        <ol>
+          <li>Open a page in the editor</li>
+          <li>Click the <strong>AI Generate</strong> button</li>
+          <li>Configure the generation settings:
+            <ul>
+              <li><strong>Tone</strong> &mdash; formal, conversational, inspirational, etc.</li>
+              <li><strong>Include coaches</strong> &mdash; pulls in your approved coaches to feature on the page</li>
+              <li><strong>Include events</strong> &mdash; pulls in upcoming events</li>
+              <li><strong>Custom context</strong> &mdash; any specific information or messaging you want included</li>
+              <li><strong>Testimonials</strong> &mdash; paste in testimonials to weave into the generated content</li>
+              <li><strong>Language</strong> &mdash; English, Spanish, Portuguese, or French</li>
+            </ul>
+          </li>
+          <li>Click generate</li>
+          <li>Review and edit the output, then save</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Rate limit</strong>
+          <p>AI generation is limited to <strong>10 generations per hour per chapter</strong> to manage costs. Text is automatically capped at 5,000 characters.</p>
+        </div>
+
+        <h3>Audio narration</h3>
+        <p>Pages can also have auto-generated audio narration (powered by ElevenLabs). When enabled, a play button appears on the public page so visitors can listen to the content. Audio is generated in the chapter&rsquo;s configured language.</p>
+
+        <h2 id="managing-events">Managing Events</h2>
+        <p>Chapter admins and content creators can manage events at <code>/admin/chapter/events</code>.</p>
+        <ul>
+          <li><strong>Create event</strong> &mdash; title, start date/time, end date/time, location, description, and a published toggle.</li>
+          <li><strong>Edit event</strong> &mdash; update any field at any time.</li>
+          <li><strong>Delete event</strong> &mdash; permanently removes the event.</li>
+        </ul>
+        <p>Published events appear on your chapter&rsquo;s website and can be included in AI-generated content.</p>
+
+        <h2 id="chapter-coaches">Chapter Coach Approvals</h2>
+        <p>Chapter admins can review coaches who have submitted their profile for their chapter at <code>/admin/chapter/coaches</code>. The workflow is the same as global approvals:</p>
+        <ul>
+          <li><strong>Approve</strong> &mdash; publishes the coach to the directory and regenerates search embeddings.</li>
+          <li><strong>Reject</strong> &mdash; with an optional reason sent by email notification.</li>
+        </ul>
+
+        <h2 id="chapter-settings">Chapter Settings</h2>
+        <p>At <code>/admin/chapter/settings</code>, chapter admins can update:</p>
+        <ul>
+          <li><strong>Chapter name</strong></li>
+          <li><strong>Region</strong> &mdash; Americas, Europe, Asia-Pacific, Africa, Middle East</li>
+          <li><strong>Country</strong></li>
+          <li><strong>Language</strong> &mdash; English, Spanish, Portuguese, French</li>
+          <li><strong>Contact email and phone</strong></li>
+          <li><strong>Description</strong></li>
+          <li><strong>Logo URL</strong> &mdash; custom chapter logo</li>
+        </ul>
+
+        <h2 id="revenue-dashboard">Revenue Dashboard</h2>
+        <p>Chapter admins can access a revenue dashboard at <code>/account/revenue</code> to monitor chapter dues and payment activity. This dashboard shows payment trends and financial summaries for the chapter.</p>
+
+        <!-- ============================================ -->
+        <!-- COACH WORKFLOWS -->
+        <!-- ============================================ -->
+
+        <h2 id="registering-as-coach">Registering as a Coach</h2>
+        <p>Any user with an account can register as a coach:</p>
+        <ol>
+          <li>Sign in to your account</li>
+          <li>Navigate to <code>/account/register-coach</code> (or click "Register as coach" in your sidebar)</li>
+          <li>Your role is immediately upgraded to <strong>coach</strong></li>
+          <li>You gain access to the certification courses, directory profile, and payment dues sections</li>
+        </ol>
+
+        <h2 id="coach-profile">Coach Profile</h2>
+        <p>Coaches manage their directory profile at <code>/dashboard/profile</code>. Your profile includes:</p>
+        <ul>
+          <li><strong>Display name</strong>, <strong>email</strong>, <strong>phone</strong></li>
+          <li><strong>Location</strong> &mdash; city, country (with coordinates for map features)</li>
+          <li><strong>Bio</strong> &mdash; a description of your coaching practice</li>
+          <li><strong>Specializations</strong> &mdash; tags describing your areas of expertise</li>
+          <li><strong>Languages</strong> &mdash; languages you coach in</li>
+          <li><strong>Photo URL</strong></li>
+          <li><strong>Website and LinkedIn</strong> links</li>
+          <li><strong>Credly badge URL</strong> &mdash; linked automatically if Credly integration is active</li>
+          <li><strong>Audio intro</strong> &mdash; an AI-generated or uploaded audio introduction</li>
+        </ul>
+        <p>After updating your profile, it goes through an approval process. A chapter admin or platform admin must approve changes before they appear in the public directory.</p>
+
+        <h2 id="certifications">Certifications</h2>
+        <p>The certification hub at <code>/account/certifications</code> shows the four WIAL certification levels:</p>
+        <table>
+          <tr><th>Level</th><th>Title</th><th>Description</th></tr>
+          <tr><td><strong>CALC</strong></td><td>Certified Action Learning Coach</td><td>Foundational certification. The first formal step in the WIAL coaching model.</td></tr>
+          <tr><td><strong>PALC</strong></td><td>Professional Action Learning Coach</td><td>Demonstrates proven ability and accumulated Action Learning experience.</td></tr>
+          <tr><td><strong>SALC</strong></td><td>Senior Action Learning Coach</td><td>Cleared to lead all WIAL programs at a higher level of experience.</td></tr>
+          <tr><td><strong>MALC</strong></td><td>Master Action Learning Coach</td><td>Thought leader in the Action Learning community. Highest level.</td></tr>
+        </table>
+        <p>Each track includes:</p>
+        <ul>
+          <li>Requirements packet (downloadable)</li>
+          <li>Application form</li>
+          <li>Recertification packet</li>
+          <li>LMS link for online courses</li>
+          <li>Credly digital badge</li>
+          <li>Renewal validity period and annual requirements</li>
+        </ul>
+
+        <h2 id="dues-payments">Dues and Payments</h2>
+        <p>Coaches can manage their dues at <code>/account/dues</code>. The payment flow:</p>
+        <ol>
+          <li>View outstanding dues and their descriptions</li>
+          <li>Click <strong>Pay now</strong> to create a Stripe checkout session</li>
+          <li>Complete payment on Stripe&rsquo;s secure checkout page</li>
+          <li>You are redirected back to the platform on success</li>
+        </ol>
+        <p>Payment history is available on the same page.</p>
+
+        <h2 id="becoming-chapter-head">Becoming a Chapter Head</h2>
+        <p>Coaches who want to lead a chapter can apply at <code>/account/register-chapter-head</code>. This upgrade requires:</p>
+        <ol>
+          <li>You must already be a <strong>coach</strong></li>
+          <li>A platform admin must assign you to a chapter first</li>
+          <li>Once assigned, you can self-promote to <strong>chapter admin</strong></li>
+        </ol>
+
+        <!-- ============================================ -->
+        <!-- PUBLIC FEATURES -->
+        <!-- ============================================ -->
+
+        <h2 id="coach-directory">Coach Directory</h2>
+        <p>The public coach directory at <code>/coaches</code> lets anyone search for and discover WIAL coaches using a hybrid search system:</p>
+        <ul>
+          <li><strong>Free text search</strong> &mdash; type a name, specialization, or natural-language query like "leadership coaches in Japan who speak Spanish"</li>
+          <li><strong>Filters</strong> &mdash; narrow results by certification level, country, city, language, and specializations</li>
+          <li><strong>AI-powered parsing</strong> &mdash; complex queries are parsed by an LLM to extract structured filters automatically</li>
+        </ul>
+        <p>The search combines four strategies behind the scenes:</p>
+        <ol>
+          <li><strong>Vector search</strong> &mdash; semantic similarity using Cohere embeddings &amp; pgvector</li>
+          <li><strong>Keyword search</strong> &mdash; PostgreSQL full-text search</li>
+          <li><strong>LLM query parsing</strong> &mdash; extracts structured filters from natural language</li>
+          <li><strong>Name fallback</strong> &mdash; direct name matching</li>
+        </ol>
+        <p>Results are cached for 5 minutes and rate-limited per IP address.</p>
+
+        <h2 id="certification-hub">Certification Hub (Public)</h2>
+        <p>The public certification page at <code>/certification</code> provides an overview of all four certification tracks with requirements, application documents, and LMS links. This is a view-only resource for prospective and current coaches.</p>
+
+        <h2 id="chatbot">AI Chatbot</h2>
+        <p>The site chatbot (available on public pages) answers questions about WIAL certification, requirements, upcoming events, and general Action Learning information. It uses GPT-4o-mini with a focused context window and is limited to 20 messages per minute per visitor.</p>
+
+        <h2 id="accessibility">Accessibility</h2>
+        <p>The platform includes built-in accessibility options that visitors can adjust:</p>
+        <ul>
+          <li><strong>Text size</strong> &mdash; default, large, or extra-large</li>
+          <li><strong>Contrast</strong> &mdash; default or high contrast mode</li>
+          <li><strong>Reduced motion</strong> &mdash; disables animations for users who prefer less motion</li>
+        </ul>
+        <p>These preferences are stored locally in the browser and applied automatically on return visits.</p>
+
+        <!-- ============================================ -->
+        <!-- MULTI-TENANCY -->
+        <!-- ============================================ -->
+
+        <h2 id="how-subdomains-work">How Subdomains Work</h2>
+        <p>Every chapter gets its own subdomain (e.g., <code>usa.wial.org</code>, <code>japan.wial.org</code>). When a visitor loads a chapter&rsquo;s subdomain, the platform:</p>
+        <ol>
+          <li>Extracts the subdomain from the request</li>
+          <li>Looks up the matching chapter (cached for 60 seconds)</li>
+          <li>Injects tenant context headers into the request</li>
+          <li>Rewrites the URL to the internal tenant route</li>
+        </ol>
+        <p>This means chapter admins and visitors see clean URLs like <code>usa.wial.org/about</code> while the system internally routes them to the correct chapter content.</p>
+
+        <h3>Local development</h3>
+        <p>During development, you can access chapters via <code>usa.localhost:3000</code> or <code>japan.localhost:3000</code>. Most browsers resolve <code>*.localhost</code> to 127.0.0.1 automatically.</p>
+
+        <h2 id="content-inheritance">Content Inheritance</h2>
+        <p>Chapter sites inherit global content by default. If a chapter does not have a custom version of a page (e.g., <code>/about</code>), it will display the global version. When a chapter creates its own version of a page, that override takes priority on the chapter&rsquo;s subdomain.</p>
+        <p>This means new chapters start with complete, professional content from day one and can progressively customize their site over time.</p>
+
+        <!-- ============================================ -->
+        <!-- REFERENCE -->
+        <!-- ============================================ -->
+
+        <h2 id="api-keys">API Keys and Integrations</h2>
+        <p>The platform connects to several external services. These are configured via environment variables and are optional unless noted:</p>
+        <table>
+          <tr><th>Service</th><th>Environment Variable</th><th>Purpose</th></tr>
+          <tr><td><strong>Supabase</strong></td><td><code>NEXT_PUBLIC_SUPABASE_URL</code><br><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code><br><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td><strong>Required.</strong> Database, auth, and storage.</td></tr>
+          <tr><td><strong>OpenRouter</strong></td><td><code>OPENROUTER_API_KEY</code></td><td>AI content generation and chatbot. Disables AI features if not set.</td></tr>
+          <tr><td><strong>Cohere</strong></td><td><code>COHERE_API_KEY</code></td><td>Vector embeddings for semantic coach search. Falls back to keyword search.</td></tr>
+          <tr><td><strong>Stripe</strong></td><td><code>STRIPE_SECRET_KEY</code></td><td>Payment processing for coach dues. Disables payments if not set.</td></tr>
+          <tr><td><strong>ElevenLabs</strong></td><td><code>ELEVENLABS_API_KEY</code></td><td>Text-to-speech audio narration for pages. Disables audio if not set.</td></tr>
+          <tr><td><strong>Resend</strong></td><td><code>RESEND_API_KEY</code></td><td>Email notifications (welcome emails, rejection notices). Emails skipped if not set.</td></tr>
+        </table>
+
+        <h2 id="role-permissions">Role Permissions Reference</h2>
+        <table>
+          <tr>
+            <th>Capability</th>
+            <th>Platform Admin</th>
+            <th>Chapter Admin</th>
+            <th>Content Creator</th>
+            <th>Coach</th>
+            <th>Public Visitor</th>
+          </tr>
+          <tr><td>Provision chapters</td><td>&#10003;</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>View global dashboard</td><td>&#10003;</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Approve coaches (all chapters)</td><td>&#10003;</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Assign content creators</td><td>&#10003;</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Edit chapter content</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td></tr>
+          <tr><td>Manage events</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td></tr>
+          <tr><td>Generate AI content</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td><td></td></tr>
+          <tr><td>Approve chapter coaches</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td><td></td></tr>
+          <tr><td>Edit chapter settings</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td><td></td></tr>
+          <tr><td>View revenue dashboard</td><td>&#10003;</td><td>&#10003;</td><td></td><td></td><td></td></tr>
+          <tr><td>Manage coach profile</td><td></td><td></td><td></td><td>&#10003;</td><td></td></tr>
+          <tr><td>View certifications</td><td></td><td></td><td></td><td>&#10003;</td><td>&#10003;</td></tr>
+          <tr><td>Pay dues</td><td></td><td></td><td></td><td>&#10003;</td><td></td></tr>
+          <tr><td>Register as coach</td><td></td><td></td><td></td><td></td><td>&#10003;</td></tr>
+          <tr><td>Browse coach directory</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+          <tr><td>Use chatbot</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+        </table>
+
+        <h2 id="troubleshooting">Troubleshooting</h2>
+
+        <h3>"No chapter workspace selected"</h3>
+        <p>This means you are not assigned to a chapter. Ask a platform admin to assign your account to a chapter, or access your chapter through its subdomain URL.</p>
+
+        <h3>AI content generation fails</h3>
+        <p>Check that the <code>OPENROUTER_API_KEY</code> environment variable is set. AI features are disabled without it. Also confirm you have not exceeded the 10 generations/hour limit.</p>
+
+        <h3>Coach not appearing in directory</h3>
+        <p>Coach profiles must be <strong>approved</strong> by a chapter admin or platform admin before they appear in the public directory. Check the approvals queue.</p>
+
+        <h3>Payments not working</h3>
+        <p>Ensure <code>STRIPE_SECRET_KEY</code> is configured. In development, use Stripe&rsquo;s test mode keys.</p>
+
+        <h3>Subdomain not resolving locally</h3>
+        <p>In development, use <code>usa.localhost:3000</code> format. Most modern browsers resolve <code>*.localhost</code> to 127.0.0.1. If yours does not, add entries to <code>/etc/hosts</code>:</p>
+        <pre><code>127.0.0.1  usa.localhost
+127.0.0.1  japan.localhost</code></pre>
+
+        <h3>Email notifications not sending</h3>
+        <p>Configure the <code>RESEND_API_KEY</code> environment variable. Without it, the platform skips email notifications for coach approvals, rejections, and welcome messages.</p>
+
+        <h3>Audio narration missing</h3>
+        <p>Audio generation requires the <code>ELEVENLABS_API_KEY</code> environment variable. Page content is also capped at 5,000 characters for audio generation.</p>
+
+        <p style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem;">
+          &copy; World Institute for Action Learning. This guide was generated for the WIAL platform. For technical support, contact <a href="mailto:info@wial.org">info@wial.org</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

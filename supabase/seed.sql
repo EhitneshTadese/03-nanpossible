@@ -1,14 +1,8 @@
-begin;
-
+-- Chapters must use explicit IDs so the content_pages FK references work.
+-- The legacy_schema_compatibility migration may have already inserted these
+-- with auto-generated UUIDs, so we update id = excluded.id on conflict.
 insert into public.chapters (
-  id,
-  name,
-  subdomain,
-  locale,
-  status,
-  contact_email,
-  theme_json,
-  tagline
+  id, name, subdomain, locale, status, contact_email, theme_json, tagline
 )
 values
 (
@@ -33,6 +27,7 @@ values
 )
 on conflict (subdomain) do update
 set
+  id = excluded.id,
   name = excluded.name,
   locale = excluded.locale,
   status = excluded.status,
@@ -140,4 +135,3 @@ set
   source_url = excluded.source_url,
   published = excluded.published;
 
-commit;

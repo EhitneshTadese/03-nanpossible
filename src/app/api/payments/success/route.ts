@@ -5,7 +5,11 @@ import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key);
+}
 
 type PaymentRecord = {
   id: string;
@@ -38,7 +42,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status !== "paid") {
       return NextResponse.redirect(new URL("/account/dues?error=payment-failed", req.url));
