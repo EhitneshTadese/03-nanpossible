@@ -50,5 +50,9 @@ export async function GET(request: Request) {
     );
   }
 
+  if (type === "recovery") {
+    return NextResponse.redirect(new URL("/reset-password", requestUrl.origin));
+  }
+
   return NextResponse.redirect(new URL(nextPath, requestUrl.origin));
 }

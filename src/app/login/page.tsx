@@ -4,6 +4,7 @@ import { getCurrentViewer, resolvePostAuthPath } from "@/lib/auth";
 import { getDefaultAccountHref } from "@/lib/account";
 import { hasSupabaseAuthConfig } from "@/lib/supabase-auth";
 import { signInWithPasswordAction } from "./actions";
+import { forgotPasswordAction } from "./forgot-password-action";
 
 type LoginPageProps = {
   searchParams: Promise<{
@@ -19,6 +20,8 @@ function getNoticeMessage(notice?: string) {
       return "You have been signed out of the WIAL workspace.";
     case "registration-success":
       return "Registration completed. Sign in with the credentials you just created.";
+    case "recovery-sent":
+      return "If that email is registered, a password reset link has been sent.";
     default:
       return null;
   }
@@ -153,6 +156,32 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 Sign in
               </button>
             </form>
+
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm text-foreground/60 hover:text-foreground/90">
+                Forgot your password?
+              </summary>
+              <form action={forgotPasswordAction} className="mt-3 space-y-3">
+                <label className="field-shell">
+                  <span className="field-label">Email address</span>
+                  <input
+                    className="field-input"
+                    disabled={!authReady}
+                    name="email"
+                    placeholder="you@wial.org"
+                    required
+                    type="email"
+                  />
+                </label>
+                <button
+                  className="button-link secondary w-full"
+                  disabled={!authReady}
+                  type="submit"
+                >
+                  Send reset link
+                </button>
+              </form>
+            </details>
 
             <div className="auth-register-card mt-6">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">
