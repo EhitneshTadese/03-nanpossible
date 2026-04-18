@@ -76,19 +76,27 @@ export const getCurrentUser = cache(async () => {
       .eq("id", user.id)
       .maybeSingle();
 
+    const metadataRole = coerceRole(
+      typeof user.app_metadata?.role === "string"
+        ? user.app_metadata.role
+        : null,
+    );
+
     if (data) {
-      return mapProfileRow(data);
+      const profile = mapProfileRow(data);
+      // app_metadata is authoritative (only service_role can set it).
+      // If it carries a non-default role that differs from the DB row, prefer it.
+      if (metadataRole !== "public_visitor" && metadataRole !== profile.role) {
+        return { ...profile, role: metadataRole };
+      }
+      return profile;
     }
 
     return {
       id: user.id,
       email: user.email ?? "",
       name: typeof user.user_metadata?.name === "string" ? user.user_metadata.name : "",
-      role: coerceRole(
-        typeof user.app_metadata?.role === "string"
-          ? user.app_metadata.role
-          : null,
-      ),
+      role: metadataRole,
       chapterId:
         typeof user.app_metadata?.chapter_id === "string"
           ? user.app_metadata.chapter_id
