@@ -95,6 +95,25 @@ export type UserProfile = {
   photoUrl: string | null;
 };
 
+export type AdminUserRecord = {
+  id: string;
+  email: string;
+  name: string;
+  role: AppRole;
+  chapterId: string | null;
+  chapterName: string | null;
+  assignedChapters: string[];
+  assignedChapterNames: string[];
+};
+
+export type RoleAssignmentInput = {
+  actorUserId: string;
+  userId: string;
+  role: AppRole;
+  chapterId: string | null;
+  assignedChapters: string[];
+};
+
 export type CoachRecord = {
   id: string;
   userId: string | null;

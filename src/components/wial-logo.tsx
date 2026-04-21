@@ -7,8 +7,8 @@ type WialLogoProps = {
 
 export function WialLogo({ chapterLabel }: WialLogoProps) {
   return (
-    <Link className="inline-flex items-center gap-4" href="/">
-      <div className="relative h-10 w-24">
+    <Link className="inline-flex min-w-0 items-center gap-3 sm:gap-4" href="/">
+      <div className="relative h-10 w-20 flex-shrink-0 sm:w-24">
         <Image
           src="/assets/logo.webp"
           alt="WIAL logo"
@@ -17,15 +17,15 @@ export function WialLogo({ chapterLabel }: WialLogoProps) {
           className="object-contain"
         />
       </div>
-      <span className="flex flex-col">
-        <span className="font-display text-[1.35rem] leading-none tracking-[-0.05em] text-teal-deep">
+      <span className="flex min-w-0 flex-col">
+        <span className="font-display text-[1.2rem] leading-none tracking-[-0.05em] text-teal-deep sm:text-[1.35rem]">
           WIAL
         </span>
-        <span className="text-[0.76rem] font-semibold uppercase tracking-[0.18em] text-foreground/65">
+        <span className="mt-0.5 hidden max-w-[12rem] text-[0.68rem] font-semibold uppercase leading-[1.25] tracking-[0.16em] text-foreground/65 sm:block lg:max-w-[15rem] xl:max-w-none">
           World Institute for Action Learning
         </span>
         {chapterLabel ? (
-          <span className="mt-1 text-sm font-semibold text-accent">
+          <span className="mt-1 truncate text-xs font-semibold text-accent sm:text-sm">
             {chapterLabel}
           </span>
         ) : null}

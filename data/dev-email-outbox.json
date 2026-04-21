@@ -1,0 +1,12 @@
+[
+  {
+    "capturedAt": "2026-04-20T19:57:02.626Z",
+    "from": "WIAL <onboarding@resend.dev>",
+    "reason": "missing-api-key",
+    "subject": "Local fallback smoke test",
+    "text": "Temporary local outbox test.",
+    "to": [
+      "lead@example.com"
+    ]
+  }
+]

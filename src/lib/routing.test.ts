@@ -24,7 +24,7 @@ describe("normalizeSegments", () => {
     });
     expect(normalizeSegments(["library"])).toEqual({
       slug: null,
-      redirectTo: "/resources",
+      redirectTo: "/clients",
     });
   });
 

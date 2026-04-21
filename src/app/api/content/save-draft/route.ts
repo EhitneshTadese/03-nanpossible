@@ -47,5 +47,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "save-failed" }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    savedAt: new Date().toISOString(),
+  });
 }

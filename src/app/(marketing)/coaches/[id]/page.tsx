@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AudioPlayer from "@/components/AudioPlayer";
-import { ensureCoachAudioIntro } from "@/lib/audio";
 import {
   formatCoachLocation,
   getApprovedCoachById,
@@ -53,7 +51,6 @@ export default async function CoachDetailPage({ params }: CoachDetailPageProps) 
     notFound();
   }
 
-  const audioIntro = await ensureCoachAudioIntro(coach);
   const location = formatCoachLocation(coach);
   const credlyBadgeImage =
     coach.credlyBadgeImageUrl ??
@@ -115,16 +112,6 @@ export default async function CoachDetailPage({ params }: CoachDetailPageProps) 
                       </span>
                     ) : null}
                   </div>
-                  {audioIntro.audioUrl ? (
-                    <div className="pt-2">
-                      <AudioPlayer
-                        audioUrl={audioIntro.audioUrl}
-                        duration={audioIntro.durationSeconds}
-                        mode="inline"
-                        pageTitle={`Listen to ${coach.name}'s introduction`}
-                      />
-                    </div>
-                  ) : null}
                 </div>
               </div>
 

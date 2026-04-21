@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import AudioPlayer from "@/components/AudioPlayer";
-import { ensureStandalonePageAudio } from "@/lib/audio";
+import Link from "next/link";
 import { CoachSearch } from "./CoachSearch";
 import { getCoachFacetOptions, listApprovedCoaches } from "@/lib/coaches";
+import { getCurrentViewer } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Find a WIAL Certified Coach",
@@ -13,21 +13,21 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function CoachesDirectoryPage() {
-  const [initialCoaches, facets, audio] = await Promise.all([
+  const [initialCoaches, facets, viewer] = await Promise.all([
     listApprovedCoaches({ limit: 20 }),
     getCoachFacetOptions(),
-    ensureStandalonePageAudio({
-      objectKey: "pages/global/coaches.mp3",
-      language: "en",
-      text: [
-        "Coach directory.",
-        "Find a WIAL-certified coach for your next high-stakes team challenge.",
-        "Search across languages, specializations, and certification levels.",
-        "The directory is designed for global discovery, so a Portuguese or Korean query can still surface the right coach.",
-        "WIAL chapters can publish one vetted coach roster while still supporting local markets, multilingual search, and chapter-level approvals.",
-      ].join(" "),
-    }),
+    getCurrentViewer(),
   ]);
+
+  const directoryIsEmpty =
+    initialCoaches.length === 0 &&
+    facets.countries.length === 0 &&
+    facets.languages.length === 0;
+
+  const registrationHref = viewer ? "/account/register-coach" : "/register";
+  const registrationLabel = viewer
+    ? "Register as a coach"
+    : "Create an account to register";
 
   return (
     <div className="page-frame">
@@ -45,13 +45,6 @@ export default async function CoachesDirectoryPage() {
                 levels. The directory is designed for global discovery, so a
                 Portuguese or Korean query can still surface the right coach.
               </p>
-              <div className="max-w-3xl">
-                <AudioPlayer
-                  audioUrl={audio.audioUrl}
-                  duration={audio.durationSeconds}
-                  pageTitle="WIAL coach directory"
-                />
-              </div>
             </div>
 
             <div className="coach-callout">
@@ -65,7 +58,29 @@ export default async function CoachesDirectoryPage() {
           </div>
         </section>
 
-        <CoachSearch facets={facets} initialCoaches={initialCoaches} />
+        {directoryIsEmpty ? (
+          <section className="site-panel rounded-[2rem] px-6 py-12 text-center md:px-10 md:py-16">
+            <span className="eyebrow">The coach directory is growing</span>
+            <h2 className="mx-auto mt-4 max-w-2xl font-display text-[clamp(2.2rem,4vw,3.4rem)] leading-[1.05] tracking-[-0.05em] text-teal-deep">
+              No coaches have been approved yet.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-foreground/72">
+              New coach profiles appear here as soon as they&apos;re approved by
+              a chapter administrator. Check back soon — or register your own
+              profile to be part of the launch roster.
+            </p>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+              <Link className="button-link primary" href={registrationHref}>
+                {registrationLabel}
+              </Link>
+              <Link className="button-link ghost" href="/certification">
+                Learn about certification
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <CoachSearch facets={facets} initialCoaches={initialCoaches} />
+        )}
       </div>
     </div>
   );

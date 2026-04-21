@@ -1,8 +1,8 @@
-import sanitizeHtml from "sanitize-html";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { canEditChapter, getCurrentUser } from "@/lib/auth";
 import { getContentPageByIdForAdmin } from "@/lib/content";
+import { sanitizeContentPageHtml } from "@/lib/content-html";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 import { getChapterById } from "@/lib/tenant";
 
@@ -13,30 +13,6 @@ function getTenantPaths(subdomain: string, slug: string) {
     base,
     slug === "home" ? base : `${base}/${slug}`,
   ];
-}
-
-function triggerAudioGeneration(request: Request, pageId: string) {
-  const secret = process.env.AUDIO_GENERATION_SECRET?.trim();
-
-  if (!secret) {
-    return;
-  }
-
-  const url = new URL("/api/audio/generate", request.url);
-
-  void fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-wial-audio-secret": secret,
-    },
-    body: JSON.stringify({ page_id: pageId }),
-  }).catch((error) => {
-    console.error("WIAL page audio trigger failed", {
-      pageId,
-      error,
-    });
-  });
 }
 
 export async function POST(request: Request) {
@@ -69,14 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const cleanHtml = sanitizeHtml(String(body.body_html ?? ""), {
-    allowedTags: ["h2", "h3", "p", "ul", "ol", "li", "strong", "em", "a", "blockquote", "img"],
-    allowedAttributes: {
-      a: ["href", "target", "rel"],
-      img: ["src", "alt"],
-    },
-    allowedSchemes: ["http", "https", "mailto"],
-  });
+  const cleanHtml = sanitizeContentPageHtml(String(body.body_html ?? ""));
 
   const { error } = await client
     .from("content_pages")
@@ -99,9 +68,10 @@ export async function POST(request: Request) {
         revalidatePath(path);
       }
     }
-
-    triggerAudioGeneration(request, pageId);
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    updatedAt: new Date().toISOString(),
+  });
 }

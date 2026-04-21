@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AudioPlayer from "@/components/AudioPlayer";
 import { AccountPageShell } from "@/components/account-page-shell";
 import {
   getCertificationHubContent,
@@ -142,12 +141,8 @@ function TrackSection({ track }: { track: CertificationTrack }) {
 }
 
 function CertificationHubSections({
-  audioDurationSeconds,
-  audioUrl,
   mode,
 }: {
-  audioDurationSeconds?: number | null;
-  audioUrl?: string | null;
   mode: "marketing" | "account";
 }) {
   const content = getCertificationHubContent();
@@ -167,11 +162,6 @@ function CertificationHubSections({
                 <p className="max-w-4xl text-lg leading-8 text-foreground/78">
                   {content.hero.intro}
                 </p>
-                <AudioPlayer
-                  audioUrl={audioUrl ?? null}
-                  duration={audioDurationSeconds ?? null}
-                  pageTitle="WIAL Certification Hub"
-                />
               </div>
             </div>
 
@@ -386,21 +376,11 @@ function CertificationHubSections({
   );
 }
 
-export function MarketingCertificationHub({
-  audioDurationSeconds,
-  audioUrl,
-}: {
-  audioDurationSeconds?: number | null;
-  audioUrl?: string | null;
-}) {
+export function MarketingCertificationHub() {
   return (
     <div className="page-frame">
       <div className="site-shell">
-        <CertificationHubSections
-          audioDurationSeconds={audioDurationSeconds}
-          audioUrl={audioUrl}
-          mode="marketing"
-        />
+        <CertificationHubSections mode="marketing" />
       </div>
     </div>
   );

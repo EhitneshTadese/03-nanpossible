@@ -271,7 +271,7 @@ function SidebarSection({
   return (
     <section className="account-sidebar-section">
       <p className="account-sidebar-section-title">{title}</p>
-      <nav className="flex flex-col gap-1.5">
+      <nav className="account-sidebar-links">
         {items.map((item) => {
           const isActive = pathname === item.href;
 
@@ -334,6 +334,7 @@ function SidebarContent({
           <div className="min-w-0">
             <p className="account-sidebar-overline">WIAL workspace</p>
             <h2 className="account-sidebar-title truncate">{platformLabel}</h2>
+            <div className="account-sidebar-pill">{roleLabel}</div>
           </div>
         </div>
         {onClose ? (
@@ -347,8 +348,6 @@ function SidebarContent({
           </button>
         ) : null}
       </div>
-
-      <div className="account-sidebar-pill">{roleLabel}</div>
 
       <div className="account-sidebar-nav">
         {sections.map((section, index) => (

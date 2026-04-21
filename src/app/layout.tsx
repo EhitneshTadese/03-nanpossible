@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { headers } from "next/headers";
+import { ACCESSIBILITY_MAIN_CONTENT_ID } from "@/lib/accessibility-assistive-tools";
 import { getAccessibilityBootScript } from "@/lib/accessibility-preferences";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -44,7 +45,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full bg-background antialiased text-scale-default contrast-default"
+      className="h-full bg-background antialiased text-scale-default contrast-default line-height-default"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -56,9 +57,15 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full bg-background text-foreground">
-        <div className="flex min-h-full flex-col">
+        <div className="site-app-shell flex min-h-full flex-col">
           <SiteHeader siteContext={siteContext} viewer={viewer} />
-          <main className="flex-1">{children}</main>
+          <main
+            className="flex-1"
+            data-readable-content="main"
+            id={ACCESSIBILITY_MAIN_CONTENT_ID}
+          >
+            {children}
+          </main>
           <SiteFooter siteContext={siteContext} />
           <SiteChatbot />
         </div>

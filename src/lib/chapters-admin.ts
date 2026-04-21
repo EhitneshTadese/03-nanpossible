@@ -1,8 +1,15 @@
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { sendResendEmail } from "@/lib/resend";
 import { isReservedSubdomain, isValidSubdomain } from "@/lib/routing";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
-import type { AppRole, ChapterProvisionInput } from "@/lib/types";
+import { listChapters } from "@/lib/tenant";
+import type {
+  AdminUserRecord,
+  AppRole,
+  ChapterProvisionInput,
+  RoleAssignmentInput,
+} from "@/lib/types";
 
 export const defaultChapterPages = [
   { slug: "about", title: "About", sortOrder: 10 },
@@ -52,8 +59,77 @@ type UserAccessInput = {
   name?: string | null;
 };
 
+type UserAccessRow = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: AppRole;
+  chapter_id: string | null;
+  assigned_chapters: string[] | null;
+};
+
+type NormalizedRoleAssignment = Pick<
+  RoleAssignmentInput,
+  "role" | "chapterId" | "assignedChapters"
+>;
+
+type ChapterRow = {
+  id: string;
+  name: string;
+  subdomain: string;
+};
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return null;
+}
+
+function normalizeAdminDataError(error: unknown) {
+  const message = getErrorMessage(error);
+
+  if (message === "Invalid API key") {
+    return new Error("invalid-service-key");
+  }
+
+  return error instanceof Error ? error : new Error(message ?? "unknown-admin-error");
+}
+
+function coerceRole(value: string | null): AppRole {
+  if (
+    value === "platform_admin" ||
+    value === "chapter_admin" ||
+    value === "content_creator" ||
+    value === "coach"
+  ) {
+    return value;
+  }
+
+  return "public_visitor";
+}
+
 function mapLanguageLabelToCode(value: string) {
   return languageMap.get(value.trim().toLowerCase()) ?? "en";
+}
+
+function normalizeNullableValue(value?: string | null) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
+function normalizeChapterIds(values: string[]) {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
 }
 
 function normalizeSubdomain(value: string) {
@@ -97,29 +173,152 @@ function buildDefaultPages(
   }));
 }
 
-async function sendWelcomeEmail(email: string, chapterName: string, subdomain: string) {
-  const apiKey = process.env.RESEND_API_KEY;
+function mapAdminUserRecord(
+  user: UserAccessRow,
+  chapterMap: ReadonlyMap<string, string>,
+): AdminUserRecord {
+  const name = user.name?.trim() || user.email.split("@")[0] || "Unnamed user";
+  const assignedChapters = normalizeChapterIds(user.assigned_chapters ?? []);
 
-  if (!apiKey) {
-    return { warning: "welcome-email-skipped" };
+  return {
+    id: user.id,
+    email: user.email,
+    name,
+    role: coerceRole(user.role),
+    chapterId: user.chapter_id,
+    chapterName: user.chapter_id ? chapterMap.get(user.chapter_id) ?? null : null,
+    assignedChapters,
+    assignedChapterNames: assignedChapters
+      .map((chapterId) => chapterMap.get(chapterId))
+      .filter((value): value is string => Boolean(value)),
+  };
+}
+
+export function normalizeRoleAssignment(
+  input: Pick<RoleAssignmentInput, "role" | "chapterId" | "assignedChapters">,
+): NormalizedRoleAssignment {
+  const chapterId = normalizeNullableValue(input.chapterId);
+  const assignedChapters = normalizeChapterIds(input.assignedChapters);
+
+  switch (input.role) {
+    case "platform_admin":
+    case "public_visitor":
+      return {
+        role: input.role,
+        chapterId: null,
+        assignedChapters: [],
+      };
+    case "chapter_admin":
+      if (!chapterId) {
+        throw new Error("chapter-required");
+      }
+
+      return {
+        role: input.role,
+        chapterId,
+        assignedChapters: [],
+      };
+    case "content_creator":
+      if (!assignedChapters.length) {
+        throw new Error("assigned-chapters-required");
+      }
+
+      return {
+        role: input.role,
+        chapterId: null,
+        assignedChapters,
+      };
+    case "coach":
+      return {
+        role: input.role,
+        chapterId,
+        assignedChapters: [],
+      };
+  }
+}
+
+export function normalizeRoleAssignmentForDeletedChapter(
+  user: Pick<UserAccessRow, "role" | "chapter_id" | "assigned_chapters">,
+  deletedChapterId: string,
+): NormalizedRoleAssignment {
+  const role = coerceRole(user.role);
+  const chapterId =
+    normalizeNullableValue(user.chapter_id) === deletedChapterId
+      ? null
+      : normalizeNullableValue(user.chapter_id);
+  const assignedChapters = normalizeChapterIds(user.assigned_chapters ?? []).filter(
+    (chapterId) => chapterId !== deletedChapterId,
+  );
+
+  switch (role) {
+    case "chapter_admin":
+      return chapterId
+        ? normalizeRoleAssignment({
+            role,
+            chapterId,
+            assignedChapters,
+          })
+        : {
+            role: "public_visitor",
+            chapterId: null,
+            assignedChapters: [],
+          };
+    case "content_creator":
+      return assignedChapters.length
+        ? normalizeRoleAssignment({
+            role,
+            chapterId: null,
+            assignedChapters,
+          })
+        : {
+            role: "public_visitor",
+            chapterId: null,
+            assignedChapters: [],
+          };
+    default:
+      return normalizeRoleAssignment({
+        role,
+        chapterId,
+        assignedChapters,
+      });
+  }
+}
+
+export function assertRoleAssignmentAllowed(options: {
+  actorUserId: string;
+  targetUserId: string;
+  currentRole: AppRole;
+  nextRole: AppRole;
+  platformAdminCount: number;
+}) {
+  if (
+    options.targetUserId === options.actorUserId &&
+    options.currentRole === "platform_admin" &&
+    options.nextRole !== "platform_admin"
+  ) {
+    throw new Error("self-demotion-forbidden");
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "WIAL <noreply@wial.org>",
-      to: [email],
-      subject: `Your ${chapterName} site is ready`,
-      text: `Your chapter workspace is ready.\n\nPublic URL: https://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}\nAdmin URL: https://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}/admin/chapter\n`,
-    }),
+  if (
+    options.currentRole === "platform_admin" &&
+    options.nextRole !== "platform_admin" &&
+    options.platformAdminCount <= 1
+  ) {
+    throw new Error("last-platform-admin");
+  }
+}
+
+async function sendWelcomeEmail(email: string, chapterName: string, subdomain: string) {
+  const result = await sendResendEmail({
+    to: [email],
+    subject: `Your ${chapterName} site is ready`,
+    text: `Your chapter workspace is ready.\n\nPublic URL: https://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}\nAdmin URL: https://${subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}/admin/chapter\n`,
   });
 
-  if (!response.ok) {
-    return { warning: "welcome-email-failed" };
+  if (!result.delivered) {
+    return {
+      warning: result.error === "missing-api-key" ? "welcome-email-skipped" : "welcome-email-failed",
+    };
   }
 
   return { warning: null };
@@ -132,17 +331,18 @@ export async function syncUserAccess(input: UserAccessInput) {
     throw new Error("missing-config");
   }
 
-  const assignedChapters = [...new Set(input.assignedChapters ?? [])];
+  const assignedChapters = normalizeChapterIds(input.assignedChapters ?? []);
   const { error: upsertError } = await client.from("users").upsert({
     id: input.userId,
     email: input.email,
     role: input.role,
     chapter_id: input.chapterId,
+    assigned_chapters: assignedChapters,
     name: input.name ?? null,
   });
 
   if (upsertError) {
-    throw upsertError;
+    throw normalizeAdminDataError(upsertError);
   }
 
   const { error: authError } = await client.auth.admin.updateUserById(input.userId, {
@@ -154,11 +354,105 @@ export async function syncUserAccess(input: UserAccessInput) {
   });
 
   if (authError) {
-    throw authError;
+    throw normalizeAdminDataError(authError);
   }
 }
 
+export async function listAdminUsers() {
+  const client = createServiceRoleSupabaseClient();
+
+  if (!client) {
+    throw new Error("missing-config");
+  }
+
+  const [usersResult, chapters] = await Promise.all([
+    client.from("users").select("id, email, name, role, chapter_id, assigned_chapters"),
+    listChapters(),
+  ]);
+
+  if (usersResult.error) {
+    throw normalizeAdminDataError(usersResult.error);
+  }
+
+  const chapterMap = new Map(chapters.map((chapter) => [chapter.id, chapter.name]));
+
+  return ((usersResult.data ?? []) as UserAccessRow[])
+    .map((user) => mapAdminUserRecord(user, chapterMap))
+    .sort((left, right) => {
+      const leftLabel = `${left.name} ${left.email}`.toLowerCase();
+      const rightLabel = `${right.name} ${right.email}`.toLowerCase();
+      return leftLabel.localeCompare(rightLabel);
+    });
+}
+
+export async function updateUserRoleAssignment(input: RoleAssignmentInput) {
+  const client = createServiceRoleSupabaseClient();
+
+  if (!client) {
+    throw new Error("missing-config");
+  }
+
+  const { data: user, error: userError } = await client
+    .from("users")
+    .select("id, email, name, role, chapter_id, assigned_chapters")
+    .eq("id", input.userId)
+    .maybeSingle();
+
+  if (userError) {
+    throw normalizeAdminDataError(userError);
+  }
+
+  if (!user) {
+    throw new Error("user-not-found");
+  }
+
+  const normalized = normalizeRoleAssignment(input);
+  const chapters = await listChapters();
+  const chapterIds = new Set(chapters.map((chapter) => chapter.id));
+
+  if (normalized.chapterId && !chapterIds.has(normalized.chapterId)) {
+    throw new Error("invalid-chapter");
+  }
+
+  if (normalized.assignedChapters.some((chapterId) => !chapterIds.has(chapterId))) {
+    throw new Error("invalid-chapters");
+  }
+
+  let platformAdminCount = 0;
+
+  if (user.role === "platform_admin" && normalized.role !== "platform_admin") {
+    const { count, error: countError } = await client
+      .from("users")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "platform_admin");
+
+    if (countError) {
+      throw normalizeAdminDataError(countError);
+    }
+
+    platformAdminCount = count ?? 0;
+  }
+
+  assertRoleAssignmentAllowed({
+    actorUserId: input.actorUserId,
+    targetUserId: user.id,
+    currentRole: coerceRole(user.role),
+    nextRole: normalized.role,
+    platformAdminCount,
+  });
+
+  await syncUserAccess({
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    role: normalized.role,
+    chapterId: normalized.chapterId,
+    assignedChapters: normalized.assignedChapters,
+  });
+}
+
 export async function assignContentCreatorToChapter(options: {
+  actorUserId: string;
   email: string;
   chapterId: string;
 }) {
@@ -169,11 +463,17 @@ export async function assignContentCreatorToChapter(options: {
   }
 
   const email = options.email.trim().toLowerCase();
-  const { data: user } = await client
+  const userLookup = await client
     .from("users")
     .select("id, email, role, chapter_id, assigned_chapters, name")
     .ilike("email", email)
     .maybeSingle();
+
+  if (userLookup.error) {
+    throw normalizeAdminDataError(userLookup.error);
+  }
+
+  const user = userLookup.data;
 
   if (!user) {
     throw new Error("user-not-found");
@@ -187,14 +487,82 @@ export async function assignContentCreatorToChapter(options: {
     ? user.role
     : "content_creator";
 
-  await syncUserAccess({
+  await updateUserRoleAssignment({
+    actorUserId: options.actorUserId,
     userId: user.id,
-    email: user.email,
-    name: user.name,
     role,
-    chapterId: user.chapter_id,
+    chapterId: normalizeNullableValue(user.chapter_id),
     assignedChapters: nextAssignments,
   });
+}
+
+export async function deleteChapter(chapterId: string) {
+  const client = createServiceRoleSupabaseClient();
+
+  if (!client) {
+    throw new Error("missing-config");
+  }
+
+  const { data: chapter, error: chapterError } = await client
+    .from("chapters")
+    .select("id, name, subdomain")
+    .eq("id", chapterId)
+    .maybeSingle();
+
+  if (chapterError) {
+    throw normalizeAdminDataError(chapterError);
+  }
+
+  if (!chapter) {
+    throw new Error("chapter-not-found");
+  }
+
+  const chapterRecord = chapter as ChapterRow;
+
+  if (chapterRecord.subdomain === "global") {
+    throw new Error("protected-chapter");
+  }
+
+  const { data: users, error: usersError } = await client
+    .from("users")
+    .select("id, email, name, role, chapter_id, assigned_chapters");
+
+  if (usersError) {
+    throw normalizeAdminDataError(usersError);
+  }
+
+  const affectedUsers = ((users ?? []) as UserAccessRow[]).filter((user) => {
+    const assignedChapters = normalizeChapterIds(user.assigned_chapters ?? []);
+
+    return user.chapter_id === chapterId || assignedChapters.includes(chapterId);
+  });
+
+  for (const user of affectedUsers) {
+    const normalized = normalizeRoleAssignmentForDeletedChapter(user, chapterId);
+
+    await syncUserAccess({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: normalized.role,
+      chapterId: normalized.chapterId,
+      assignedChapters: normalized.assignedChapters,
+    });
+  }
+
+  const { error: deleteError } = await client.from("chapters").delete().eq("id", chapterId);
+
+  if (deleteError) {
+    throw normalizeAdminDataError(deleteError);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/global");
+  revalidatePath("/admin/global/chapters");
+  revalidatePath("/admin/global/users");
+  revalidatePath(`/sites/${chapterRecord.subdomain}`);
+
+  return chapterRecord;
 }
 
 export async function updateChapterSettings(options: {
