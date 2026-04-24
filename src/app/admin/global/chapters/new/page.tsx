@@ -22,7 +22,7 @@ export default async function NewChapterPage() {
           <p className="eyebrow">What happens next</p>
           <div className="mt-4 grid gap-3">
             {[
-              "Seed About, Team, Events, Resources, Testimonials, and Contact pages",
+              "Seed About and Contact pages for chapter-specific content with image and text editing",
               "Assign or invite the chapter lead account",
               "Make the chapter ready for content editing and AI generation",
             ].map((item) => (

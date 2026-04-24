@@ -5,6 +5,22 @@ import {
   getTenantCandidateForRequest,
   shouldBypassTenantRewrite,
 } from "@/lib/routing";
+
+/**
+ * Paths that are global-only (served by the (marketing) route group)
+ * and should NOT be rewritten to the tenant /sites/{chapter}/... route
+ * even when browsing on a chapter subdomain.
+ */
+function isGlobalOnlyPath(pathname: string) {
+  return (
+    pathname === "/coaches" ||
+    pathname.startsWith("/coaches/") ||
+    pathname === "/certification" ||
+    pathname.startsWith("/certification/") ||
+    pathname === "/clients" ||
+    pathname.startsWith("/clients/")
+  );
+}
 import { getChapterBySubdomain } from "@/lib/tenant";
 
 const STATIC_FILE_PATTERN = /\.(.*)$/;
@@ -140,6 +156,7 @@ export async function middleware(request: NextRequest) {
     pathname === "/favicon.ico" ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml" ||
+    isGlobalOnlyPath(pathname) ||
     STATIC_FILE_PATTERN.test(pathname)
   ) {
     return applySupabaseCookies(

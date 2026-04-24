@@ -21,6 +21,7 @@ type BuilderPageRendererProps = {
   chrome: ChapterBuilderChromeV1 | null;
   embedded?: boolean;
   forceViewport?: "desktop" | "mobile";
+  suppressChrome?: boolean;
 };
 
 type SurfaceKind = "header" | "page" | "footer";
@@ -429,6 +430,7 @@ export function BuilderPageRenderer({
   chrome,
   embedded = false,
   forceViewport,
+  suppressChrome = false,
 }: BuilderPageRendererProps) {
   const resolvedChrome =
     chrome ??
@@ -437,6 +439,23 @@ export function BuilderPageRenderer({
       contactEmail: chapter.contactEmail,
       contactPhone: chapter.contactPhone,
     });
+
+  if (suppressChrome) {
+    return (
+      <div className="page-frame">
+        <div className="site-shell">
+          <BuilderSurface
+            chrome={resolvedChrome}
+            embedded={false}
+            forceViewport={forceViewport}
+            kind="page"
+            mode="public"
+            surface={doc.artboard}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -463,3 +482,4 @@ export function BuilderPageRenderer({
     </div>
   );
 }
+

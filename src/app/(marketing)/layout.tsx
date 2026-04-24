@@ -1,14 +1,16 @@
+import { headers } from "next/headers";
 import { SiteChromeFrame } from "@/components/site-chrome-frame";
 import { getCurrentViewer } from "@/lib/auth";
-import { getGlobalSiteContext } from "@/lib/site-context";
+import { getLayoutSiteContext } from "@/lib/site-context";
 
 export default async function MarketingLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerStore = await headers();
   const [siteContext, viewer] = await Promise.all([
-    getGlobalSiteContext(),
+    getLayoutSiteContext(headerStore),
     getCurrentViewer(),
   ]);
 

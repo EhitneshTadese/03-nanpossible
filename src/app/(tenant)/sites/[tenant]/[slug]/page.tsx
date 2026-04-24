@@ -46,26 +46,29 @@ export default async function TenantChapterPage({
     notFound();
   }
 
-  if (page.liveRenderSource === "builder" && page.builderPublished) {
-    return (
-      <BuilderPageRenderer
-        chapter={chapter}
-        chrome={chapter.builderChromePublished ?? null}
-        doc={page.builderPublished}
-      />
-    );
-  }
-
-  if (!page.bodyHtml) {
-    notFound();
-  }
-
   const viewer = await getCurrentViewer();
   const siteContext = {
     isGlobal: false as const,
     tenant: chapter,
     host: `${chapter.subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}`,
   };
+
+  if (page.liveRenderSource === "builder" && page.builderPublished) {
+    return (
+      <SiteChromeFrame siteContext={siteContext} viewer={viewer}>
+        <BuilderPageRenderer
+          chapter={chapter}
+          chrome={chapter.builderChromePublished ?? null}
+          doc={page.builderPublished}
+          suppressChrome
+        />
+      </SiteChromeFrame>
+    );
+  }
+
+  if (!page.bodyHtml) {
+    notFound();
+  }
 
   return (
     <SiteChromeFrame siteContext={siteContext} viewer={viewer}>

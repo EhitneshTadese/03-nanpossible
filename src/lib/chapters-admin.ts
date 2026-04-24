@@ -13,10 +13,6 @@ import type {
 
 export const defaultChapterPages = [
   { slug: "about", title: "About", sortOrder: 10 },
-  { slug: "team", title: "Our Team", sortOrder: 20 },
-  { slug: "events", title: "Events", sortOrder: 30 },
-  { slug: "resources", title: "Resources", sortOrder: 40 },
-  { slug: "testimonials", title: "Testimonials", sortOrder: 50 },
   { slug: "contact", title: "Contact", sortOrder: 60 },
 ] as const;
 
