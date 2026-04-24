@@ -9,6 +9,7 @@ const preferredNodePaths = [
   "/usr/local/opt/node@22/bin/node",
 ];
 const maxAttempts = 3;
+const prodDistDir = resolve(root, ".next.nosync", "prod");
 
 function resolveNodeBin() {
   for (const candidate of preferredNodePaths) {
@@ -23,7 +24,7 @@ function resolveNodeBin() {
 const nodeBin = resolveNodeBin();
 
 for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-  rmSync(resolve(root, ".next"), { force: true, recursive: true });
+  rmSync(prodDistDir, { force: true, recursive: true });
 
   console.log(`Build attempt ${attempt}/${maxAttempts}`);
 

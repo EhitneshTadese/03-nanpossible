@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { canEditChapter, getCurrentUser } from "@/lib/auth";
 import { getContentPageByIdForAdmin } from "@/lib/content";
+import {
+  buildChapterConfigUpdatePayload,
+  buildDraftUpdatePayload,
+} from "@/lib/content-page-editor";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
+import { getChapterById } from "@/lib/tenant";
 
 export async function POST(request: Request) {
   const viewer = await getCurrentUser();
@@ -17,8 +22,10 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as {
+    editor_kind?: "legacy" | "builder";
     page_id?: string;
     body_json?: unknown;
+    builder_chrome?: unknown;
   };
   const pageId = String(body.page_id ?? "");
 
@@ -36,15 +43,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const { error } = await client
-    .from("content_pages")
-    .update({
-      body_richtext: body.body_json ?? null,
-    })
-    .eq("id", pageId);
+  const editorKind = body.editor_kind === "builder" ? "builder" : "legacy";
+  const updatePayload = buildDraftUpdatePayload(page, {
+    editorKind,
+    bodyJson: body.body_json ?? null,
+  });
+  const { error } = await client.from("content_pages").update(updatePayload).eq("id", pageId);
 
   if (error) {
     return NextResponse.json({ error: "save-failed" }, { status: 500 });
+  }
+
+  if (editorKind === "builder" && body.builder_chrome != null) {
+    const chapter = await getChapterById(page.chapterId);
+
+    if (!chapter) {
+      return NextResponse.json({ error: "missing-chapter" }, { status: 404 });
+    }
+
+    const configPayload = buildChapterConfigUpdatePayload(chapter, body.builder_chrome);
+    const { error: chapterError } = await client
+      .from("chapters")
+      .update({
+        config: configPayload,
+      })
+      .eq("id", page.chapterId);
+
+    if (chapterError) {
+      return NextResponse.json({ error: "save-failed" }, { status: 500 });
+    }
   }
 
   return NextResponse.json({

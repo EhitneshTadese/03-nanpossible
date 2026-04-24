@@ -391,6 +391,7 @@ export function ContentEditor({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          editor_kind: "legacy",
           page_id: pageId,
           body_json: editor.getJSON(),
         }),
@@ -434,6 +435,7 @@ export function ContentEditor({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        editor_kind: "legacy",
         page_id: pageId,
         body_json: editor.getJSON(),
         body_html: editor.getHTML(),

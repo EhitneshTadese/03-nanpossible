@@ -1,5 +1,8 @@
 import { notFound, redirect } from "next/navigation";
+import { BuilderPageRenderer } from "@/components/chapter/BuilderPageRenderer";
 import { ChapterHtmlPage } from "@/components/chapter/ChapterHtmlPage";
+import { SiteChromeFrame } from "@/components/site-chrome-frame";
+import { getCurrentViewer } from "@/lib/auth";
 import { getContentPage } from "@/lib/content";
 import { normalizeChapterSlug } from "@/lib/routing";
 import { getChapterBySubdomain } from "@/lib/tenant";
@@ -39,9 +42,34 @@ export default async function TenantChapterPage({
     tenantSubdomain: chapter.subdomain,
   });
 
-  if (!page?.published || !page.bodyHtml) {
+  if (!page?.published) {
     notFound();
   }
 
-  return <ChapterHtmlPage chapterName={chapter.name} html={page.bodyHtml} title={page.title} />;
+  if (page.liveRenderSource === "builder" && page.builderPublished) {
+    return (
+      <BuilderPageRenderer
+        chapter={chapter}
+        chrome={chapter.builderChromePublished ?? null}
+        doc={page.builderPublished}
+      />
+    );
+  }
+
+  if (!page.bodyHtml) {
+    notFound();
+  }
+
+  const viewer = await getCurrentViewer();
+  const siteContext = {
+    isGlobal: false as const,
+    tenant: chapter,
+    host: `${chapter.subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}`,
+  };
+
+  return (
+    <SiteChromeFrame siteContext={siteContext} viewer={viewer}>
+      <ChapterHtmlPage chapterName={chapter.name} html={page.bodyHtml} title={page.title} />
+    </SiteChromeFrame>
+  );
 }

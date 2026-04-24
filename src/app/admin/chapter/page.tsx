@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { AccountPageShell } from "@/components/account-page-shell";
-import { ContentEditor } from "@/components/admin/ContentEditor";
+import { ChapterPageEditor } from "@/components/admin/ChapterPageEditor";
 import { PageList } from "@/components/admin/PageList";
 import { requireAccountViewer } from "@/lib/auth";
 import { listChapterPagesForAdmin } from "@/lib/content";
@@ -31,6 +31,25 @@ export default async function ChapterAdminPage({
   const selectedPage =
     pages.find((page) => page.id === params.page) ?? pages[0] ?? null;
 
+  if (
+    selectedPage &&
+    selectedPage.editorKind === "builder" &&
+    selectedPage.builderState &&
+    chapter.builderChromeState
+  ) {
+    return (
+      <ChapterPageEditor
+        chapterId={chapter.id}
+        chapterName={chapter.name}
+        chapterSubdomain={chapter.subdomain}
+        defaultLanguage={chapter.language}
+        initialBuilderChromeState={chapter.builderChromeState}
+        page={selectedPage}
+        pages={pages}
+      />
+    );
+  }
+
   return (
     <AccountPageShell
       badge="Chapter content"
@@ -41,17 +60,14 @@ export default async function ChapterAdminPage({
       <div className="space-y-5">
         <PageList currentPageId={selectedPage?.id ?? null} pages={pages} />
         {selectedPage ? (
-          <ContentEditor
+          <ChapterPageEditor
             chapterId={chapter.id}
             chapterName={chapter.name}
             chapterSubdomain={chapter.subdomain}
             defaultLanguage={chapter.language}
-            initialContent={selectedPage.bodyJson ?? selectedPage.bodyRichtext}
-            initialHtml={selectedPage.bodyHtml ?? ""}
-            pageId={selectedPage.id}
-            pageSlug={selectedPage.slug}
-            pageTitle={selectedPage.title}
-            published={selectedPage.published}
+            initialBuilderChromeState={chapter.builderChromeState ?? null}
+            pages={pages}
+            page={selectedPage}
           />
         ) : (
           <section className="site-panel rounded-[2rem] p-8">

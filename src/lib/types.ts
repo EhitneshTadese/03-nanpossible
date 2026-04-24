@@ -197,6 +197,9 @@ export type ChapterRecord = {
   locale?: string;
   themeJson?: Record<string, string>;
   tagline?: string;
+  builderChromeState?: ChapterBuilderChromeStateV1 | null;
+  builderChromeDraft?: ChapterBuilderChromeV1 | null;
+  builderChromePublished?: ChapterBuilderChromeV1 | null;
 };
 
 export type MetricItem = {
@@ -275,6 +278,181 @@ export type ContentBody = {
   sections: ContentSection[];
 };
 
+export type PageEditorKind = "legacy" | "builder";
+
+export type PageLiveRenderSource = "builder" | "legacy";
+
+export type BuilderTextAlign = "left" | "center" | "right";
+
+export type BuilderButtonTone = "primary" | "secondary";
+
+export type BuilderImageFit = "cover" | "contain";
+
+export type BuilderSectionTone = "canvas" | "warm" | "mint" | "blush" | "ink";
+
+export type BuilderDesktopFrame = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  zIndex: number;
+};
+
+export type BuilderBlockBaseV1 = {
+  id: string;
+  desktop: BuilderDesktopFrame;
+};
+
+export type BuilderHeroBlockV1 = BuilderBlockBaseV1 & {
+  type: "hero";
+  eyebrow: string;
+  title: string;
+  body: string;
+  buttonLabel?: string;
+  buttonHref?: string;
+  align: BuilderTextAlign;
+};
+
+export type BuilderTextBlockV1 = BuilderBlockBaseV1 & {
+  type: "text";
+  title?: string;
+  body: string;
+  align: BuilderTextAlign;
+};
+
+export type BuilderImageBlockV1 = BuilderBlockBaseV1 & {
+  type: "image";
+  src: string;
+  alt: string;
+  caption?: string;
+  fit: BuilderImageFit;
+};
+
+export type BuilderButtonBlockV1 = BuilderBlockBaseV1 & {
+  type: "button";
+  label: string;
+  href: string;
+  tone: BuilderButtonTone;
+  align: BuilderTextAlign;
+};
+
+export type BuilderQuoteBlockV1 = BuilderBlockBaseV1 & {
+  type: "quote";
+  quote: string;
+  attribution: string;
+  align: BuilderTextAlign;
+};
+
+export type BuilderSpacerBlockV1 = BuilderBlockBaseV1 & {
+  type: "spacer";
+  height: number;
+};
+
+export type BuilderBlockV1 =
+  | BuilderHeroBlockV1
+  | BuilderTextBlockV1
+  | BuilderImageBlockV1
+  | BuilderButtonBlockV1
+  | BuilderQuoteBlockV1
+  | BuilderSpacerBlockV1;
+
+export type BuilderSectionBackgroundV1 = {
+  tone: BuilderSectionTone;
+  color: string;
+  accent: string;
+};
+
+export type BuilderSectionV1 = {
+  id: string;
+  name: string;
+  minHeight: number;
+  paddingTop: number;
+  paddingBottom: number;
+  background: BuilderSectionBackgroundV1;
+  blocks: BuilderBlockV1[];
+};
+
+export type BuilderPageDocV1 = {
+  schemaVersion: 1;
+  title: string;
+  sections: BuilderSectionV1[];
+};
+
+export type BuilderPageStateV1 = {
+  editorKind: "builder";
+  schemaVersion: 1;
+  draft: BuilderPageDocV1;
+  published: BuilderPageDocV1 | null;
+};
+
+export type BuilderSurfaceKind = "header" | "page" | "footer";
+
+export type BuilderNodeBaseV2 = BuilderBlockBaseV1;
+
+export type BuilderHeroNodeV2 = BuilderHeroBlockV1;
+
+export type BuilderTextNodeV2 = BuilderTextBlockV1;
+
+export type BuilderImageNodeV2 = BuilderImageBlockV1;
+
+export type BuilderButtonNodeV2 = BuilderButtonBlockV1;
+
+export type BuilderQuoteNodeV2 = BuilderQuoteBlockV1;
+
+export type BuilderSpacerNodeV2 = BuilderSpacerBlockV1;
+
+export type BuilderNodeV2 =
+  | BuilderHeroNodeV2
+  | BuilderTextNodeV2
+  | BuilderImageNodeV2
+  | BuilderButtonNodeV2
+  | BuilderQuoteNodeV2
+  | BuilderSpacerNodeV2;
+
+export type BuilderSurfaceBackgroundV2 = BuilderSectionBackgroundV1;
+
+export type BuilderArtboardV2 = {
+  width: number;
+  minHeight: number;
+  background: BuilderSurfaceBackgroundV2;
+  nodes: BuilderNodeV2[];
+};
+
+export type BuilderSurfaceDocV2 = {
+  minHeight: number;
+  background: BuilderSurfaceBackgroundV2;
+  nodes: BuilderNodeV2[];
+};
+
+export type BuilderPageDocV2 = {
+  schemaVersion: 2;
+  title: string;
+  artboard: BuilderArtboardV2;
+};
+
+export type BuilderPageStateV2 = {
+  editorKind: "builder";
+  schemaVersion: 2;
+  draft: BuilderPageDocV2;
+  published: BuilderPageDocV2 | null;
+};
+
+export type ChapterBuilderChromeV1 = {
+  schemaVersion: 1;
+  brandLabel: string;
+  brandHref: string;
+  navigationItems: NavigationItem[];
+  footerLegal: string;
+  header: BuilderSurfaceDocV2;
+  footer: BuilderSurfaceDocV2;
+};
+
+export type ChapterBuilderChromeStateV1 = {
+  schemaVersion: 1;
+  draft: ChapterBuilderChromeV1;
+  published: ChapterBuilderChromeV1 | null;
+};
+
 export type SeoRecord = {
   description: string;
   sourceUrl: string;
@@ -292,9 +470,16 @@ export type ContentPageRecord = {
   sortOrder: number;
   published: boolean;
   aiGenerated: boolean;
+  editorKind: PageEditorKind;
+  publishedEditorKind: PageEditorKind;
+  hasPublishedBuilderSnapshot: boolean;
+  liveRenderSource: PageLiveRenderSource;
   bodyHtml?: string;
   bodyJson?: unknown;
   bodyRichtext: ContentBody;
+  builderState?: BuilderPageStateV2 | null;
+  builderDraft?: BuilderPageDocV2 | null;
+  builderPublished?: BuilderPageDocV2 | null;
   seo: SeoRecord;
   audioUrl?: string;
   audioDurationSeconds?: number | null;

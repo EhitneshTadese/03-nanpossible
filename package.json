@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:smoke:tenant": "node scripts/smoke-tenant-routes.mjs",
     "content:sync": "node scripts/sync-content-artifacts.mjs",
     "seed:coaches": "tsx scripts/seed-coaches.ts",
     "backfill:credly": "tsx scripts/backfill-credly-badges.ts",
