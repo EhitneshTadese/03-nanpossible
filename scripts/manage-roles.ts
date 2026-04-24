@@ -56,9 +56,21 @@ async function main() {
       process.exit(1);
     }
 
-    console.log(`\nSelected User: ${selectedUser.email}`);
-    const nextRole = selectedUser.role === "chapter_admin" ? "coach" : "chapter_admin";
-    
+    console.log(`\nSelected User: ${selectedUser.email} (current role: ${selectedUser.role})`);
+    const validRoles = ["platform_admin", "chapter_admin", "content_creator", "coach", "public_visitor"];
+    console.log(`Available roles: ${validRoles.join(", ")}`);
+    const nextRole = await rl.question("Enter new role: ");
+
+    if (!validRoles.includes(nextRole)) {
+      console.log(`Invalid role. Must be one of: ${validRoles.join(", ")}`);
+      process.exit(1);
+    }
+
+    if (nextRole === selectedUser.role) {
+      console.log("Role is already set to that value.");
+      process.exit(0);
+    }
+
     const confirm = await rl.question(`Switch role from '${selectedUser.role}' to '${nextRole}'? (y/n): `);
     if (confirm.toLowerCase() !== 'y') {
       console.log("Aborted.");
@@ -75,10 +87,10 @@ async function main() {
       throw new Error(`Failed to update public.users: ${updateError.message}`);
     }
 
-    // 2. Update auth.users metadata to keep it in sync for JWT/Session
+    // 2. Update auth.users app_metadata to keep it in sync for JWT/Session
     const { error: authError } = await supabase.auth.admin.updateUserById(
       selectedUser.id,
-      { user_metadata: { role: nextRole } }
+      { app_metadata: { role: nextRole } }
     );
 
     if (authError) {
