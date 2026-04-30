@@ -14,6 +14,8 @@ The World Institute for Action Learning (WIAL) is a global nonprofit that trains
 
 Our solution: a multi-tenant, AI-enhanced platform that unifies WIAL's operations globally while empowering each chapter to maintain its own branded presence.
 
+
+
 ## Key Features
 
 - **Multi-Tenant Chapter Microsites** — Each WIAL chapter gets its own branded subdomain (e.g., `usa.wial.org`, `emea.wial.org`) powered by a single codebase
