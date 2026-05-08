@@ -44,10 +44,17 @@ export async function POST(request: Request) {
   }
 
   const editorKind = body.editor_kind === "builder" ? "builder" : "legacy";
-  const updatePayload = buildDraftUpdatePayload(page, {
-    editorKind,
-    bodyJson: body.body_json ?? null,
-  });
+
+  let updatePayload: ReturnType<typeof buildDraftUpdatePayload>;
+  try {
+    updatePayload = buildDraftUpdatePayload(page, {
+      editorKind,
+      bodyJson: body.body_json ?? null,
+    });
+  } catch {
+    return NextResponse.json({ error: "invalid-update-payload" }, { status: 400 });
+  }
+
   const { error } = await client.from("content_pages").update(updatePayload).eq("id", pageId);
 
   if (error) {
@@ -61,7 +68,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "missing-chapter" }, { status: 404 });
     }
 
-    const configPayload = buildChapterConfigUpdatePayload(chapter, body.builder_chrome);
+    let configPayload: ReturnType<typeof buildChapterConfigUpdatePayload>;
+    try {
+      configPayload = buildChapterConfigUpdatePayload(chapter, body.builder_chrome);
+    } catch {
+      return NextResponse.json({ error: "invalid-update-payload" }, { status: 400 });
+    }
+
     const { error: chapterError } = await client
       .from("chapters")
       .update({

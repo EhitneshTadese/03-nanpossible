@@ -224,8 +224,25 @@ export async function chatCompletionDetailed({
         });
       }
 
+      if (payload.error) {
+        throw createRequestError(formatOpenRouterError(payload), {
+          statusCode: response.status,
+          isRetryable: true,
+        });
+      }
+
+      if (!payload.choices?.[0]) {
+        throw createRequestError(
+          "OpenRouter response is missing choices",
+          {
+            statusCode: response.status,
+            isRetryable: true,
+          },
+        );
+      }
+
       return {
-        content: getTextContent(payload.choices?.[0]?.message?.content),
+        content: getTextContent(payload.choices[0].message?.content),
         usage: {
           promptTokens: payload.usage?.prompt_tokens ?? 0,
           completionTokens: payload.usage?.completion_tokens ?? 0,

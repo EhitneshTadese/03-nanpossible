@@ -97,7 +97,7 @@ export async function POST(request: Request) {
         ? buildPublishUpdatePayload(page, {
             editorKind,
             bodyJson: body.body_json ?? null,
-            builderChrome: body.builder_chrome ?? null,
+            chromeState: nextChromeState,
             published: Boolean(body.published),
           })
         : buildPublishUpdatePayload(page, {

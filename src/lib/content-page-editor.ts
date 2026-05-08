@@ -8,6 +8,7 @@ import {
 } from "@/lib/builder-page";
 import type {
   BuilderPageStateV2,
+  ChapterBuilderChromeStateV1,
   ChapterRecord,
   ContentPageRecord,
 } from "@/lib/types";
@@ -33,7 +34,7 @@ type ContentPublishInput =
   | {
       editorKind: "builder";
       bodyJson: unknown;
-      builderChrome?: unknown;
+      chromeState?: ChapterBuilderChromeStateV1 | null;
       published: boolean;
     };
 
@@ -125,18 +126,14 @@ export function buildPublishUpdatePayload(
 
   const nextState = parseBuilderDraftState(input.bodyJson);
   const publishedDoc = nextState.draft;
-  const chromeState = input.builderChrome
-    ? parseChapterBuilderChromeState(input.builderChrome, {
-        chapterName: "",
-      })
-    : null;
+  const chromeDoc = input.chromeState?.draft ?? null;
 
   return {
     body_json: {
       ...nextState,
       published: publishedDoc,
     } satisfies BuilderPageStateV2,
-    body_html: serializeBuilderPageToHtml(publishedDoc, chromeState?.draft ?? null),
+    body_html: serializeBuilderPageToHtml(publishedDoc, chromeDoc),
     published: Boolean(input.published),
   };
 }

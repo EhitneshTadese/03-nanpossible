@@ -77,7 +77,7 @@ describe("content-page-editor", () => {
       {
         editorKind: "builder",
         bodyJson: state,
-        builderChrome: chrome,
+        chromeState: chrome,
         published: true,
       },
     );

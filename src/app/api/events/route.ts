@@ -54,6 +54,22 @@ export async function POST(request: Request) {
     );
   }
 
+  if (normalized.payload.eventId) {
+    const existing = await getEventByIdForAdmin(normalized.payload.eventId);
+    if (!existing) {
+      return NextResponse.json(
+        { error: "WIAL could not find this event." },
+        { status: 404 },
+      );
+    }
+    if (existing.chapterId !== normalized.payload.chapterId) {
+      return NextResponse.json(
+        { error: "This event does not belong to the active chapter." },
+        { status: 403 },
+      );
+    }
+  }
+
   const payload = {
     chapter_id: normalized.payload.chapterId,
     title: normalized.payload.title,
@@ -69,6 +85,7 @@ export async function POST(request: Request) {
         .from("events")
         .update(payload)
         .eq("id", normalized.payload.eventId)
+        .eq("chapter_id", normalized.payload.chapterId)
         .select("id")
         .single()
     : client.from("events").insert(payload).select("id").single();
@@ -129,7 +146,7 @@ export async function DELETE(request: Request) {
 
   if (!chapterId || !eventId) {
     return NextResponse.json(
-      { error: "Title, chapter, and start date are required." },
+      { error: "Chapter and event id are required." },
       { status: 400 },
     );
   }
@@ -141,7 +158,25 @@ export async function DELETE(request: Request) {
     );
   }
 
-  const { error } = await client.from("events").delete().eq("id", eventId);
+  const existing = await getEventByIdForAdmin(eventId);
+  if (!existing) {
+    return NextResponse.json(
+      { error: "WIAL could not find this event." },
+      { status: 404 },
+    );
+  }
+  if (existing.chapterId !== chapterId) {
+    return NextResponse.json(
+      { error: "This event does not belong to the active chapter." },
+      { status: 403 },
+    );
+  }
+
+  const { error } = await client
+    .from("events")
+    .delete()
+    .eq("id", eventId)
+    .eq("chapter_id", chapterId);
 
   if (error) {
     return NextResponse.json({ error: "WIAL could not delete this event." }, { status: 500 });
