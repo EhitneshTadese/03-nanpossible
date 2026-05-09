@@ -9,15 +9,17 @@ function jsonResponse(payload: unknown, status = 200) {
 }
 
 describe("chatCompletionDetailed", () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  const originalFetch = globalThis.fetch;
+  const fetchSpy = vi.fn<(input: unknown, init?: unknown) => Promise<Response>>();
 
   beforeEach(() => {
     process.env.OPENROUTER_API_KEY = "test-key";
-    fetchSpy = vi.spyOn(globalThis, "fetch");
+    fetchSpy.mockReset();
+    globalThis.fetch = fetchSpy as unknown as typeof globalThis.fetch;
   });
 
   afterEach(() => {
-    fetchSpy.mockRestore();
+    globalThis.fetch = originalFetch;
     delete process.env.OPENROUTER_API_KEY;
   });
 
