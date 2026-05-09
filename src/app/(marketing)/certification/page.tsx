@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { ensureContentPageAudio } from "@/lib/audio";
-import { getContentPage } from "@/lib/content";
 import { MarketingCertificationHub } from "@/components/certification-hub";
 
 export const metadata: Metadata = {
@@ -10,13 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default async function CertificationHubPage() {
-  const page = await getContentPage({ slug: "certification" });
-  const audio = await ensureContentPageAudio(page);
-
-  return (
-    <MarketingCertificationHub
-      audioDurationSeconds={audio.durationSeconds ?? page?.audioDurationSeconds ?? null}
-      audioUrl={audio.audioUrl ?? page?.audioUrl ?? null}
-    />
-  );
+  return <MarketingCertificationHub />;
 }

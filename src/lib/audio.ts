@@ -511,30 +511,14 @@ export async function ensureContentPageAudio(
     };
   }
 
-  if (!hasAudioGenerationConfig()) {
-    return {
-      audioUrl: null,
-      durationSeconds: null,
-    };
-  }
-
-  try {
-    const result = await generateContentPageAudioById(page.id);
-
-    return {
-      audioUrl: result.audioUrl,
-      durationSeconds: result.durationSeconds,
-    };
-  } catch {
-    return ensureStandalonePageAudio({
-      objectKey:
-        page.chapterId == null
-          ? `pages/global/${page.slug}.mp3`
-          : `pages/${page.chapterId}/${page.slug}.mp3`,
-      language: page.language,
-      text: getContentPageNarrationText(page),
-    });
-  }
+  return ensureStandalonePageAudio({
+    objectKey:
+      page.chapterId == null
+        ? `pages/global/${page.slug}.mp3`
+        : `pages/${page.chapterId}/${page.slug}.mp3`,
+    language: page.language,
+    text: getContentPageNarrationText(page),
+  });
 }
 
 export async function ensureStandalonePageAudio(options: {
@@ -560,23 +544,10 @@ export async function ensureStandalonePageAudio(options: {
     };
   }
 
-  try {
-    const bytes = await synthesizeSpeech(narrationText, options.language);
-    const stored = await uploadAudioBytes(options.objectKey, bytes, {
-      contentType: "audio/mpeg",
-      upsert: true,
-    });
-
-    return {
-      audioUrl: stored.audioUrl,
-      durationSeconds: stored.durationSeconds,
-    };
-  } catch {
-    return {
-      audioUrl: null,
-      durationSeconds: null,
-    };
-  }
+  return {
+    audioUrl: null,
+    durationSeconds: null,
+  };
 }
 
 export async function generateDraftPageAudioPreview(options: {

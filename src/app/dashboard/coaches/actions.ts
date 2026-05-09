@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { generateCoachAudioIntroById } from "@/lib/audio";
 import { embedCoachById } from "@/lib/coach-embeddings";
 import { requireAccountViewer } from "@/lib/auth";
 import { getCoachByIdForAdmin } from "@/lib/coaches";
 import { syncCoachCredlyBadgeFields } from "@/lib/credly";
 import { sanitizeNextPath } from "@/lib/account";
+import { getResendFromAddress } from "@/lib/resend";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 
 function buildReturnPath(pathname: string, params: Record<string, string>) {
@@ -32,7 +32,7 @@ async function sendRejectionEmail(email: string, name: string, reason: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "WIAL <noreply@wial.org>",
+      from: getResendFromAddress(),
       to: [email],
       subject: "Your WIAL coach profile needs revision",
       text: `Hello ${name},\n\nYour WIAL coach directory profile needs a revision before it can be published.\n\nReason: ${reason}\n\nPlease sign in to the WIAL platform and update your profile.\n`,
@@ -91,12 +91,6 @@ export async function approveCoachAction(formData: FormData) {
     await syncCoachCredlyBadgeFields(coachId, coach.credlyBadgeUrl);
   } catch {
     // Badge enrichment is best-effort and should not block approval.
-  }
-
-  try {
-    await generateCoachAudioIntroById(coachId);
-  } catch {
-    // Audio intros are best-effort and must not block approval.
   }
 
   try {

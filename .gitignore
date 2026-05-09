@@ -60,3 +60,10 @@ Thumbs.db
 *.log
 eslint.config 2.mjs
 .next.nosync/
+graphify-out/
+.codex
+.next 2
+.claude
+
+# Local dev artifacts
+data/dev-email-outbox.json

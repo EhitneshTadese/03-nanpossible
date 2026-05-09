@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
-import AudioPlayer from "@/components/AudioPlayer";
-import { ensureContentPageAudio } from "@/lib/audio";
+import { BuilderPageRenderer } from "@/components/chapter/BuilderPageRenderer";
+import { ChapterHtmlPage } from "@/components/chapter/ChapterHtmlPage";
+import { SiteChromeFrame } from "@/components/site-chrome-frame";
+import { getCurrentViewer } from "@/lib/auth";
 import { getContentPage } from "@/lib/content";
 import { normalizeChapterSlug } from "@/lib/routing";
 import { getChapterBySubdomain } from "@/lib/tenant";
@@ -40,33 +42,37 @@ export default async function TenantChapterPage({
     tenantSubdomain: chapter.subdomain,
   });
 
-  if (!page?.published || !page.bodyHtml) {
+  if (!page?.published) {
     notFound();
   }
 
-  const audio = await ensureContentPageAudio(page);
+  const viewer = await getCurrentViewer();
+  const siteContext = {
+    isGlobal: false as const,
+    tenant: chapter,
+    host: `${chapter.subdomain}.${process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "wial.org"}`,
+  };
+
+  if (page.liveRenderSource === "builder" && page.builderPublished) {
+    return (
+      <SiteChromeFrame siteContext={siteContext} viewer={viewer}>
+        <BuilderPageRenderer
+          chapter={chapter}
+          chrome={chapter.builderChromePublished ?? null}
+          doc={page.builderPublished}
+          suppressChrome
+        />
+      </SiteChromeFrame>
+    );
+  }
+
+  if (!page.bodyHtml) {
+    notFound();
+  }
 
   return (
-    <div className="page-frame">
-      <div className="site-shell">
-        <section className="site-panel rounded-[2rem] p-7 md:p-10">
-          <span className="eyebrow">{chapter.name}</span>
-          <h1 className="mt-5 font-display text-4xl tracking-[-0.05em] text-teal-deep md:text-6xl">
-            {page.title}
-          </h1>
-          <div className="mt-6">
-            <AudioPlayer
-              audioUrl={audio.audioUrl ?? page.audioUrl ?? null}
-              duration={audio.durationSeconds ?? page.audioDurationSeconds ?? null}
-              pageTitle={page.title}
-            />
-          </div>
-          <div
-            className="prose mt-8 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
-          />
-        </section>
-      </div>
-    </div>
+    <SiteChromeFrame siteContext={siteContext} viewer={viewer}>
+      <ChapterHtmlPage chapterName={chapter.name} html={page.bodyHtml} title={page.title} />
+    </SiteChromeFrame>
   );
 }

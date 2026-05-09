@@ -1,9 +1,28 @@
 import pages from "@/content/pages.json";
+import {
+  getPageEditorKind,
+  getPublishedPageEditorKind,
+  parseBuilderPageState,
+} from "@/lib/builder-page";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 import { createSupabaseContentClient } from "@/lib/supabase";
 import type { ContentBody, ContentPageRecord } from "@/lib/types";
 
-const pageFixtures = pages as ContentPageRecord[];
+type StaticContentPageFixture = {
+  id: string;
+  chapterId: string | null;
+  slug: string;
+  title: string;
+  published: boolean;
+  bodyHtml?: string;
+  bodyJson?: unknown;
+  bodyRichtext?: ContentBody | null;
+  seo?: ContentPageRecord["seo"] | null;
+  isGlobal?: boolean | null;
+  language?: string | null;
+  sortOrder?: number | null;
+  aiGenerated?: boolean | null;
+};
 
 type GetContentPageOptions = {
   slug: string;
@@ -58,7 +77,7 @@ function getEmptyBody(): ContentBody {
   };
 }
 
-function mapPageRecord(
+export function normalizeContentPageRecord(
   data: {
     id: string;
     chapterId: string | null;
@@ -78,6 +97,10 @@ function mapPageRecord(
     audio_generated_at?: string | null;
   },
 ) {
+  const builderState = parseBuilderPageState(data.body_json ?? null);
+  const hasPublishedBuilderSnapshot = Boolean(data.published && builderState?.published);
+  const liveRenderSource = hasPublishedBuilderSnapshot ? "builder" : "legacy";
+
   return {
     id: data.id,
     chapterId: data.chapterId ?? null,
@@ -88,9 +111,19 @@ function mapPageRecord(
     sortOrder: data.sortOrder,
     published: data.published,
     aiGenerated: data.aiGenerated,
+    editorKind: getPageEditorKind(data.body_json ?? null),
+    publishedEditorKind: getPublishedPageEditorKind(
+      data.body_json ?? null,
+      data.published,
+    ),
+    hasPublishedBuilderSnapshot,
+    liveRenderSource,
     bodyHtml: data.body_html ?? undefined,
     bodyJson: data.body_json ?? data.body_richtext ?? null,
     bodyRichtext: data.body_richtext ?? getEmptyBody(),
+    builderState,
+    builderDraft: builderState?.draft ?? null,
+    builderPublished: builderState?.published ?? null,
     seo: data.seo ?? {
       description: "",
       sourceUrl: "",
@@ -115,8 +148,29 @@ function mapPageRecord(
   } satisfies ContentPageRecord;
 }
 
+const pageFixtures = (pages as StaticContentPageFixture[]).map((page) =>
+  normalizeContentPageRecord({
+    id: page.id,
+    chapterId: page.chapterId,
+    slug: page.slug,
+    title: page.title,
+    isGlobal: Boolean(page.isGlobal ?? (page.chapterId == null)),
+    language: page.language ?? "en",
+    sortOrder: page.sortOrder ?? 0,
+    published: page.published,
+    aiGenerated: Boolean(page.aiGenerated),
+    body_json: page.bodyJson ?? null,
+    body_richtext: page.bodyRichtext ?? null,
+    body_html: page.bodyHtml ?? null,
+    seo: page.seo ?? null,
+    audio_url: null,
+    audio_duration_seconds: null,
+    audio_generated_at: null,
+  }),
+);
+
 function mapPageRow(data: ContentPageRow) {
-  return mapPageRecord({
+  return normalizeContentPageRecord({
     id: data.id,
     chapterId: data.chapter_id,
     slug: data.slug,

@@ -26,7 +26,9 @@ describe("account navigation", () => {
     expect(getAccountNavItems("platform_admin").map((item) => item.label)).toEqual([
       "Global admin",
       "Chapters",
+      "Users & roles",
       "Coach approvals",
+      "Platform guide",
       "Update account details",
     ]);
     expect(getAccountNavItems("chapter_admin").map((item) => item.label)).toEqual([
@@ -35,11 +37,13 @@ describe("account navigation", () => {
       "Events",
       "Chapter settings",
       "Chapter revenue dashboard",
+      "Platform guide",
       "Update account details",
     ]);
     expect(getAccountNavItems("content_creator").map((item) => item.label)).toEqual([
       "Change website content",
       "Events",
+      "Platform guide",
       "Update account details",
     ]);
     expect(getAccountNavItems("coach").map((item) => item.label)).toEqual([
@@ -66,6 +70,9 @@ describe("account navigation", () => {
       "chapter_admin",
     ]);
     expect(getAllowedRolesForAccountRoute("/admin/approvals")).toEqual([
+      "platform_admin",
+    ]);
+    expect(getAllowedRolesForAccountRoute("/admin/global/users")).toEqual([
       "platform_admin",
     ]);
     expect(getAllowedRolesForAccountRoute("/admin/chapter")).toEqual([

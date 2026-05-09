@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AccountPageShell } from "@/components/account-page-shell";
 import { requireAccountViewer } from "@/lib/auth";
 import { listChapters } from "@/lib/tenant";
-import { assignContentCreatorAction } from "./actions";
+import { assignContentCreatorAction, deleteChapterAction } from "./actions";
 
 type GlobalChaptersPageProps = {
   searchParams: Promise<{
@@ -15,6 +15,8 @@ function getNotice(notice?: string) {
   switch (notice) {
     case "assigned":
       return "Content creator assignment saved.";
+    case "deleted":
+      return "Chapter deleted and related user access was updated.";
     default:
       return null;
   }
@@ -22,12 +24,22 @@ function getNotice(notice?: string) {
 
 function getError(error?: string) {
   switch (error) {
+    case "missing-config":
+      return "The Supabase service-role configuration is missing.";
     case "missing-fields":
       return "Choose a chapter and email before assigning.";
     case "user-not-found":
       return "That email does not belong to an existing WIAL user yet.";
+    case "invalid-service-key":
+      return "The Supabase service-role key in this environment is invalid. Update `SUPABASE_SERVICE_ROLE_KEY` and restart the dev server.";
+    case "chapter-not-found":
+      return "That chapter record no longer exists.";
+    case "protected-chapter":
+      return "The global WIAL record cannot be deleted from this screen.";
     case "assign-failed":
       return "WIAL could not update the content creator assignment.";
+    case "delete-failed":
+      return "WIAL could not delete that chapter.";
     default:
       return null;
   }
@@ -84,6 +96,28 @@ export default async function GlobalChaptersPage({
                     {chapter.country ? <span>{chapter.country}</span> : null}
                     {chapter.language ? <span>{chapter.language.toUpperCase()}</span> : null}
                   </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-4">
+                  <p className="max-w-xl text-sm leading-6 text-foreground/62">
+                    Deleting a chapter removes its local pages and events and clears related user access for chapter heads, coaches, and content creators.
+                  </p>
+
+                  {chapter.subdomain === "global" ? (
+                    <span className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
+                      Protected record
+                    </span>
+                  ) : (
+                    <form action={deleteChapterAction}>
+                      <input name="chapterId" type="hidden" value={chapter.id} />
+                      <button
+                        className="inline-flex items-center justify-center rounded-full border border-[rgba(209,0,52,0.22)] px-4 py-2 text-sm font-semibold text-[var(--teal)] transition hover:border-[rgba(209,0,52,0.4)] hover:bg-[rgba(209,0,52,0.05)]"
+                        type="submit"
+                      >
+                        Delete chapter
+                      </button>
+                    </form>
+                  )}
                 </div>
               </article>
             ))}

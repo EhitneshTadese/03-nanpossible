@@ -1,7 +1,7 @@
-import sanitizeHtml from "sanitize-html";
 import { NextResponse } from "next/server";
-import { generateDraftPageAudioPreview } from "@/lib/audio";
 import { canEditChapter, getCurrentUser } from "@/lib/auth";
+import { getContentPageByIdForAdmin } from "@/lib/content";
+import { sanitizeContentPageHtml } from "@/lib/content-html";
 import { chatCompletionDetailed } from "@/lib/openrouter";
 import { listApprovedCoaches } from "@/lib/coaches";
 import { listUpcomingEvents } from "@/lib/events";
@@ -12,7 +12,20 @@ import type { GenerationTone } from "@/lib/types";
 const GENERATION_LIMIT = 10;
 const GENERATION_WINDOW_MS = 60 * 60 * 1000;
 const DEFAULT_CONTENT_MODEL = "anthropic/claude-sonnet-4-20250514";
+const DEFAULT_CONTENT_TIMEOUT_MS = 45_000;
+const DEFAULT_CONTENT_RETRIES = 1;
 const generationRateLimit = new Map<string, number[]>();
+
+function readPositiveIntegerEnv(name: string, fallback: number) {
+  const raw = process.env[name]?.trim();
+
+  if (!raw) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
 
 function enforceGenerationRateLimit(chapterId: string) {
   const now = Date.now();
@@ -119,6 +132,7 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as {
     chapter_id?: string;
+    page_id?: string;
     page_slug?: string;
     page_title?: string;
     language?: string;
@@ -128,51 +142,88 @@ export async function POST(request: Request) {
     custom_context?: string;
     tone?: GenerationTone;
   };
-  const chapterId = String(body.chapter_id ?? "");
-  const pageSlug = String(body.page_slug ?? "");
+  const requestedChapterId = String(body.chapter_id ?? "");
+  const pageId = String(body.page_id ?? "");
+  const requestedPageSlug = String(body.page_slug ?? "");
 
-  if (!chapterId || !pageSlug) {
+  if (!requestedChapterId || (!pageId && !requestedPageSlug)) {
     return NextResponse.json({ error: "missing-fields" }, { status: 400 });
   }
 
-  if (!canEditChapter(viewer, chapterId)) {
+  let effectiveChapterId = requestedChapterId;
+  let effectivePageId = pageId;
+  let effectivePageSlug = requestedPageSlug;
+  let effectivePageTitle = String(body.page_title ?? requestedPageSlug);
+
+  if (pageId) {
+    const page = await getContentPageByIdForAdmin(pageId);
+
+    if (!page || !page.chapterId) {
+      return NextResponse.json({ error: "page-not-found" }, { status: 404 });
+    }
+
+    effectiveChapterId = page.chapterId;
+    effectivePageId = page.id;
+    effectivePageSlug = page.slug;
+    effectivePageTitle = page.title;
+  }
+
+  if (!canEditChapter(viewer, effectiveChapterId)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   try {
-    enforceGenerationRateLimit(chapterId);
+    enforceGenerationRateLimit(effectiveChapterId);
   } catch {
     return NextResponse.json({ error: "rate-limit" }, { status: 429 });
   }
 
-  const chapter = await getChapterById(chapterId);
+  const chapter = await getChapterById(effectiveChapterId);
 
   if (!chapter) {
     return NextResponse.json({ error: "chapter-not-found" }, { status: 404 });
   }
 
-  const [coaches, events, page] = await Promise.all([
-    body.include_coaches ? listApprovedCoaches({ chapterId, limit: 8 }) : Promise.resolve([]),
-    body.include_events ? listUpcomingEvents(chapterId, { limit: 10 }) : Promise.resolve([]),
-    client
+  if (!effectivePageId) {
+    const page = await client
       .from("content_pages")
       .select("id, title")
-      .eq("chapter_id", chapterId)
-      .eq("slug", pageSlug)
-      .maybeSingle(),
-  ]);
+      .eq("chapter_id", effectiveChapterId)
+      .eq("slug", effectivePageSlug)
+      .maybeSingle();
 
-  if (!page.data) {
-    return NextResponse.json({ error: "page-not-found" }, { status: 404 });
+    if (page.error) {
+      return NextResponse.json(
+        { error: `page-query-failed: ${page.error.message}` },
+        { status: 500 },
+      );
+    }
+
+    if (!page.data) {
+      return NextResponse.json({ error: "page-not-found" }, { status: 404 });
+    }
+
+    effectivePageId = page.data.id;
+    effectivePageTitle =
+      typeof page.data.title === "string" ? page.data.title : effectivePageTitle;
   }
+
+  const [coaches, events] = await Promise.all([
+    body.include_coaches
+      ? listApprovedCoaches({ chapterId: effectiveChapterId, limit: 8 })
+      : Promise.resolve([]),
+    body.include_events
+      ? listUpcomingEvents(effectiveChapterId, { limit: 10 })
+      : Promise.resolve([]),
+  ]);
 
   const prompt = buildPrompt({
     chapterName: chapter.name,
     chapterCountry: chapter.country,
     chapterDescription: chapter.description,
     language: body.language ?? chapter.language ?? "en",
-    pageSlug,
-    pageTitle: typeof page.data.title === "string" ? page.data.title : String(body.page_title ?? pageSlug),
+    pageSlug: effectivePageSlug,
+    pageTitle: effectivePageTitle,
     tone: body.tone ?? "professional",
     customContext: String(body.custom_context ?? ""),
     testimonials: String(body.testimonials ?? ""),
@@ -180,66 +231,61 @@ export async function POST(request: Request) {
     events,
   });
 
-  const result = await chatCompletionDetailed({
-    model:
-      process.env.OPENROUTER_CONTENT_MODEL?.trim() || DEFAULT_CONTENT_MODEL,
-    messages: [
-      {
-        role: "system",
-        content: prompt.system,
-      },
-      {
-        role: "user",
-        content: prompt.user,
-      },
-    ],
-    maxTokens: 2000,
-    temperature: 0.7,
-    timeoutMs: 15_000,
-  });
-
-  const clean = sanitizeHtml(result.content, {
-    allowedTags: ["h2", "h3", "p", "ul", "ol", "li", "strong", "em", "a", "blockquote"],
-    allowedAttributes: { a: ["href"] },
-    allowedSchemes: ["http", "https", "mailto"],
-  });
-
-  await client
-    .from("content_pages")
-    .update({
-      body_html: clean,
-      body_richtext: null,
-      ai_generated: true,
-      published: false,
-    })
-    .eq("chapter_id", chapterId)
-    .eq("slug", pageSlug);
-
-  let audioPreview: Awaited<ReturnType<typeof generateDraftPageAudioPreview>> = {
-    audioUrl: null,
-    durationSeconds: null,
-  };
+  const contentModel =
+    process.env.OPENROUTER_CONTENT_MODEL?.trim() || DEFAULT_CONTENT_MODEL;
+  const contentTimeoutMs = readPositiveIntegerEnv(
+    "OPENROUTER_CONTENT_TIMEOUT_MS",
+    DEFAULT_CONTENT_TIMEOUT_MS,
+  );
+  const contentRetries = readPositiveIntegerEnv(
+    "OPENROUTER_CONTENT_RETRIES",
+    DEFAULT_CONTENT_RETRIES,
+  );
 
   try {
-    audioPreview = await generateDraftPageAudioPreview({
-      chapterId,
-      pageSlug,
-      language: body.language ?? chapter.language ?? "en",
+    const result = await chatCompletionDetailed({
+      model: contentModel,
+      messages: [
+        {
+          role: "system",
+          content: prompt.system,
+        },
+        {
+          role: "user",
+          content: prompt.user,
+        },
+      ],
+      maxTokens: 2000,
+      temperature: 0.7,
+      timeoutMs: contentTimeoutMs,
+      retries: contentRetries,
+    });
+
+    const clean = sanitizeContentPageHtml(result.content);
+
+    return NextResponse.json({
       html: clean,
+      tokens_used: result.usage.totalTokens,
+      model: result.model,
     });
   } catch (error) {
-    console.error("WIAL AI draft audio preview failed", {
-      chapterId,
-      pageSlug,
-      error,
-    });
-  }
+    const rawMessage =
+      error instanceof Error ? error.message : "OpenRouter content generation failed";
+    const isTimeout = /timed out/i.test(rawMessage);
+    const message = isTimeout
+      ? `Content generation timed out after ${contentTimeoutMs}ms. Try again or use a faster OpenRouter model.`
+      : rawMessage;
 
-  return NextResponse.json({
-    html: clean,
-    audio_url: audioPreview.audioUrl,
-    audio_duration: audioPreview.durationSeconds,
-    tokens_used: result.usage.totalTokens,
-    model: result.model,
-  });
+    console.error("Content generation failed", {
+      chapterId: effectiveChapterId,
+      pageId: effectivePageId,
+      pageSlug: effectivePageSlug,
+      model: contentModel,
+      timeoutMs: contentTimeoutMs,
+      retries: contentRetries,
+      error: rawMessage,
+    });
+
+    return NextResponse.json({ error: message }, { status: isTimeout ? 504 : 502 });
+  }
 }

@@ -1,4 +1,5 @@
 import chapters from "@/content/chapters.json";
+import { parseChapterBuilderChromeState } from "@/lib/builder-page";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-admin";
 import { createSupabaseContentClient } from "@/lib/supabase";
 import type { ChapterRecord } from "@/lib/types";
@@ -26,6 +27,12 @@ type ChapterDbRow = {
 };
 
 function mapChapterRow(row: ChapterDbRow): ChapterRecord {
+  const builderChromeState = parseChapterBuilderChromeState(row.config ?? row.theme_json ?? {}, {
+    chapterName: row.name,
+    contactEmail: row.contact_email,
+    contactPhone: row.contact_phone,
+  });
+
   return {
     id: row.id,
     name: row.name,
@@ -44,13 +51,43 @@ function mapChapterRow(row: ChapterDbRow): ChapterRecord {
     locale: row.locale ?? row.language ?? "en",
     themeJson: row.theme_json ?? undefined,
     tagline: row.tagline ?? row.description ?? undefined,
+    builderChromeState,
+    builderChromeDraft: builderChromeState?.draft ?? null,
+    builderChromePublished: builderChromeState?.published ?? null,
   };
 }
 
 function mapFixture(record: Record<string, unknown>): ChapterRecord {
+  const name = String(record.name);
+  const contactEmail =
+    typeof record.contactEmail === "string"
+      ? record.contactEmail
+      : typeof record.contact_email === "string"
+        ? record.contact_email
+        : null;
+  const contactPhone =
+    typeof record.contactPhone === "string"
+      ? record.contactPhone
+      : typeof record.contact_phone === "string"
+        ? record.contact_phone
+        : null;
+  const rawConfig =
+    (typeof record.config === "object" && record.config !== null
+      ? (record.config as Record<string, unknown>)
+      : typeof record.themeJson === "object" && record.themeJson !== null
+        ? (record.themeJson as Record<string, unknown>)
+        : typeof record.theme_json === "object" && record.theme_json !== null
+          ? (record.theme_json as Record<string, unknown>)
+          : {}) ?? {};
+  const builderChromeState = parseChapterBuilderChromeState(rawConfig, {
+    chapterName: name,
+    contactEmail,
+    contactPhone,
+  });
+
   return {
     id: String(record.id),
-    name: String(record.name),
+    name,
     subdomain: String(record.subdomain),
     region: typeof record.region === "string" ? record.region : null,
     language:
@@ -61,18 +98,8 @@ function mapFixture(record: Record<string, unknown>): ChapterRecord {
           : "en",
     country: typeof record.country === "string" ? record.country : null,
     leadUserId: typeof record.leadUserId === "string" ? record.leadUserId : null,
-    contactEmail:
-      typeof record.contactEmail === "string"
-        ? record.contactEmail
-        : typeof record.contact_email === "string"
-          ? record.contact_email
-          : null,
-    contactPhone:
-      typeof record.contactPhone === "string"
-        ? record.contactPhone
-        : typeof record.contact_phone === "string"
-          ? record.contact_phone
-          : null,
+    contactEmail,
+    contactPhone,
     description:
       typeof record.description === "string"
         ? record.description
@@ -91,14 +118,7 @@ function mapFixture(record: Record<string, unknown>): ChapterRecord {
         : typeof record.stripe_account_id === "string"
           ? record.stripe_account_id
           : null,
-    config:
-      (typeof record.config === "object" && record.config !== null
-        ? (record.config as Record<string, unknown>)
-        : typeof record.themeJson === "object" && record.themeJson !== null
-          ? (record.themeJson as Record<string, unknown>)
-          : typeof record.theme_json === "object" && record.theme_json !== null
-            ? (record.theme_json as Record<string, unknown>)
-            : {}) ?? {},
+    config: rawConfig,
     status:
       record.status === "active" ||
       record.status === "draft" ||
@@ -111,6 +131,9 @@ function mapFixture(record: Record<string, unknown>): ChapterRecord {
         ? (record.themeJson as Record<string, string>)
         : undefined,
     tagline: typeof record.tagline === "string" ? record.tagline : undefined,
+    builderChromeState,
+    builderChromeDraft: builderChromeState?.draft ?? null,
+    builderChromePublished: builderChromeState?.published ?? null,
   };
 }
 
@@ -121,6 +144,9 @@ const publicChapterColumns = [
   "locale",
   "status",
   "contact_email",
+  "contact_phone",
+  "config",
+  "logo_url",
   "theme_json",
   "tagline",
 ].join(", ");

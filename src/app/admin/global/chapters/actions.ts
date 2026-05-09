@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { assignContentCreatorToChapter } from "@/lib/chapters-admin";
+import { assignContentCreatorToChapter, deleteChapter } from "@/lib/chapters-admin";
 import { requireAccountViewer } from "@/lib/auth";
 
 function buildReturnPath(params: Record<string, string>) {
@@ -10,7 +10,7 @@ function buildReturnPath(params: Record<string, string>) {
 }
 
 export async function assignContentCreatorAction(formData: FormData) {
-  await requireAccountViewer("/admin/global/chapters", ["platform_admin"]);
+  const viewer = await requireAccountViewer("/admin/global/chapters", ["platform_admin"]);
 
   const email = String(formData.get("email") ?? "").trim();
   const chapterId = String(formData.get("chapterId") ?? "").trim();
@@ -21,6 +21,7 @@ export async function assignContentCreatorAction(formData: FormData) {
 
   try {
     await assignContentCreatorToChapter({
+      actorUserId: viewer.id,
       email,
       chapterId,
     });
@@ -28,8 +29,13 @@ export async function assignContentCreatorAction(formData: FormData) {
     redirect(
       buildReturnPath({
         error:
-          error instanceof Error && error.message === "user-not-found"
-            ? "user-not-found"
+          error instanceof Error &&
+          (
+            error.message === "missing-config" ||
+            error.message === "user-not-found" ||
+            error.message === "invalid-service-key"
+          )
+            ? error.message
             : "assign-failed",
       }),
     );
@@ -37,4 +43,36 @@ export async function assignContentCreatorAction(formData: FormData) {
 
   revalidatePath("/admin/global/chapters");
   redirect(buildReturnPath({ notice: "assigned" }));
+}
+
+const chapterDeleteErrorCodes = new Set([
+  "missing-config",
+  "invalid-service-key",
+  "chapter-not-found",
+  "protected-chapter",
+]);
+
+export async function deleteChapterAction(formData: FormData) {
+  await requireAccountViewer("/admin/global/chapters", ["platform_admin"]);
+
+  const chapterId = String(formData.get("chapterId") ?? "").trim();
+
+  if (!chapterId) {
+    redirect(buildReturnPath({ error: "missing-fields" }));
+  }
+
+  try {
+    await deleteChapter(chapterId);
+  } catch (error) {
+    const code =
+      error instanceof Error && chapterDeleteErrorCodes.has(error.message)
+        ? error.message
+        : "delete-failed";
+    redirect(buildReturnPath({ error: code }));
+  }
+
+  revalidatePath("/admin/global");
+  revalidatePath("/admin/global/chapters");
+  revalidatePath("/admin/global/users");
+  redirect(buildReturnPath({ notice: "deleted" }));
 }

@@ -5,7 +5,11 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
-  distDir: process.env.VERCEL ? ".next" : ".next.nosync",
+  distDir: process.env.VERCEL
+    ? ".next"
+    : process.env.NODE_ENV === "development"
+      ? ".next.nosync/dev"
+      : ".next.nosync/prod",
   images: {
     remotePatterns: [
       {

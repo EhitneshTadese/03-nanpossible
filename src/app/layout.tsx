@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { headers } from "next/headers";
 import { getAccessibilityBootScript } from "@/lib/accessibility-preferences";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { SiteChatbot } from "@/components/site-chatbot";
-import { getCurrentViewer } from "@/lib/auth";
-import { getLayoutSiteContext } from "@/lib/site-context";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -35,16 +29,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerStore = await headers();
-  const [siteContext, viewer] = await Promise.all([
-    getLayoutSiteContext(headerStore),
-    getCurrentViewer(),
-  ]);
-
   return (
     <html
       lang="en"
-      className="h-full bg-background antialiased text-scale-default contrast-default"
+      className="h-full bg-background antialiased text-scale-default contrast-default line-height-default"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -55,14 +43,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground">
-        <div className="flex min-h-full flex-col">
-          <SiteHeader siteContext={siteContext} viewer={viewer} />
-          <main className="flex-1">{children}</main>
-          <SiteFooter siteContext={siteContext} />
-          <SiteChatbot />
-        </div>
-      </body>
+      <body className="min-h-full bg-background text-foreground">{children}</body>
     </html>
   );
 }

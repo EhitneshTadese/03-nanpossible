@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AudioPlayer from "@/components/AudioPlayer";
 import type { ContentPageRecord, ContentSection, SiteContext } from "@/lib/types";
 
 type ContentPageProps = {
@@ -228,11 +227,6 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                   </p>
                 ) : null}
               </div>
-              <AudioPlayer
-                audioUrl={page.audioUrl ?? null}
-                duration={page.audioDurationSeconds ?? null}
-                pageTitle={page.title}
-              />
               <div className="flex flex-wrap gap-3">
                 <Link className="button-link primary" href="/contact">
                   Contact WIAL

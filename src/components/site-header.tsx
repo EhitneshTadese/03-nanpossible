@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AccessibilityPreferencesWidget } from "@/components/accessibility-preferences";
 import { MobileNav } from "@/components/mobile-nav";
 import { WialLogo } from "@/components/wial-logo";
+import { getAccountNavItems } from "@/lib/account";
 import { navigationItems } from "@/lib/routing";
 import type { SiteContext, UserProfile } from "@/lib/types";
 
@@ -21,17 +22,26 @@ export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
         href: "/login",
         label: "Sign in",
       };
+  const voiceNavigationRoutes = [
+    { href: "/", label: "Home" },
+    ...navigationItems,
+    ...(viewer ? getAccountNavItems(viewer.role) : []),
+    accountLink,
+    ...(!viewer ? [{ href: "/register", label: "Register" }] : []),
+  ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-transparent bg-background/88 py-4 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-transparent bg-[var(--background)]/85 py-3 backdrop-blur-xl">
       <div className="site-shell">
-        <div className="site-panel flex items-center justify-between gap-6 rounded-[2rem] px-5 py-4 md:px-7">
-          <WialLogo chapterLabel={chapterLabel} />
+        <div className="site-panel flex items-center gap-3 px-4 py-3 sm:px-5 lg:gap-5 lg:px-6">
+          <div className="min-w-0 flex-1">
+            <WialLogo chapterLabel={chapterLabel} />
+          </div>
 
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex xl:gap-2">
             {navigationItems.map((item) => (
               <Link
-                className="rounded-full px-4 py-2 text-sm font-semibold text-teal-deep transition hover:bg-accent-soft"
+                className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-teal-deep transition hover:bg-accent-soft xl:px-4"
                 href={item.href}
                 key={item.href}
               >
@@ -40,10 +50,8 @@ export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
             ))}
           </nav>
 
-          <AccessibilityPreferencesWidget variant="desktop" />
-
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right md:block">
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <div className="hidden text-right xl:block">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/50">
                 Platform
               </p>
@@ -55,20 +63,27 @@ export function SiteHeader({ siteContext, viewer }: SiteHeaderProps) {
             </div>
             {!viewer ? (
               <Link
-                className="hidden text-sm font-semibold text-teal-deep/78 transition hover:text-teal-deep md:inline-flex"
+                className="hidden text-sm font-semibold text-teal-deep/78 transition hover:text-teal-deep xl:inline-flex"
                 href="/register"
               >
                 Register
               </Link>
             ) : null}
+            <AccessibilityPreferencesWidget
+              navigationRoutes={voiceNavigationRoutes}
+              variant="desktop"
+            />
             <Link
-              className="button-link secondary hidden min-w-[9.5rem] md:inline-flex"
+              className="button-link secondary hidden min-w-[8.75rem] px-4 py-2.5 text-sm sm:inline-flex sm:min-w-[9.5rem]"
               href={accountLink.href}
             >
               {accountLink.label}
             </Link>
-            <div className="flex items-center gap-2 md:hidden">
-              <AccessibilityPreferencesWidget variant="mobile" />
+            <div className="flex items-center gap-2 lg:hidden">
+              <AccessibilityPreferencesWidget
+                navigationRoutes={voiceNavigationRoutes}
+                variant="mobile"
+              />
               <MobileNav
                 accountLink={accountLink}
                 chapterLabel={chapterLabel}

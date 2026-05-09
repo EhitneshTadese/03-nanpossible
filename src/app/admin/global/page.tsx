@@ -14,7 +14,7 @@ export default async function GlobalAdminPage() {
   return (
     <AccountPageShell
       badge="Global control surface"
-      description="Provision new chapters, assign content creators, and monitor the chapter network from one admin workspace."
+      description="Provision chapters, manage user roles, and monitor the network from one admin workspace."
       eyebrow="Platform admin"
       title="Global chapter operations"
     >
@@ -56,6 +56,9 @@ export default async function GlobalAdminPage() {
             </Link>
             <Link className="button-link secondary" href="/admin/global/chapters">
               View all chapters
+            </Link>
+            <Link className="button-link secondary" href="/admin/global/users">
+              Manage users &amp; roles
             </Link>
             <Link className="button-link secondary" href="/admin/approvals">
               Review coach approvals

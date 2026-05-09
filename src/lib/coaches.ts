@@ -1,5 +1,4 @@
 import { cache } from "react";
-import coachSeedSource from "../../data/coaches-seed.json";
 import {
   formatCoachLocation,
   getCertificationBadgeTone,
@@ -13,8 +12,6 @@ import type {
   CoachRecord,
   CoachSearchFilters,
 } from "@/lib/types";
-
-const coachSeedRecords = coachSeedSource as CoachRecord[];
 
 const coachColumns = [
   "id",
@@ -221,68 +218,6 @@ function applyCoachFilters<T extends CoachFilterQuery>(
   return query;
 }
 
-function matchesSeedFilters(coach: CoachRecord, filters: CoachSearchFilters = {}) {
-  if (filters.certLevel && coach.certLevel !== filters.certLevel) {
-    return false;
-  }
-
-  if (
-    filters.country &&
-    !coach.locationCountry?.toLowerCase().includes(filters.country.toLowerCase())
-  ) {
-    return false;
-  }
-
-  if (
-    filters.city &&
-    !coach.locationCity?.toLowerCase().includes(filters.city.toLowerCase())
-  ) {
-    return false;
-  }
-
-  if (
-    filters.language &&
-    !coach.languages.some(
-      (language) => language.toLowerCase() === filters.language?.toLowerCase(),
-    )
-  ) {
-    return false;
-  }
-
-  if (
-    filters.specializations?.length &&
-    !filters.specializations.some((specialization) =>
-      coach.specializations.some(
-        (value) => value.toLowerCase() === specialization.toLowerCase(),
-      ),
-    )
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-function fallbackApprovedCoaches({
-  filters = {},
-  limit = 20,
-  offset = 0,
-  nameQuery = null,
-  chapterId = null,
-}: CoachListOptions = {}) {
-  const loweredQuery = nameQuery?.trim().toLowerCase() ?? "";
-
-  return coachSeedRecords
-    .filter((coach) => coach.approved)
-    .filter((coach) => (chapterId ? coach.chapterId === chapterId : true))
-    .filter((coach) => matchesSeedFilters(coach, filters))
-    .filter((coach) =>
-      loweredQuery ? coach.name.toLowerCase().includes(loweredQuery) : true,
-    )
-    .sort((left, right) => left.name.localeCompare(right.name))
-    .slice(offset, offset + limit);
-}
-
 function buildCoachKeywordHaystack(coach: CoachRecord) {
   return normalizeSearchText(
     [
@@ -352,62 +287,72 @@ export const listApprovedCoaches = cache(
   }: CoachListOptions = {}) => {
     const client = createSupabaseContentClient();
 
-    if (client) {
-      try {
-        let query = client
-          .from("coaches")
-          .select(coachColumns)
-          .eq("approved", true)
-          .order("name", { ascending: true })
-          .range(offset, offset + limit - 1);
-
-        if (chapterId) {
-          query = query.eq("chapter_id", chapterId);
-        }
-
-        query = applyCoachFilters(query, filters);
-
-        if (nameQuery) {
-          query.ilike("name", `%${nameQuery}%`);
-        }
-
-        const { data } = await query;
-
-        if (data) {
-          return (data as unknown as CoachDbRow[]).map((row) =>
-            mapCoachRecord(row),
-          );
-        }
-      } catch {
-        // fall through to local seed records
-      }
+    if (!client) {
+      return [] satisfies CoachRecord[];
     }
 
-    return fallbackApprovedCoaches({ filters, limit, offset, nameQuery, chapterId });
+    try {
+      let query = client
+        .from("coaches")
+        .select(coachColumns)
+        .eq("approved", true)
+        .order("name", { ascending: true })
+        .range(offset, offset + limit - 1);
+
+      if (chapterId) {
+        query = query.eq("chapter_id", chapterId);
+      }
+
+      query = applyCoachFilters(query, filters);
+
+      if (nameQuery) {
+        query.ilike("name", `%${nameQuery}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("listApprovedCoaches query failed", error);
+        return [] satisfies CoachRecord[];
+      }
+
+      if (!data) {
+        return [] satisfies CoachRecord[];
+      }
+
+      return (data as unknown as CoachDbRow[]).map((row) => mapCoachRecord(row));
+    } catch (error) {
+      console.error("listApprovedCoaches threw", error);
+      return [] satisfies CoachRecord[];
+    }
   },
 );
 
 export const listApprovedCoachIds = cache(async () => {
   const client = createSupabaseContentClient();
 
-  if (client) {
-    try {
-      const { data } = await client
-        .from("coaches")
-        .select("id")
-        .eq("approved", true)
-        .order("name", { ascending: true })
-        .limit(200);
-
-      if (data) {
-        return data.map((row) => row.id);
-      }
-    } catch {
-      // fall back to static seed records
-    }
+  if (!client) {
+    return [] satisfies string[];
   }
 
-  return coachSeedRecords.filter((coach) => coach.approved).map((coach) => coach.id);
+  try {
+    const { data, error } = await client
+      .from("coaches")
+      .select("id")
+      .eq("approved", true)
+      .order("name", { ascending: true })
+      .limit(200);
+
+    if (error) {
+      console.error("listApprovedCoachIds query failed", error);
+      return [] satisfies string[];
+    }
+
+    return (data ?? []).map((row) => row.id);
+  } catch (error) {
+    console.error("listApprovedCoachIds threw", error);
+    return [] satisfies string[];
+  }
 });
 
 export async function searchApprovedCoachesByKeyword({
@@ -429,16 +374,7 @@ export async function searchApprovedCoachesByKeyword({
     offset: 0,
   });
 
-  const source =
-    dbBackedCoaches.length > 0
-      ? dbBackedCoaches
-      : fallbackApprovedCoaches({
-          filters,
-          limit: coachSeedRecords.length,
-          offset: 0,
-        });
-
-  return source
+  return dbBackedCoaches
     .filter((coach) => {
       const haystack = buildCoachKeywordHaystack(coach);
 
@@ -462,88 +398,75 @@ export async function searchApprovedCoachesByKeyword({
 
 export const getCoachFacetOptions = cache(async (): Promise<CoachFacetOptions> => {
   const client = createSupabaseContentClient();
+  const empty: CoachFacetOptions = { countries: [], languages: [] };
 
-  if (client) {
-    try {
-      const { data } = await client
-        .from("coaches")
-        .select("location_country, languages")
-        .eq("approved", true)
-        .order("location_country", { ascending: true })
-        .limit(1000);
+  if (!client) {
+    return empty;
+  }
 
-      if (data) {
-        const countries = new Set<string>();
-        const languages = new Set<string>();
+  try {
+    const { data, error } = await client
+      .from("coaches")
+      .select("location_country, languages")
+      .eq("approved", true)
+      .order("location_country", { ascending: true })
+      .limit(1000);
 
-        for (const row of data) {
-          const country = toText(row.location_country);
+    if (error) {
+      console.error("getCoachFacetOptions query failed", error);
+      return empty;
+    }
 
-          if (country) {
-            countries.add(country);
-          }
+    const countries = new Set<string>();
+    const languages = new Set<string>();
 
-          for (const language of toArray(row.languages)) {
-            languages.add(language);
-          }
-        }
+    for (const row of data ?? []) {
+      const country = toText(row.location_country);
 
-        return {
-          countries: [...countries].sort((left, right) => left.localeCompare(right)),
-          languages: [...languages].sort((left, right) => left.localeCompare(right)),
-        };
+      if (country) {
+        countries.add(country);
       }
-    } catch {
-      // fall through to seed facets
+
+      for (const language of toArray(row.languages)) {
+        languages.add(language);
+      }
     }
+
+    return {
+      countries: [...countries].sort((left, right) => left.localeCompare(right)),
+      languages: [...languages].sort((left, right) => left.localeCompare(right)),
+    };
+  } catch (error) {
+    console.error("getCoachFacetOptions threw", error);
+    return empty;
   }
-
-  const countries = new Set<string>();
-  const languages = new Set<string>();
-
-  for (const coach of coachSeedRecords) {
-    if (!coach.approved) {
-      continue;
-    }
-
-    if (coach.locationCountry) {
-      countries.add(coach.locationCountry);
-    }
-
-    for (const language of coach.languages) {
-      languages.add(language);
-    }
-  }
-
-  return {
-    countries: [...countries].sort((left, right) => left.localeCompare(right)),
-    languages: [...languages].sort((left, right) => left.localeCompare(right)),
-  };
 });
 
 export async function getApprovedCoachById(id: string) {
   const client = createSupabaseContentClient();
 
-  if (client) {
-    try {
-      const { data } = await client
-        .from("coaches")
-        .select(coachColumns)
-        .eq("id", id)
-        .eq("approved", true)
-        .maybeSingle();
-
-      if (data) {
-        return mapCoachRecord(data as unknown as CoachDbRow);
-      }
-    } catch {
-      // fall through to seed fallback
-    }
+  if (!client) {
+    return null;
   }
 
-  return (
-    coachSeedRecords.find((coach) => coach.id === id && coach.approved) ?? null
-  );
+  try {
+    const { data, error } = await client
+      .from("coaches")
+      .select(coachColumns)
+      .eq("id", id)
+      .eq("approved", true)
+      .maybeSingle();
+
+    if (error) {
+      console.error("getApprovedCoachById query failed", error);
+      return null;
+    }
+
+    return data ? mapCoachRecord(data as unknown as CoachDbRow) : null;
+  } catch (error) {
+    console.error("getApprovedCoachById threw", error);
+    return null;
+  }
 }
 
 export async function getCoachByIdForAdmin(id: string) {

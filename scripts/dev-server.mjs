@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawn } from "node:child_process";
 
@@ -8,6 +8,7 @@ const preferredNodePaths = [
   "/opt/homebrew/opt/node@22/bin/node",
   "/usr/local/opt/node@22/bin/node",
 ];
+const devDistDir = resolve(root, ".next.nosync", "dev");
 
 function resolveNodeBin() {
   for (const candidate of preferredNodePaths) {
@@ -20,6 +21,8 @@ function resolveNodeBin() {
 }
 
 const nodeBin = resolveNodeBin();
+
+rmSync(devDistDir, { force: true, recursive: true });
 
 const devServer = spawn(nodeBin, [nextBin, "dev"], {
   cwd: root,

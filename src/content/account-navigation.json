@@ -14,6 +14,7 @@
       "items": [
         { "href": "/admin/global", "label": "Global admin" },
         { "href": "/admin/global/chapters", "label": "Chapters" },
+        { "href": "/admin/global/users", "label": "Users & roles" },
         { "href": "/admin/approvals", "label": "Coach approvals" },
         { "href": "/guide", "label": "Platform guide" },
         { "href": "/account/profile", "label": "Update account details" }

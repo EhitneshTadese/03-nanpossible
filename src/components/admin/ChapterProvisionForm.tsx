@@ -12,6 +12,17 @@ function slugify(value: string) {
     .replace(/-+/g, "-");
 }
 
+function getProvisionNotice(url: string, warning?: string | null) {
+  switch (warning) {
+    case "welcome-email-skipped":
+      return `Chapter created at ${url}. Email delivery is not configured yet.`;
+    case "welcome-email-failed":
+      return `Chapter created at ${url}. Welcome email could not be sent. Check RESEND_API_KEY and sender-domain configuration.`;
+    default:
+      return `Chapter created at ${url}.`;
+  }
+}
+
 export function ChapterProvisionForm() {
   const [name, setName] = useState("");
   const [subdomain, setSubdomain] = useState("");
@@ -67,11 +78,7 @@ export function ChapterProvisionForm() {
             return;
           }
 
-          setNotice(
-            payload.warning
-              ? `Chapter created at ${payload.url}. Email delivery is not configured yet.`
-              : `Chapter created at ${payload.url}.`,
-          );
+          setNotice(getProvisionNotice(payload.url ?? "the new site", payload.warning));
           form.reset();
           setName("");
           setSubdomain("");
