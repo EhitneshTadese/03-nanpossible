@@ -20,6 +20,7 @@ const coachColumns = [
   "name",
   "email",
   "phone",
+  "phone_country_code",
   "photo_url",
   "cert_level",
   "location_city",
@@ -52,6 +53,7 @@ type CoachDbRow = {
   name: string;
   email: string | null;
   phone: string | null;
+  phone_country_code: string | null;
   photo_url: string | null;
   cert_level: CertificationLevel | null;
   location_city: string | null;
@@ -153,7 +155,6 @@ function extractSearchTerms(query: string) {
 
   return [...new Set(terms)];
 }
-
 function mapCoachRecord(row: CoachDbRow): CoachRecord {
   return {
     id: row.id,
@@ -162,6 +163,7 @@ function mapCoachRecord(row: CoachDbRow): CoachRecord {
     name: row.name,
     email: row.email,
     phone: row.phone,
+    phoneCountryCode: row.phone_country_code,
     photoUrl: row.photo_url,
     certLevel: row.cert_level,
     locationCity: row.location_city,

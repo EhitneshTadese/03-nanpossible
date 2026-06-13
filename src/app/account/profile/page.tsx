@@ -2,6 +2,7 @@ import { AccountPageShell } from "@/components/account-page-shell";
 import { requireAccountViewer } from "@/lib/auth";
 import { getRoleLabel } from "@/lib/account";
 import { updateProfileAction } from "./actions";
+import { PhoneInputField } from "@/components/phone-input-field";
 
 type ProfilePageProps = {
   searchParams: Promise<{
@@ -84,15 +85,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 />
               </label>
 
-              <label className="field-shell">
-                <span className="field-label">Phone</span>
-                <input
-                  className="field-input"
-                  defaultValue={viewer.phone ?? ""}
-                  name="phone"
-                  type="tel"
-                />
-              </label>
+             <label className="field-shell">
+             <span className="field-label">Phone</span>
+       <PhoneInputField
+    defaultPhone={viewer.phone}
+    defaultCountryCode={viewer.phoneCountryCode}
+         />
+</label>
 
               <label className="field-shell">
                 <span className="field-label">Location</span>

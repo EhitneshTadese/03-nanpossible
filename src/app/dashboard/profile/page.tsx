@@ -3,6 +3,7 @@ import { AccountPageShell } from "@/components/account-page-shell";
 import { requireAccountViewer } from "@/lib/auth";
 import { getClaimableCoachByEmail, getCoachByUserId, getCoachInitials } from "@/lib/coaches";
 import { saveCoachProfileAction } from "./actions";
+import { PhoneInputField } from "@/components/phone-input-field";
 
 type DashboardProfilePageProps = {
   searchParams: Promise<{
@@ -159,15 +160,14 @@ export default async function DashboardProfilePage({
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="field-shell">
-                <span className="field-label">Phone</span>
-                <input
-                  className="field-input"
-                  defaultValue={activeCoach?.phone ?? ""}
-                  name="phone"
-                  type="tel"
-                />
-              </label>
+            
+    <label className="field-shell">
+     <span className="field-label">Phone</span>
+     <PhoneInputField
+      defaultPhone={activeCoach?.phone}
+      defaultCountryCode={activeCoach?.phoneCountryCode}
+    />
+   </label>
               <label className="field-shell">
                 <span className="field-label">Certification level</span>
                 <div className="field-shell is-readonly">

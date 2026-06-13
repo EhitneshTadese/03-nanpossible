@@ -30,6 +30,7 @@ function mapProfileRow(data: {
   chapter_id: string | null;
   assigned_chapters: string[] | null;
   phone: string | null;
+  phone_country_code: string | null;
   location: string | null;
   bio: string | null;
   photo_url: string | null;
@@ -42,6 +43,7 @@ function mapProfileRow(data: {
     chapterId: data.chapter_id,
     assignedChapters: data.assigned_chapters ?? [],
     phone: data.phone,
+    phoneCountryCode: data.phone_country_code,
     location: data.location,
     bio: data.bio,
     photoUrl: data.photo_url,
@@ -71,7 +73,7 @@ export const getCurrentUser = cache(async () => {
     const { data } = await supabase
       .from("users")
       .select(
-        "id, email, name, role, chapter_id, assigned_chapters, phone, location, bio, photo_url",
+        "id, email, name, role, chapter_id, assigned_chapters, phone,phone_country_code, location, bio, photo_url",
       )
       .eq("id", user.id)
       .maybeSingle();

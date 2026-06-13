@@ -29,6 +29,7 @@ type SearchRow = {
   name: string;
   email: string | null;
   phone: string | null;
+  phone_country_code: string | null;
   photo_url: string | null;
   cert_level: CertificationLevel | null;
   location_city: string | null;
@@ -262,6 +263,7 @@ export async function searchCoachesByName(
         "name",
         "email",
         "phone",
+        "phone_country_code",
         "photo_url",
         "cert_level",
         "location_city",
@@ -320,6 +322,7 @@ export async function searchCoachesByName(
     name: row.name,
     email: row.email,
     phone: row.phone,
+    phoneCountryCode: row.phone_country_code,
     photoUrl: row.photo_url,
     certLevel: row.cert_level,
     locationCity: row.location_city,
@@ -396,6 +399,7 @@ export async function vectorSearchCoaches(options: {
     name: String(row.name),
     email: typeof row.email === "string" ? row.email : null,
     phone: typeof row.phone === "string" ? row.phone : null,
+    phoneCountryCode: typeof row.phone_country_code === "string" ? row.phone_country_code : null,
     photoUrl: typeof row.photo_url === "string" ? row.photo_url : null,
     certLevel: toCertificationLevel(row.cert_level),
     locationCity: typeof row.location_city === "string" ? row.location_city : null,

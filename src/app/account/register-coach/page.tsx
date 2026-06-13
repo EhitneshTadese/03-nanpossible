@@ -4,6 +4,7 @@ import { requireAccountViewer } from "@/lib/auth";
 import { getCoachByUserId } from "@/lib/coaches";
 import { listChapters } from "@/lib/tenant";
 import { registerCoachProfileAction } from "./actions";
+import { PhoneInputField } from "@/components/phone-input-field";
 
 type RegisterCoachPageProps = {
   searchParams: Promise<{
@@ -151,17 +152,13 @@ export default async function RegisterCoachPage({
                 type="email"
               />
             </label>
-
-            <label className="field-shell">
-              <span className="field-label">Phone</span>
-              <input
-                className="field-input"
-                defaultValue={viewer.phone ?? ""}
-                name="phone"
-                placeholder="Optional"
-                type="tel"
-              />
-            </label>
+<label className="field-shell">
+  <span className="field-label">Phone</span>
+  <PhoneInputField
+    defaultPhone={viewer.phone}
+    defaultCountryCode={viewer.phoneCountryCode}
+  />
+</label>
 
             <label className="field-shell">
               <span className="field-label">Profile photo URL</span>

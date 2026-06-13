@@ -42,6 +42,7 @@ export async function saveCoachProfileAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
+  const phoneCountryCode = String(formData.get("phone_country_code") ?? "").trim();
   const locationCity = String(formData.get("locationCity") ?? "").trim();
   const locationCountry = String(formData.get("locationCountry") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
@@ -105,6 +106,7 @@ export async function saveCoachProfileAction(formData: FormData) {
     name,
     email: email || viewer.email,
     phone: phone || null,
+    phone_country_code: phoneCountryCode || null,
     photo_url: photoUrl,
     cert_level: existingCoach?.certLevel ?? claimableCoach?.certLevel ?? null,
     location_city: locationCity || null,

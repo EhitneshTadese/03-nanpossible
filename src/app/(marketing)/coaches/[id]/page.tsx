@@ -10,6 +10,9 @@ import {
   listApprovedCoachIds,
 } from "@/lib/coaches";
 
+import { formatPhoneNumberIntl } from "react-phone-number-input";
+import { parsePhoneNumber } from "libphonenumber-js"
+
 type CoachDetailPageProps = {
   params: Promise<{
     id: string;
@@ -149,7 +152,11 @@ export default async function CoachDetailPage({ params }: CoachDetailPageProps) 
                   {coach.email ? (
                     <a href={`mailto:${coach.email}`}>{coach.email}</a>
                   ) : null}
-                  {coach.phone ? <a href={`tel:${coach.phone}`}>{coach.phone}</a> : null}
+               {coach.phone ? (
+  <a href={`tel:${coach.phone}`}>
+    {parsePhoneNumber(coach.phone)?.formatInternational() ?? coach.phone}
+  </a>
+) : null}
                   {coach.website ? (
                     <a href={coach.website} rel="noreferrer" target="_blank">
                       Website

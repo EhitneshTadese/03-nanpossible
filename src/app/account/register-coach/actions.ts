@@ -86,6 +86,7 @@ export async function registerCoachProfileAction(formData: FormData) {
   }
 
   const phone = readOptionalString(formData, "phone");
+  const phoneCountryCode = readOptionalString(formData, "phone_country_code");
   const photoUrl = readOptionalString(formData, "photoUrl");
   const locationCity = readOptionalString(formData, "locationCity");
   const locationCountry = readOptionalString(formData, "locationCountry");
@@ -119,6 +120,7 @@ export async function registerCoachProfileAction(formData: FormData) {
     name,
     email,
     phone,
+    phone_country_code: phoneCountryCode,
     photo_url: photoUrl,
     cert_level: certLevel,
     location_city: locationCity,
