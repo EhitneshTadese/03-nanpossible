@@ -46,6 +46,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     requireAccountViewer("/account/profile"),
     searchParams,
   ]);
+  (viewer as any).phoneCountryCode =viewer.phoneCountryCode ?? null;
   const notice = getProfileNotice(params.notice);
   const error = getProfileError(params.error);
 
