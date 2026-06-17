@@ -90,7 +90,7 @@ export type UserProfile = {
   chapterId: string | null;
   assignedChapters: string[];
   phone: string | null;
-  phoneCountryCode: string | null;
+  phoneCountryCode?: string | null;
   location: string | null;
   bio: string | null;
   photoUrl: string | null;
