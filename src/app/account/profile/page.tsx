@@ -176,3 +176,4 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     </AccountPageShell>
   );
 }
+
