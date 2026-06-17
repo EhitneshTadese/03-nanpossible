@@ -109,7 +109,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <span className="field-label">Profile photo URL</span>
               <input
                 className="field-input"
-                defaultValue={viewer.as any).photoUrl ?? ""}
+                defaultValue={(viewer as any).photoUrl ?? ""}
                 name="photoUrl"
                 placeholder="https://..."
                 type="url"
@@ -129,12 +129,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="field-shell is-readonly">
                 <span className="field-label">Role</span>
-                <p className="field-static">{getRoleLabel((viewer as any.role)}</p>
+                <p className="field-static">{getRoleLabel((viewer as any).role)}</p>
               </div>
               <div className="field-shell is-readonly">
                 <span className="field-label">Chapter</span>
                 <p className="field-static">
-                  {viewer as any.chapterId ? "Assigned by WIAL admin" : "Global account"}
+                  { (viewer as any).chapterId ? "Assigned by WIAL admin" : "Global account"}
                 </p>
               </div>
             </div>
