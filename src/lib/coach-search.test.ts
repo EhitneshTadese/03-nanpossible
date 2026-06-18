@@ -13,6 +13,7 @@ const baseCoach: CoachRecord = {
   name: "Maria Santos",
   email: "maria@wial.org",
   phone: null,
+  phoneCountryCode: null,
   photoUrl: null,
   certLevel: "SALC",
   locationCity: "Sao Paulo",

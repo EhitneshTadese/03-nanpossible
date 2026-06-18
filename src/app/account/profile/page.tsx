@@ -161,7 +161,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <span>{(viewer as any).name.slice(0, 1).toUpperCase() || "W"}</span>
             </div>
             <h2 className="mt-4 font-display text-3xl leading-none tracking-[-0.04em] text-teal-deep">
-              { (viewer as any).name || "WIAL Member"}
+              { (viewer.name) || "WIAL Member"}
             </h2>
             <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-accent">
               {getRoleLabel(viewer as any.role)}
