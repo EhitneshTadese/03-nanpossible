@@ -46,6 +46,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     requireAccountViewer("/account/profile"),
     searchParams,
   ]);
+  (viewer as any).phoneCountryCode = (viewer as any).phoneCountryCode ?? null;
   const notice = getProfileNotice(params.notice);
   const error = getProfileError(params.error);
 
@@ -89,7 +90,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
              <span className="field-label">Phone</span>
        <PhoneInputField
     defaultPhone={viewer.phone}
-    defaultCountryCode={viewer.phoneCountryCode}
+    defaultCountryCode={(viewer as any).phoneCountryCode}
          />
 </label>
 
@@ -97,7 +98,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 <span className="field-label">Location</span>
                 <input
                   className="field-input"
-                  defaultValue={viewer.location ?? ""}
+                  defaultValue={(viewer as any).location ?? ""}
                   name="location"
                   type="text"
                 />
@@ -108,7 +109,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <span className="field-label">Profile photo URL</span>
               <input
                 className="field-input"
-                defaultValue={viewer.photoUrl ?? ""}
+                defaultValue={(viewer as any).photoUrl ?? ""}
                 name="photoUrl"
                 placeholder="https://..."
                 type="url"
@@ -119,7 +120,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               <span className="field-label">Bio</span>
               <textarea
                 className="field-textarea"
-                defaultValue={viewer.bio ?? ""}
+                defaultValue={(viewer as any).bio ?? ""}
                 name="bio"
                 rows={6}
               />
@@ -128,12 +129,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="field-shell is-readonly">
                 <span className="field-label">Role</span>
-                <p className="field-static">{getRoleLabel(viewer.role)}</p>
+                <p className="field-static">{getRoleLabel((viewer as any).role)}</p>
               </div>
               <div className="field-shell is-readonly">
                 <span className="field-label">Chapter</span>
                 <p className="field-static">
-                  {viewer.chapterId ? "Assigned by WIAL admin" : "Global account"}
+                  { (viewer as any).chapterId ? "Assigned by WIAL admin" : "Global account"}
                 </p>
               </div>
             </div>
@@ -157,13 +158,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           </p>
           <div className="mt-5 rounded-[1.65rem] border border-line bg-white/60 p-5">
             <div className="account-avatar">
-              <span>{viewer.name.slice(0, 1).toUpperCase() || "W"}</span>
+              <span>{(viewer as any).name.slice(0, 1).toUpperCase() || "W"}</span>
             </div>
             <h2 className="mt-4 font-display text-3xl leading-none tracking-[-0.04em] text-teal-deep">
-              {viewer.name || "WIAL Member"}
+              { (viewer as any).name || "WIAL Member"}
             </h2>
             <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-              {getRoleLabel(viewer.role)}
+              {getRoleLabel(viewer as any.role)}
             </p>
             <p className="mt-4 text-sm leading-7 text-foreground/72">
               Keep your core contact details current so future certification,
@@ -175,3 +176,4 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     </AccountPageShell>
   );
 }
+

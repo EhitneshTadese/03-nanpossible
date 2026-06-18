@@ -62,7 +62,7 @@ export default async function RegisterCoachPage({
     searchParams,
   ]);
 
-  const existingCoach = await getCoachByUserId(viewer.id);
+  const existingCoach = await getCoachByUserId(viewer as any).id);
   const chapters = await listChapters();
 
   const error = getErrorMessage(params.error);
@@ -135,7 +135,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Display name</span>
               <input
                 className="field-input"
-                defaultValue={viewer.name}
+                defaultValue={(viewer as any).name}
                 name="name"
                 required
                 type="text"
@@ -146,7 +146,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Contact email</span>
               <input
                 className="field-input"
-                defaultValue={viewer.email}
+                defaultValue={(viewer as any).email}
                 name="email"
                 required
                 type="email"
@@ -155,8 +155,8 @@ export default async function RegisterCoachPage({
 <label className="field-shell">
   <span className="field-label">Phone</span>
   <PhoneInputField
-    defaultPhone={viewer.phone}
-    defaultCountryCode={viewer.phoneCountryCode}
+    defaultPhone={(viewer as any).phone}
+    defaultCountryCode={(viewer as any).phoneCountryCode}
   />
 </label>
 
@@ -164,7 +164,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Profile photo URL</span>
               <input
                 className="field-input"
-                defaultValue={viewer.photoUrl ?? ""}
+                defaultValue={(viewer as any).photoUrl ?? ""}
                 name="photoUrl"
                 placeholder="https://..."
                 type="url"
@@ -186,7 +186,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">WIAL chapter</span>
               <select
                 className="field-input"
-                defaultValue={viewer.chapterId ?? ""}
+                defaultValue={(viewer as any).chapterId ?? ""}
                 name="chapterId"
                 required
               >
@@ -273,7 +273,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Professional bio</span>
               <textarea
                 className="field-textarea"
-                defaultValue={viewer.bio ?? ""}
+                defaultValue={(viewer as any).bio ?? ""}
                 minLength={40}
                 name="bio"
                 placeholder="Share your coaching philosophy, signature engagements, and credentials. 80–300 words works well."
