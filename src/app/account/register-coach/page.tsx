@@ -62,7 +62,7 @@ export default async function RegisterCoachPage({
     searchParams,
   ]);
 
-  const existingCoach = await getCoachByUserId(viewer as any).id);
+  const existingCoach = await getCoachByUserId(viewer.id);
   const chapters = await listChapters();
 
   const error = getErrorMessage(params.error);
