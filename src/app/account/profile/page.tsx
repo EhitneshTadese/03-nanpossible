@@ -164,7 +164,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
               { (viewer.name) || "WIAL Member"}
             </h2>
             <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-accent">
-              {getRoleLabel(viewer as any.role)}
+              {getRoleLabel(viewer.role)}
             </p>
             <p className="mt-4 text-sm leading-7 text-foreground/72">
               Keep your core contact details current so future certification,
