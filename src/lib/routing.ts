@@ -1,8 +1,8 @@
 import type { CanonicalPageSlug, NavigationItem } from "@/lib/types";
 
 export const navigationItems: NavigationItem[] = [
-  { href: "/coaches", label: "Find a Coach" },
   { href: "/about", label: "About WIAL" },
+  { href: "/coaches", label: "Find a Coach" },  
   { href: "/certification", label: "Certification" },
   { href: "/clients", label: "Our Clients" },
   { href: "/contact", label: "Contact" },
