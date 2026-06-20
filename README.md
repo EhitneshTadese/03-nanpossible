@@ -56,8 +56,9 @@ Our solution: a multi-tenant, AI-enhanced platform that unifies WIAL's operation
 ## Getting Started
 
 ### Requirements
-- Node.js >= 20.9 (< 23)
-- Supabase account (or local setup)
+- Node.js 22.x (recommended; see `.nvmrc`)
+- Docker Desktop (required for local Supabase)
+- Supabase CLI (via `npx supabase` or global install)
 
 ### Installation
 
@@ -76,39 +77,106 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_DOMAIN=localhost:3000
 
 # Required: Supabase
-NEXT_PUBLIC_SUPABASE_URL=<supabase-url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key-from-supabase-status>
+SUPABASE_SERVICE_ROLE_KEY=<local-service-role-key-from-supabase-status>
 
-# Required: LLM & Search
-OPENROUTER_API_KEY=<openrouter-api-key>
-
-
-## Optional Services:
-
-# AI Vector Search (coach directory)
-COHERE_API_KEY=<cohere-api-key>
-
-# Payments
-STRIPE_SECRET_KEY=<stripe-secret-key>
-
-# Audio Narration
-ELEVENLABS_API_KEY=<elevenlabs-api-key>
-
-# Email Notifications
-RESEND_API_KEY=<resend-api-key>
+# Optional integrations (leave blank to disable)
+OPENROUTER_API_KEY=
+COHERE_API_KEY=
+STRIPE_SECRET_KEY=
+ELEVENLABS_API_KEY=
+RESEND_API_KEY=
 
 # Optional: WIAL LMS (defaults to https://wialportal.org/)
 NEXT_PUBLIC_WIAL_LMS_URL=https://wialportal.org/
 ```
 
+### Local Supabase Setup
+
+Start Docker Desktop first, then run:
+
+```bash
+npx supabase start
+```
+
+If `npx` prompts to install the CLI package, accept with `y`.
+
+Get local keys and URLs for `.env.local`:
+
+```bash
+npx supabase status -o env
+```
+
+Useful local services:
+
+- API: `http://127.0.0.1:54321`
+- Studio: `http://127.0.0.1:54323`
+- Mailpit: `http://127.0.0.1:54324`
+
+To stop local Supabase:
+
+```bash
+npx supabase stop
+```
+
+### First Sign-In and Admin Access
+
+New accounts default to `public_visitor`. To access chapter/global admin features locally, promote your user:
+
+```sql
+update public.users
+set role = 'platform_admin'::app_role
+where email = 'you@example.com';
+
+select public.sync_auth_user_role(id, 'platform_admin'::app_role, chapter_id)
+from public.users
+where email = 'you@example.com';
+```
+
+Then sign out and sign back in (or clear localhost cookies) to refresh JWT role claims.
+
 ### Running Locally
+
+After Supabase is running and `.env.local` is configured:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser. If 3000 is occupied, Next.js will automatically use 3001.
+
+Guide page:
+
+- `http://localhost:3000/guide` (or `http://localhost:3001/guide` if port fallback occurs)
+
+### Troubleshooting Local Setup
+
+- `Cannot connect to Docker daemon`: Docker Desktop is not running.
+- `supabase_db_* container is not ready`: wait 10-30 seconds and rerun `npx supabase status -o env`.
+- Stuck on `public_visitor` after promotion: run `sync_auth_user_role(...)`, then sign out/in.
+- Local app hangs on auth requests: verify Supabase is running and `NEXT_PUBLIC_SUPABASE_URL` points to `http://127.0.0.1:54321`.
+
+### Optional Cloud/Hosted Environment Variables
+
+If you are not using local Supabase, replace these with hosted values:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=<supabase-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
+```
+
+Optional integrations for hosted/local use:
+
+```bash
+OPENROUTER_API_KEY=<openrouter-api-key>
+COHERE_API_KEY=<cohere-api-key>
+STRIPE_SECRET_KEY=<stripe-secret-key>
+ELEVENLABS_API_KEY=<elevenlabs-api-key>
+RESEND_API_KEY=<resend-api-key>
+NEXT_PUBLIC_WIAL_LMS_URL=https://wialportal.org/
+```
 
 ### Available Scripts
 
