@@ -218,7 +218,7 @@ export function ContentPage({ page, siteContext }: ContentPageProps) {
                 {siteContext.isGlobal ? "Global WIAL" : `${siteContext.tenant?.name} chapter`}
               </span>
               <div className="space-y-4">
-                <h1 className="max-w-4xl font-display text-4xl leading-none tracking-[-0.05em] text-teal-deep md:text-7xl">
+                <h1 className="max-w-4xl font-display text-3xl leading-none tracking-[-0.05em] text-teal-deep md:text-5xl">
                   {page.title}
                 </h1>
                 {body.heroIntro ? (

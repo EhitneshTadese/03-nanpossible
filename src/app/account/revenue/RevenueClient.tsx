@@ -89,31 +89,28 @@ export function RevenueClient() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="site-panel rounded-[2rem] p-6">
-          <p className="text-sm font-semibold text-foreground/60 uppercase">Total Revenue</p>
-          <p className="text-4xl font-bold text-teal-deep mt-3">${totalRevenue.toFixed(2)}</p>
-        </div>
-        <div className="site-panel rounded-[2rem] p-6">
-          <p className="text-sm font-semibold text-foreground/60 uppercase">Total Payments</p>
-          <p className="text-4xl font-bold text-teal-deep mt-3">{payments.length}</p>
-        </div>
-        <div className="site-panel rounded-[2rem] p-6">
-          <p className="text-sm font-semibold text-foreground/60 uppercase">Chapters</p>
-          <p className="text-4xl font-bold text-teal-deep mt-3">{uniqueChapters}</p>
-        </div>
-        <div className="site-panel rounded-[2rem] p-6">
-          <p className="text-sm font-semibold text-foreground/60 uppercase">This Month</p>
-          <p className="text-4xl font-bold text-teal-deep mt-3">${thisMonthRevenue.toFixed(2)}</p>
-        </div>
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+  {[
+    { label: "Total Revenue", value: `$${totalRevenue.toFixed(2)}` },
+    { label: "Total Payments", value: String(payments.length) },
+    { label: "Chapters", value: String(uniqueChapters) },
+    { label: "This Month", value: `$${thisMonthRevenue.toFixed(2)}` },
+  ].map(({ label, value }) => (
+    <div key={label} className="site-panel rounded-[1.5rem] p-4 flex items-center gap-4">
+      <div>
+        <p className="text-xs font-semibold text-foreground/55 uppercase tracking-[0.14em]">{label}</p>
+        <p className="text-2xl font-bold text-teal-deep mt-1">{value}</p>
       </div>
+    </div>
+  ))}
+</div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
         <div className="site-panel rounded-[2rem] p-6">
           <h3 className="text-lg font-semibold mb-4">Revenue by Date</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={paymentsByDate}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
