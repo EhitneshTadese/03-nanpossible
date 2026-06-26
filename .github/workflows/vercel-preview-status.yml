@@ -1,0 +1,105 @@
+name: Vercel Preview Status → PR
+
+# Reacts to the deployment statuses that Vercel's GitHub integration reports.
+# We do NOT deploy here — Vercel already auto-deploys previews. This workflow
+# just posts a single, self-updating comment on the PR: the preview URL when a
+# deploy succeeds, or a failure notice when it fails.
+#
+# NOTE: deployment_status workflows only run from the version of this file on
+# the DEFAULT branch (main). It will not run from a PR branch until merged.
+on:
+  deployment_status:
+
+# Least privilege: read repo to map commit→PR, write to post the PR comment.
+permissions:
+  contents: read
+  pull-requests: write
+
+# Serialize updates per branch so concurrent status events don't double-post
+# the sticky comment. Don't cancel — we want the final terminal state to land.
+concurrency:
+  group: vercel-status-${{ github.event.deployment.ref }}
+  cancel-in-progress: false
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post deployment result to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ds = context.payload.deployment_status || {};
+            const deployment = context.payload.deployment || {};
+            const state = ds.state;
+
+            // Only act on terminal states. Vercel also fires queued/in_progress.
+            if (!['success', 'failure', 'error'].includes(state)) {
+              core.info(`Ignoring non-terminal state: ${state}`);
+              return;
+            }
+
+            // Keep PR comments to preview deploys. Production deploys (post-merge)
+            // have no open PR anyway, but skip them explicitly to avoid noise.
+            const env = ds.environment || deployment.environment || '';
+            if (/production/i.test(env)) {
+              core.info(`Skipping production environment: ${env}`);
+              return;
+            }
+
+            const sha = deployment.sha;
+            if (!sha) { core.info('No deployment SHA; skipping.'); return; }
+
+            // Map the deployed commit back to its open PR(s).
+            const { data: prs } =
+              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+              });
+            const openPrs = prs.filter(p => p.state === 'open');
+            if (openPrs.length === 0) {
+              core.info(`No open PR for ${sha.slice(0, 7)}; skipping.`);
+              return;
+            }
+
+            const url = ds.environment_url || ds.target_url || '';
+            const failed = state === 'failure' || state === 'error';
+            const short = sha.slice(0, 7);
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Hidden marker → one sticky comment per PR, updated in place.
+            const MARKER = '<!-- vercel-preview-status -->';
+            const body = failed
+              ? `${MARKER}\n❌ **Vercel preview deployment failed** (\`${state}\`)\n\n` +
+                `Commit \`${short}\`. Open the **Details** link on the failed Vercel ` +
+                `check above, or the [Vercel dashboard](https://vercel.com/dashboard), ` +
+                `for full build logs.` +
+                (url ? `\n\nLast attempted URL: ${url}` : '')
+              : `${MARKER}\n✅ **Vercel preview deployment ready**\n\n` +
+                `🔗 Preview: ${url}\n\nCommit \`${short}\`.`;
+
+            for (const pr of openPrs) {
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                per_page: 100,
+              });
+              const existing = comments.find(c => c.body && c.body.includes(MARKER));
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body,
+                });
+              }
+            }
