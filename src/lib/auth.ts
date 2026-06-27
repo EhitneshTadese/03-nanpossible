@@ -108,6 +108,7 @@ export const getCurrentUser = cache(async () => {
             .filter((value): value is string => typeof value === "string")
         : [],
       phone: null,
+      phoneCountryCode: null,
       location: null,
       bio: null,
       photoUrl: null,
