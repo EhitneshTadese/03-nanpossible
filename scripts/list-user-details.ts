@@ -79,8 +79,9 @@ async function main() {
     
     console.log(`Total Users: ${users.length}`);
 
-  } catch (err: any) {
-    console.error("\nAn error occurred:", err.message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("\nAn error occurred:", message);
   }
 }
 
