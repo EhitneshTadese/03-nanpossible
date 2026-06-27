@@ -22,6 +22,19 @@ function getProfileNotice(notice?: string) {
   }
 }
 
+export default async function ProfilePage({ searchParams }: ProfilePageProps) {
+  const [viewer, params] = await Promise.all([
+    requireAccountViewer("/account/profile"),
+    searchParams,
+  ]);
+  
+const safeViewer = {
+  ...viewer,
+  phoneCountryCode: viewer.phoneCountryCode ?? null,
+  location: viewer.location ?? "",
+  photoUrl: viewer.photoUrl ?? "",
+  bio: viewer.bio ?? "",
+};
 function getProfileError(error?: string) {
   switch (error) {
     case "name-required":
@@ -41,125 +54,119 @@ function getProfileError(error?: string) {
   }
 }
 
-export default async function ProfilePage({ searchParams }: ProfilePageProps) {
-  const [viewer, params] = await Promise.all([
-    requireAccountViewer("/account/profile"),
-    searchParams,
-  ]);
-  (viewer as any).phoneCountryCode = (viewer as any).phoneCountryCode ?? null;
+
   const notice = getProfileNotice(params.notice);
-  const error = getProfileError(params.error);
+const error = getProfileError(params.error);
 
-  return (
-    <AccountPageShell
-      badge="Live profile editor"
-      description="Manage the self-service profile fields that travel with your WIAL account while keeping role and chapter membership read-only."
-      eyebrow="Account settings"
-      title="Update account details"
-    >
-      {notice ? <div className="account-flash is-success">{notice}</div> : null}
-      {error ? <div className="account-flash is-error">{error}</div> : null}
+return (
+  <AccountPageShell
+    badge="Live profile editor"
+    description="Manage the self-service profile fields that travel with your WIAL account while keeping role and chapter membership read-only."
+    eyebrow="Account settings"
+    title="Update account details"
+  >
+    {notice ? <div className="account-flash is-success">{notice}</div> : null}
+    {error ? <div className="account-flash is-error">{error}</div> : null}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_320px]">
-        <section className="site-panel rounded-[2rem] p-6 md:p-8">
-          <form action={updateProfileAction} className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="field-shell">
-                <span className="field-label">Display name</span>
-                <input
-                  className="field-input"
-                  defaultValue={viewer.name}
-                  name="name"
-                  required
-                  type="text"
-                />
-              </label>
-
-              <label className="field-shell">
-                <span className="field-label">Email</span>
-                <input
-                  className="field-input"
-                  defaultValue={viewer.email}
-                  name="email"
-                  required
-                  type="email"
-                />
-              </label>
-
-             <label className="field-shell">
-             <span className="field-label">Phone</span>
-       <PhoneInputField
-    defaultPhone={viewer.phone}
-    defaultCountryCode={(viewer as any).phoneCountryCode}
-         />
-</label>
-
-              <label className="field-shell">
-                <span className="field-label">Location</span>
-                <input
-                  className="field-input"
-                  defaultValue={(viewer as any).location ?? ""}
-                  name="location"
-                  type="text"
-                />
-              </label>
-            </div>
-
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_320px]">
+      <section className="site-panel rounded-[2rem] p-6 md:p-8">
+        <form action={updateProfileAction} className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="field-shell">
-              <span className="field-label">Profile photo URL</span>
+              <span className="field-label">Display name</span>
               <input
                 className="field-input"
-                defaultValue={(viewer as any).photoUrl ?? ""}
-                name="photoUrl"
-                placeholder="https://..."
-                type="url"
+                defaultValue={safeViewer.name}
+                name="name"
+                required
+                type="text"
               />
             </label>
 
             <label className="field-shell">
-              <span className="field-label">Bio</span>
-              <textarea
-                className="field-textarea"
-                defaultValue={(viewer as any).bio ?? ""}
-                name="bio"
-                rows={6}
+              <span className="field-label">Email</span>
+              <input
+                className="field-input"
+                defaultValue={safeViewer.email}
+                name="email"
+                required
+                type="email"
               />
             </label>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="field-shell is-readonly">
-                <span className="field-label">Role</span>
-                <p className="field-static">{getRoleLabel((viewer as any).role)}</p>
-              </div>
-              <div className="field-shell is-readonly">
-                <span className="field-label">Chapter</span>
-                <p className="field-static">
-                  { (viewer as any).chapterId ? "Assigned by WIAL admin" : "Global account"}
-                </p>
-              </div>
+            <label className="field-shell">
+              <span className="field-label">Phone</span>
+              <PhoneInputField
+                defaultPhone={safeViewer.phone}
+                defaultCountryCode={safeViewer.phoneCountryCode}
+              />
+            </label>
+
+            <label className="field-shell">
+              <span className="field-label">Location</span>
+              <input
+                className="field-input"
+                defaultValue={safeViewer.location}
+                name="location"
+                type="text"
+              />
+            </label>
+          </div>
+
+          <label className="field-shell">
+            <span className="field-label">Profile photo URL</span>
+            <input
+              className="field-input"
+              defaultValue={safeViewer.photoUrl}
+              name="photoUrl"
+              placeholder="https://..."
+              type="url"
+            />
+          </label>
+
+          <label className="field-shell">
+            <span className="field-label">Bio</span>
+            <textarea
+              className="field-textarea"
+              defaultValue={safeViewer.bio}
+              name="bio"
+              rows={6}
+            />
+          </label>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="field-shell is-readonly">
+              <span className="field-label">Role</span>
+              <p className="field-static">{getRoleLabel(safeViewer.role)}</p>
             </div>
 
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <button className="button-link primary" type="submit">
-                Save account details
-              </button>
-              <p className="text-sm leading-6 text-foreground/60">
-                Email changes go through Supabase confirmation. Role upgrades
-                happen through the dedicated workspace routes, while chapter
-                assignment itself remains admin-managed.
+            <div className="field-shell is-readonly">
+              <span className="field-label">Chapter</span>
+              <p className="field-static">
+                {safeViewer.chapterId ? "Assigned by WIAL admin" : "Global account"}
               </p>
             </div>
-          </form>
-        </section>
+          </div>
 
-        <aside className="site-panel rounded-[2rem] p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">
-            Profile summary
-          </p>
-          <div className="mt-5 rounded-[1.65rem] border border-line bg-white/60 p-5">
-            <div className="account-avatar">
-              <span>{(viewer as any).name.slice(0, 1).toUpperCase() || "W"}</span>
-            </div>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <button className="button-link primary" type="submit">
+              Save account details
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <aside className="site-panel rounded-[2rem] p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">
+          Profile summary
+        </p>
+
+        <div className="mt-5 rounded-[1.65rem] border border-line bg-white/60 p-5">
+          <div className="account-avatar">
+            <span>
+              {safeViewer.name?.slice(0, 1).toUpperCase() || "W"}
+            </span>
+          </div>
             <h2 className="mt-4 font-display text-3xl leading-none tracking-[-0.04em] text-teal-deep">
               { (viewer.name) || "WIAL Member"}
             </h2>

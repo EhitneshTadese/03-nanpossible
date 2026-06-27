@@ -9,10 +9,6 @@ import type { NavigationItem, UserProfile } from "@/lib/types";
 type MobileNavProps = {
   items: NavigationItem[];
   chapterLabel?: string | null;
-  accountLink: {
-    href: string;
-    label: string;
-  };
   viewer: UserProfile | null;
 };
 
@@ -52,7 +48,6 @@ function DrawerLink({
 export function MobileNav({
   items,
   chapterLabel,
-  accountLink,
   viewer,
 }: MobileNavProps) {
   const [open, setOpen] = useState(false);
@@ -72,136 +67,150 @@ export function MobileNav({
     };
   }, [canPortal, open]);
 
-  const drawer = open && canPortal
-    ? createPortal(
-        <div
-          className="account-sidebar-drawer"
-          onClick={() => setOpen(false)}
-          role="presentation"
-        >
+  const closeDrawer = () => setOpen(false);
+
+  const drawer =
+    open && canPortal
+      ? createPortal(
           <div
-            className="account-sidebar-panel account-sidebar-drawer-panel"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site navigation"
+            className="account-sidebar-drawer"
+            onClick={closeDrawer}
+            role="presentation"
           >
-            <div className="account-sidebar-inner">
-              <div className="account-sidebar-header">
-                <div className="account-sidebar-brand">
-                  <div className="account-sidebar-mark" aria-hidden="true">
-                    W
+            <div
+              className="account-sidebar-panel account-sidebar-drawer-panel"
+              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site navigation"
+            >
+              <div className="account-sidebar-inner">
+                <div className="account-sidebar-header">
+                  <div className="account-sidebar-brand">
+                    <div className="account-sidebar-mark" aria-hidden="true">
+                      W
+                    </div>
+                    <div className="min-w-0">
+                      <p className="account-sidebar-overline">Navigation</p>
+                      <h2 className="account-sidebar-title truncate">
+                        {chapterLabel ?? "Global WIAL"}
+                      </h2>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="account-sidebar-overline">Navigation</p>
-                    <h2 className="account-sidebar-title truncate">
-                      {chapterLabel ?? "Global WIAL"}
-                    </h2>
-                  </div>
+
+                  <button
+                    aria-label="Close navigation"
+                    className="account-sidebar-close"
+                    onClick={closeDrawer}
+                    type="button"
+                  >
+                    <CloseIcon />
+                  </button>
                 </div>
-                <button
-                  aria-label="Close navigation"
-                  className="account-sidebar-close"
-                  onClick={() => setOpen(false)}
-                  type="button"
-                >
-                  <CloseIcon />
-                </button>
-              </div>
 
-              <div className="account-sidebar-pill">
-                {viewer ? getRoleLabel(viewer.role) : "Public visitor"}
-              </div>
+                <div className="account-sidebar-pill">
+                  {viewer ? getRoleLabel(viewer.role) : "Public visitor"}
+                </div>
 
-              <div className="account-sidebar-nav">
-                <section className="account-sidebar-section">
-                  <p className="account-sidebar-section-title">Explore</p>
-                  <nav className="flex flex-col gap-1.5">
-                    <DrawerLink href="/" label="Home" onClick={() => setOpen(false)} />
-                    {items.map((item) => (
-                      <DrawerLink
-                        href={item.href}
-                        key={item.href}
-                        label={item.label}
-                        onClick={() => setOpen(false)}
-                      />
-                    ))}
-                  </nav>
-                </section>
-
-                <div className="account-sidebar-divider" />
-
-                {viewer ? (
+                <div className="account-sidebar-nav">
                   <section className="account-sidebar-section">
-                    <p className="account-sidebar-section-title">Workspace</p>
+                    <p className="account-sidebar-section-title">Explore</p>
+
                     <nav className="flex flex-col gap-1.5">
-                      {workspaceItems.map((item) => (
+                      <DrawerLink
+                        href="/"
+                        label="Home"
+                        onClick={closeDrawer}
+                      />
+
+                      {items.map((item) => (
                         <DrawerLink
-                          href={item.href}
                           key={item.href}
+                          href={item.href}
                           label={item.label}
-                          onClick={() => setOpen(false)}
+                          onClick={closeDrawer}
                         />
                       ))}
                     </nav>
                   </section>
-                ) : (
-                  <section className="account-sidebar-section">
-                    <p className="account-sidebar-section-title">Access</p>
-                    <div className="grid gap-3">
-                      <Link
-                        className="account-sidebar-signout"
-                        href="/login"
-                        onClick={() => setOpen(false)}
-                      >
-                        Sign in
-                      </Link>
-                      <Link
-                        className="account-sidebar-signout"
-                        href="/register"
-                        onClick={() => setOpen(false)}
-                      >
-                        Register
-                      </Link>
-                    </div>
-                  </section>
-                )}
-              </div>
 
-              <div className="account-sidebar-footer">
-                {viewer ? (
-                  <>
-                    <Link
-                      className="account-sidebar-signout"
-                      href={accountLink.href}
-                      onClick={() => setOpen(false)}
-                    >
-                      {accountLink.label}
-                    </Link>
+                  <div className="account-sidebar-divider" />
+
+                  {viewer ? (
+                    <section className="account-sidebar-section">
+                      <p className="account-sidebar-section-title">
+                        Workspace
+                      </p>
+
+                      <nav className="flex flex-col gap-1.5">
+                        {workspaceItems.map((item) => (
+                          <DrawerLink
+                            key={item.href}
+                            href={item.href}
+                            label={item.label}
+                            onClick={closeDrawer}
+                          />
+                        ))}
+                      </nav>
+                    </section>
+                  ) : (
+                    <section className="account-sidebar-section">
+                      <p className="account-sidebar-section-title">
+                        Access
+                      </p>
+
+                      <div className="grid gap-3">
+                        <Link
+                          className="account-sidebar-signout"
+                          href="/login"
+                          onClick={closeDrawer}
+                        >
+                          Sign in
+                        </Link>
+
+                        <Link
+                          className="account-sidebar-signout"
+                          href="/register"
+                          onClick={closeDrawer}
+                        >
+                          Register
+                        </Link>
+                      </div>
+                    </section>
+                  )}
+                </div>
+
+                <div className="account-sidebar-footer">
+                  {viewer ? (
                     <form action="/auth/sign-out" method="post">
-                      <button className="account-sidebar-signout" type="submit">
-                        Sign out
+                      <button
+                        className="account-sidebar-signout w-full"
+                        type="submit"
+                      >
+                        Logout
                       </button>
                     </form>
-                  </>
-                ) : (
-                  <div className="account-sidebar-note">
-                    <p className="account-sidebar-note-label">Public signup</p>
-                    <p className="account-sidebar-note-body">
-                      Registration creates a public visitor account. After
-                      sign-in, public visitors can register as coaches and
-                      coaches assigned to a chapter can register as chapter
-                      heads.
-                    </p>
-                  </div>
-                )}
+                  ) : (
+                    <div className="account-sidebar-note">
+                      <p className="account-sidebar-note-label">
+                        Public signup
+                      </p>
+
+                      <p className="account-sidebar-note-body">
+                        Registration creates a public visitor account. After
+                        sign-in, public visitors can register as coaches and
+                        coaches assigned to a chapter can register as chapter
+                        heads.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body,
-      )
-    : null;
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
     <div>

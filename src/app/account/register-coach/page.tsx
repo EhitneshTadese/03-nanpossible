@@ -135,7 +135,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Display name</span>
               <input
                 className="field-input"
-                defaultValue={(viewer as any).name}
+                defaultValue={(viewer.name)}
                 name="name"
                 required
                 type="text"
@@ -146,7 +146,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Contact email</span>
               <input
                 className="field-input"
-                defaultValue={(viewer as any).email}
+                defaultValue={(viewer.email)}
                 name="email"
                 required
                 type="email"
@@ -155,8 +155,8 @@ export default async function RegisterCoachPage({
 <label className="field-shell">
   <span className="field-label">Phone</span>
   <PhoneInputField
-    defaultPhone={(viewer as any).phone}
-    defaultCountryCode={(viewer as any).phoneCountryCode}
+    defaultPhone={(viewer.phone)}
+    defaultCountryCode={(viewer.phoneCountryCode)}
   />
 </label>
 
@@ -164,7 +164,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Profile photo URL</span>
               <input
                 className="field-input"
-                defaultValue={(viewer as any).photoUrl ?? ""}
+                defaultValue={(viewer.photoUrl) ?? ""}
                 name="photoUrl"
                 placeholder="https://..."
                 type="url"
@@ -186,7 +186,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">WIAL chapter</span>
               <select
                 className="field-input"
-                defaultValue={(viewer as any).chapterId ?? ""}
+                defaultValue={(viewer.chapterId) ?? ""}
                 name="chapterId"
                 required
               >
@@ -273,7 +273,7 @@ export default async function RegisterCoachPage({
               <span className="field-label">Professional bio</span>
               <textarea
                 className="field-textarea"
-                defaultValue={(viewer as any).bio ?? ""}
+                defaultValue={(viewer.bio) ?? ""}
                 minLength={40}
                 name="bio"
                 placeholder="Share your coaching philosophy, signature engagements, and credentials. 80–300 words works well."
