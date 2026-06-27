@@ -99,8 +99,9 @@ async function main() {
 
     console.log(`\nSuccessfully switched ${selectedUser.email} to role: ${nextRole}`);
 
-  } catch (err: any) {
-    console.error("\nAn error occurred:", err.message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("\nAn error occurred:", message);
   } finally {
     rl.close();
   }

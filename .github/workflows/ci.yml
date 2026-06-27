@@ -22,8 +22,17 @@ jobs:
 
       - run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Typecheck
         run: npm run typecheck
 
       - name: Tests
         run: npm test
+
+      # Same build Vercel runs (next build). Succeeds without secrets:
+      # the Supabase clients return null when env is missing and the app
+      # falls back to JSON fixtures in src/content/.
+      - name: Build
+        run: npm run build
