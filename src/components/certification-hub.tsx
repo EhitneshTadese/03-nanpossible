@@ -156,7 +156,7 @@ function CertificationHubSections({
             <div className="space-y-5">
               <span className="eyebrow">{content.hero.eyebrow}</span>
               <div className="space-y-4">
-                <h1 className="max-w-5xl font-display text-[clamp(3.2rem,7vw,6.2rem)] leading-[0.94] tracking-[-0.07em] text-teal-deep">
+                <h1 className="max-w-5xl font-display text-[clamp(2rem,2vw,2.5rem)] leading-[0.94] tracking-[-0.07em] text-teal-deep">
                   {content.hero.title}
                 </h1>
                 <p className="max-w-4xl text-lg leading-8 text-foreground/78">
