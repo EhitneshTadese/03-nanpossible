@@ -368,12 +368,6 @@ function SidebarContent({
           <p className="account-sidebar-note-label">Access model</p>
           <p className="account-sidebar-note-body">{note}</p>
         </div>
-
-        <form action="/auth/sign-out" method="post">
-          <button className="account-sidebar-signout" type="submit">
-            Sign out
-          </button>
-        </form>
       </div>
     </div>
   );
